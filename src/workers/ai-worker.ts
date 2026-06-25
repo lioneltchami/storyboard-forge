@@ -173,7 +173,7 @@ async function handleGenerateScreenplay(command: GenerateScreenplayCommand): Pro
     
     // Only require API key if not in mock mode
     if (!apiKey && !mockMode) {
-      throw new Error('未配置 API Key，请在设置中添加或启用 Mock 模式');
+      throw new Error('No API key is configured. Add one in Settings or enable Mock mode.');
     }
     
     // Call the backend API with correct schema
@@ -234,7 +234,7 @@ async function generateImage(
   const provider = (config as any).imageProvider || 'memefast';
   
   if (!apiKey) {
-    throw new Error('未配置图片生成 API Key');
+    throw new Error('No image generation API key is configured.');
   }
   
   // Submit image generation task
@@ -290,7 +290,7 @@ async function generateVideo(
   const provider = (config as any).videoProvider || 'memefast';
   
   if (!apiKey) {
-    throw new Error('未配置视频生成 API Key');
+    throw new Error('No video generation API key is configured.');
   }
   
   // Submit video generation task
@@ -685,12 +685,12 @@ async function handleExecuteScreenplayImages(command: { type: string; payload: {
         completedCount: 0,
         failedCount: screenplay.scenes.length,
         totalCount: screenplay.scenes.length,
-        error: '未配置图片生成 API Key，请在服务映射中配置',
+        error: 'No image generation API key is configured. Set it up in Service Mapping.',
       },
     });
     // Also report failure for each scene
     for (const scene of screenplay.scenes) {
-      reportSceneFailed(screenplay.id, scene.sceneId, '未配置图片生成 API Key', false);
+      reportSceneFailed(screenplay.id, scene.sceneId, 'No image generation API key is configured.', false);
     }
     return;
   }
