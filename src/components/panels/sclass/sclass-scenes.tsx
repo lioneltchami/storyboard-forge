@@ -601,7 +601,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const runninghubBaseUrl = runninghubProvider?.baseUrl?.trim();
     const runninghubAppId = runninghubProvider?.model?.[0];
     if (!runninghubKey || !runninghubBaseUrl || !runninghubAppId) {
-      toast.error("请先在设置中配置 RunningHub（API Key / Base URL / 模型AppId）");
+      toast.error("Please configure RunningHub in Settings (API key / base URL / model App ID).");
       setAngleSwitchOpen(false);
       return;
     }
@@ -613,7 +613,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       ? (scene.imageDataUrl || scene.imageHttpUrl) 
       : (scene.endFrameImageUrl || scene.endFrameHttpUrl);
     if (!originalImage) {
-      toast.error("找不到原图");
+      toast.error("Original image not found");
       return;
     }
 
@@ -659,9 +659,9 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       setAngleSwitchOpen(false);
       setAngleSwitchResultOpen(true);
 
-      toast.success("视角切换生成完成");
+      toast.success("Angle switch generated");
     } catch (error) {
-      toast.error(`视角切换失败: ${(error as Error).message}`);
+      toast.error(`Angle switch failed: ${(error as Error).message}`);
     } finally {
       setIsAngleSwitching(false);
     }
@@ -726,7 +726,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       ? (scene.imageDataUrl || scene.imageHttpUrl)
       : (scene.endFrameImageUrl || scene.endFrameHttpUrl);
     if (!imageUrl) {
-      toast.error(`请先生成${type === "start" ? "首帧" : "尾帧"}`);
+      toast.error(`Please generate the ${type === "start" ? "first frame" : "last frame"} first`);
       return;
     }
 
@@ -745,14 +745,14 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       ? (scene.imageDataUrl || scene.imageHttpUrl) 
       : (scene.endFrameImageUrl || scene.endFrameHttpUrl);
     if (!sourceImage) {
-      toast.error("找不到原图");
+      toast.error("Original image not found");
       return;
     }
 
     // Get API key - 使用服务映射配置
     const featureConfig = getFeatureConfig('character_generation');
     if (!featureConfig) {
-      toast.error('请先在设置中配置图片生成 API');
+      toast.error('Please configure the image generation API in Settings');
       setQuadGridOpen(false);
       return;
     }
@@ -760,20 +760,20 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       setQuadGridOpen(false);
       return;
     }
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      toast.error('请先在设置中配置图片生成模型');
+      toast.error('Please configure the image generation model in Settings');
       setQuadGridOpen(false);
       return;
     }
     const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!imageBaseUrl) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       setQuadGridOpen(false);
       return;
     }
@@ -787,10 +787,10 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     try {
       // Build variation labels based on type
       const variationLabels = variationType === 'angle'
-        ? ['正面偏左', '正面偏右', '侧面特写', '全景俯瞰']
+        ? ['Front-left angle', 'Front-right angle', 'Side close-up', 'Wide aerial view']
         : variationType === 'composition'
-          ? ['全身远景', '半身中景', '面部特写', '环境交代']
-          : ['动作起始', '动作过程', '动作高潮', '动作结束'];
+          ? ['Full-body wide shot', 'Medium half-body shot', 'Face close-up', 'Environment establishing shot']
+          : ['Action start', 'Action in progress', 'Action climax', 'Action ending'];
 
       const variationPrompts = variationType === 'angle'
         ? ['slight left angle view', 'slight right angle view', 'side profile close-up', 'wide aerial overview']
@@ -931,7 +931,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             headers: { 'Authorization': `Bearer ${apiKey}` },
           });
           
-          if (!statusResp.ok) throw new Error(`查询任务失败: ${statusResp.status}`);
+          if (!statusResp.ok) throw new Error(`Failed to check task: ${statusResp.status}`);
           
           const statusData = await statusResp.json();
           const status = (statusData.status ?? statusData.data?.status ?? '').toString().toLowerCase();
@@ -946,7 +946,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           }
           
           if (status === 'failed' || status === 'error') {
-            throw new Error(statusData.error || '图片生成失败');
+            throw new Error(statusData.error || 'Image generation failed');
           }
           
           await new Promise(r => setTimeout(r, pollInterval));
@@ -954,7 +954,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       }
 
       if (!gridImageUrl) {
-        throw new Error('未获取到四宫格图片 URL');
+        throw new Error('Did not receive a 2x2 grid image URL');
       }
 
       console.log('[QuadGrid] Grid image URL:', gridImageUrl.substring(0, 80));
@@ -1073,7 +1073,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const folderId = getImageFolderId();
     addMediaFromUrl({
       url: imageToSave,
-      name: `四宫格-${quadGridResult.variationType}-${imageIndex + 1}`,
+      name: `Quad Grid-${quadGridResult.variationType}-${imageIndex + 1}`,
       type: 'image',
       source: 'ai-image',
       folderId,
@@ -1091,7 +1091,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     quadGridResult.images.forEach((img, idx) => {
       addMediaFromUrl({
         url: img,
-        name: `四宫格-${quadGridResult.variationType}-${idx + 1}`,
+        name: `Quad Grid-${quadGridResult.variationType}-${idx + 1}`,
         type: 'image',
         source: 'ai-image',
         folderId,
@@ -1099,7 +1099,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       });
     });
 
-    toast.success(`已保存 ${quadGridResult.images.length} 张图片到素材库`);
+    toast.success(`Saved ${quadGridResult.images.length} images to the media library`);
   }, [quadGridResult, getImageFolderId, addMediaFromUrl]);
 
   // Apply angle switch result
@@ -1130,13 +1130,13 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     setAngleSwitchResult(null);
     setAngleSwitchTarget(null);
     setSelectedHistoryIndex(-1);
-    toast.success("视角已应用");
+    toast.success("Angle applied");
   }, [angleSwitchResult, angleSwitchTarget, splitScenes, selectedHistoryIndex, updateSplitSceneImage, updateSplitSceneEndFrame]);
 
   // Handle auto-generate prompts using Gemini Vision
   const handleAutoGeneratePrompts = useCallback(async () => {
     if (!storyboardImage || splitScenes.length === 0) {
-      toast.error("无法生成提示词：缺失故事板或分镜");
+      toast.error("Unable to generate prompts: storyboard or scenes are missing");
       return;
     }
 
@@ -1149,11 +1149,11 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // Note: API config is optional - if scenes have text descriptions, no API is needed
 
     setIsGeneratingPrompts(true);
-    toast.info("正在根据分镜内容生成提示词...");
+    toast.info("Generating prompts from the storyboard content...");
 
     try {
       // Get story prompt from storyboard config
-      const storyPrompt = storyboardConfig.storyPrompt || "视频分镜";
+      const storyPrompt = storyboardConfig.storyPrompt || "Video storyboard";
 
       const prompts = await generateScenePrompts({
         storyboardImage,
@@ -1199,11 +1199,11 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         }
       });
 
-      toast.success(`成功生成 ${updatedCount} 个分镜的提示词（${endFrameCount} 个需要尾帧）`);
+      toast.success(`Generated prompts for ${updatedCount} scenes (${endFrameCount} need end frames)`);
     } catch (error) {
       const err = error as Error;
       console.error("[SplitScenes] Prompt generation failed:", err);
-      toast.error(`生成失败: ${err.message}`);
+      toast.error(`Generation failed: ${err.message}`);
     } finally {
       setIsGeneratingPrompts(false);
     }
@@ -1213,7 +1213,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   const handleGenerateVideos = useCallback(async () => {
     console.warn('[DEPRECATED] handleGenerateVideos 已废弃，请使用 S级批量生成');
     if (splitScenes.length === 0) {
-      toast.error("没有可生成的分镜");
+      toast.error("No scenes available for generation");
       return;
     }
 
@@ -1225,7 +1225,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     const provider = featureConfig.platform;
@@ -1233,7 +1233,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // Check if all scenes have prompts
     const scenesWithoutPrompts = splitScenes.filter(s => !s.videoPrompt.trim());
     if (scenesWithoutPrompts.length > 0) {
-      toast.warning(`还有 ${scenesWithoutPrompts.length} 个分镜没有提示词，将使用默认提示词`);
+      toast.warning(`${scenesWithoutPrompts.length} scenes are still missing prompts. Default prompts will be used.`);
     }
 
     // Filter scenes that need generation (idle or failed)
@@ -1242,12 +1242,12 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     );
 
     if (scenesToGenerate.length === 0) {
-      toast.info("所有分镜已生成或正在生成中");
+      toast.info("All scenes are already generated or currently generating");
       return;
     }
 
     setIsGenerating(true);
-    toast.info(`开始串行生成 ${scenesToGenerate.length} 个视频...每次处理 ${concurrency} 个`);
+    toast.info(`Starting sequential generation for ${scenesToGenerate.length} videos... processing ${concurrency} at a time`);
 
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -1307,7 +1307,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               imageUrl,
-              prompt: fullPrompt || scene.videoPrompt || `分镜 ${scene.id + 1} 动态效果`,
+              prompt: fullPrompt || scene.videoPrompt || `Scene ${scene.id + 1} dynamic effect`,
               aspectRatio: storyboardConfig.aspectRatio,
               duration: videoDuration,
               apiKey,
@@ -1329,7 +1329,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               videoProgress: 100,
               videoUrl: submitData.videoUrl,
             });
-            toast.success(`分镜 ${scene.id + 1} 视频生成完成`);
+            toast.success(`Scene ${scene.id + 1} video generated`);
             return;
           }
 
@@ -1362,7 +1362,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                   videoProgress: 100,
                   videoUrl,
                 });
-                toast.success(`分镜 ${scene.id + 1} 视频生成完成`);
+                toast.success(`Scene ${scene.id + 1} video generated`);
                 return;
               }
 
@@ -1373,7 +1373,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               await new Promise(r => setTimeout(r, pollInterval));
             }
 
-            throw new Error('视频生成超时');
+            throw new Error('Video generation timed out');
           }
 
           throw new Error('Invalid API response');
@@ -1386,7 +1386,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             videoProgress: 0,
             videoError: err.message,
           });
-          toast.error(`分镜 ${scene.id + 1} 生成失败: ${err.message}`);
+          toast.error(`Scene ${scene.id + 1} generation failed: ${err.message}`);
         }
       }));
     }
@@ -1396,7 +1396,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     
     const completedCount = splitScenes.filter(s => s.videoStatus === 'completed').length;
     if (completedCount === splitScenes.length) {
-      toast.success("所有视频生成完成！");
+      toast.success("All videos generated");
     }
   }, [splitScenes, storyboardConfig, getApiKey, concurrency, updateSplitSceneVideo]);
 
@@ -1433,12 +1433,12 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      toast.error('请先在设置中配置视频生成模型');
+      toast.error('Please configure the video generation model in Settings');
       return;
     }
     const videoBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!videoBaseUrl) {
-      toast.error('请先在设置中配置视频生成服务映射');
+      toast.error('Please configure the video generation service mapping in Settings');
       return;
     }
     
@@ -1448,7 +1448,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error(`请先配置 ${platform} API Key`);
+      toast.error(`Please configure the ${platform} API key first`);
       return;
     }
     
@@ -1495,7 +1495,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       }
       
       if (!firstFrameUrl) {
-        toast.error(`分镜 ${sceneId + 1} 没有首帧图片，请先生成图片`);
+        toast.error(`Scene ${sceneId + 1} is missing a first frame image. Please generate one first.`);
         setIsGenerating(false);
         setCurrentGeneratingId(null);
         return;
@@ -1580,7 +1580,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       
       const firstFrameConverted = await convertToHttpUrl(normalizedFirstFrame);
       if (!firstFrameConverted) {
-        throw new Error('无法获取首帧图片的 HTTP URL，请重新生成图片');
+        throw new Error('Unable to get an HTTP URL for the first frame image. Please regenerate the image.');
       }
       imageWithRoles.push({ url: firstFrameConverted, role: 'first_frame' });
       console.log('[SplitScenes] First frame HTTP URL:', firstFrameConverted.substring(0, 60));
@@ -1636,7 +1636,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         videoUrl: finalVideoUrl,
         videoMediaId: mediaId,
       });
-      toast.success(`分镜 ${sceneId + 1} 视频生成完成，已保存到素材库`);
+      toast.success(`Scene ${sceneId + 1} video generated and saved to the media library`);
       
       // 视觉连续性：仅当分镜需要尾帧时，提取视频最后一帧
       const currentScene = splitScenes.find(s => s.id === sceneId);
@@ -1680,7 +1680,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           videoProgress: 0,
           videoError: `MODERATION_SKIPPED:${err.message}`,
         });
-        toast.warning(`分镜 ${sceneId + 1} 因内容审核跳过`);
+        toast.warning(`Scene ${sceneId + 1} was skipped due to content moderation`);
         console.log(`[SplitScenes] Scene ${sceneId} skipped due to content moderation`);
       } else {
         // 普通错误
@@ -1689,7 +1689,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           videoProgress: 0,
           videoError: err.message,
         });
-        toast.error(`分镜 ${sceneId + 1} 生成失败: ${err.message}`);
+        toast.error(`Scene ${sceneId + 1} generation failed: ${err.message}`);
       }
     }
 
@@ -1705,26 +1705,26 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // 使用服务映射配置 - 不再 fallback 到硬编码
     const featureConfig = getFeatureConfig('character_generation');
     if (!featureConfig) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      toast.error('请先在设置中配置图片生成模型');
+      toast.error('Please configure the image generation model in Settings');
       return;
     }
     
     const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!imageBaseUrl) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     
@@ -1734,7 +1734,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const promptToUse = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() 
       || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
     if (!promptToUse) {
-      toast.warning("请先填写首帧提示词后再生成图片");
+      toast.warning("Please fill in the first-frame prompt before generating an image");
       return;
     }
 
@@ -1831,7 +1831,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         const persistResult = await persistSceneImage(apiResult.imageUrl, sceneId, 'first');
         updateSplitSceneImage(sceneId, persistResult.localPath, scene.width, scene.height, persistResult.httpUrl || apiResult.imageUrl);
         autoSaveImageToLibrary(sceneId, persistResult.localPath);
-        toast.success(`分镜 ${sceneId + 1} 图片生成完成，已保存到素材库`);
+        toast.success(`Scene ${sceneId + 1} image generated and saved to the media library`);
         setIsGenerating(false);
         return;
       }
@@ -1862,7 +1862,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
           if (!statusResponse.ok) {
             if (statusResponse.status === 404) {
-              throw new Error('任务不存在');
+              throw new Error('Task not found');
             }
             throw new Error(`Failed to check task status: ${statusResponse.status}`);
           }
@@ -1880,26 +1880,26 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             }
             imageUrl = imageUrl || normalizeUrlValue(statusData.output_url) || normalizeUrlValue(statusData.result_url) || normalizeUrlValue(statusData.url);
 
-            if (!imageUrl) throw new Error('任务完成但没有图片 URL');
+            if (!imageUrl) throw new Error('The task completed but did not return an image URL');
             
             // 持久化到本地 + 图床
             const persistResult = await persistSceneImage(imageUrl, sceneId, 'first');
             updateSplitSceneImage(sceneId, persistResult.localPath, scene.width, scene.height, persistResult.httpUrl || imageUrl);
             autoSaveImageToLibrary(sceneId, persistResult.localPath);
-            toast.success(`分镜 ${sceneId + 1} 图片生成完成，已保存到素材库`);
+            toast.success(`Scene ${sceneId + 1} image generated and saved to the media library`);
             setIsGenerating(false);
             return;
           }
 
           if (status === 'failed' || status === 'error') {
-            const errorMsg = statusData.error || statusData.message || statusData.data?.error || '图片生成失败';
+            const errorMsg = statusData.error || statusData.message || statusData.data?.error || 'Image generation failed';
             console.error('[SplitScenes] Task failed:', statusData);
             throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
           }
 
           await new Promise(r => setTimeout(r, pollInterval));
         }
-        throw new Error('图片生成超时');
+        throw new Error('Image generation timed out');
       }
 
       throw new Error('Invalid API response: no image URL or task ID');
@@ -1911,7 +1911,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         imageProgress: 0,
         imageError: err.message,
       });
-      toast.error(`分镜 ${sceneId + 1} 图片生成失败: ${err.message}`);
+      toast.error(`Scene ${sceneId + 1} image generation failed: ${err.message}`);
     }
 
     setIsGenerating(false);
@@ -2009,32 +2009,32 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
   const handleMergedGenerate = useCallback(async (mode: 'first'|'last'|'both', strategy: 'cluster'|'minimal'|'none' = 'cluster', exemplar: boolean = true) => {
     if (splitScenes.length === 0) {
-      toast.error('没有可生成的分镜');
+      toast.error('No scenes available for generation');
       return;
     }
 
     // 获取图像生成能力 - 使用服务映射配置
     const featureConfig = getFeatureConfig('character_generation');
     if (!featureConfig) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      toast.error('请先在设置中配置图片生成模型');
+      toast.error('Please configure the image generation model in Settings');
       return;
     }
     const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!imageBaseUrl) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     
@@ -2076,7 +2076,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
     // 检查是否有需要生成的
     if (tasks.length === 0) {
-      toast.info('所有分镜已生成完成，无需重复生成');
+      toast.info('All scenes are already generated. No need to generate them again');
       setIsMergedRunning(false);
       return;
     }
@@ -2085,11 +2085,11 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const firstCount = tasks.filter(t => t.type === 'first').length;
     const endCount = tasks.filter(t => t.type === 'end').length;
     const parts: string[] = [];
-    if (firstCount > 0) parts.push(`${firstCount}个首帧`);
-    if (endCount > 0) parts.push(`${endCount}个尾帧`);
+    if (firstCount > 0) parts.push(`${firstCount} first frames`);
+    if (endCount > 0) parts.push(`${endCount} end frames`);
     const completedCount = splitScenes.filter(isSceneCompleted).length;
-    const skipInfo = completedCount > 0 ? `（跳过${completedCount}个已完成视频）` : '';
-    toast.info(`开始九宫格合并生成：${parts.join('、')}${skipInfo}`);
+    const skipInfo = completedCount > 0 ? ` (skipping ${completedCount} completed videos)` : '';
+    toast.info(`Starting 3x3 merged generation: ${parts.join(', ')}${skipInfo}`);
 
     // 任务分页（每9个任务一页，混合首帧和尾帧）
     const taskPages: GridTask[][] = [];
@@ -2214,7 +2214,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           }
           resolve(results);
         };
-        img.onerror = (e) => reject(new Error('加载九宫格图片失败'));
+        img.onerror = (e) => reject(new Error('Failed to load the 3x3 grid image'));
         img.src = gridImageUrl;
       });
     };
@@ -2398,7 +2398,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             headers: { 'Authorization': `Bearer ${apiKey}` },
           });
           
-          if (!statusResp.ok) throw new Error(`查询任务失败: ${statusResp.status}`);
+          if (!statusResp.ok) throw new Error(`Failed to check task: ${statusResp.status}`);
           
           const statusData = await statusResp.json();
           console.log(`[MergedGen] Task ${taskId} poll #${attempt}:`, JSON.stringify(statusData, null, 2).substring(0, 500));
@@ -2422,7 +2422,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           }
           
           if (status === 'failed' || status === 'error') {
-            const errMsg = statusData.error || statusData.message || statusData.data?.error || '图片生成失败';
+            const errMsg = statusData.error || statusData.message || statusData.data?.error || 'Image generation failed';
             throw new Error(typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg));
           }
           
@@ -2433,9 +2433,9 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       if (!gridImageUrl) {
         console.error('[MergedGen] 无法获取图片 URL, apiResult:', apiResult);
         if (taskId) {
-          throw new Error(`九宫格生成超时（任务 ${taskId} 在 3 分钟内未完成），API 服务可能繁忙，请稍后重试`);
+          throw new Error(`3x3 grid generation timed out (task ${taskId} did not finish within 3 minutes). The API service may be busy, so please try again shortly.`);
         }
-        throw new Error('未获取到九宫格图片 URL，请检查 API 响应');
+        throw new Error('Did not receive a 3x3 grid image URL. Please check the API response.');
       }
       
       console.log('[MergedGen] Grid image URL:', gridImageUrl.substring(0, 80));
@@ -2478,7 +2478,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             // 自动保存尾帧到素材库
             addMediaFromUrl({
               url: localPath,
-              name: `分镜 ${s.id + 1} - 尾帧`,
+              name: `Scene ${s.id + 1} - End Frame`,
               type: 'image',
               source: 'ai-image',
               folderId,
@@ -2490,7 +2490,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             // 自动保存首帧到素材库
             addMediaFromUrl({
               url: localPath,
-              name: `分镜 ${s.id + 1} - 首帧`,
+              name: `Scene ${s.id + 1} - First Frame`,
               type: 'image',
               source: 'ai-image',
               folderId,
@@ -2521,7 +2521,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     for (let p = 0; p < taskPages.length; p++) {
       if (mergedAbortRef.current) {
         console.log('[MergedGen] 用户停止合并生成');
-        toast.info('合并生成已停止');
+        toast.info('Merged generation stopped');
         setIsMergedRunning(false);
         return;
       }
@@ -2532,7 +2532,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       // 统计当前页的首帧/尾帧数量
       const pageFirstCount = pageTasks.filter(t => t.type === 'first').length;
       const pageEndCount = pageTasks.filter(t => t.type === 'end').length;
-      const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount}首帧` : '', pageEndCount > 0 ? `${pageEndCount}尾帧` : ''].filter(Boolean).join('+');
+      const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount} first frames` : '', pageEndCount > 0 ? `${pageEndCount} end frames` : ''].filter(Boolean).join(' + ');
       
       console.log(`[MergedGen] 第 ${p + 1}/${taskPages.length} 页，${pageTasks.length} 个任务（${pageInfo}），${refs.length} 张参考图`);
       
@@ -2540,7 +2540,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         await generateGridAndSlice(pageTasks, refs);
         succeededCount++;
         if (!mergedAbortRef.current) {
-          toast.success(`第 ${p + 1}/${taskPages.length} 页完成（${pageInfo}）`);
+          toast.success(`Page ${p + 1}/${taskPages.length} completed (${pageInfo})`);
         }
       } catch (e: any) {
         const errorMsg = e.message || String(e);
@@ -2548,7 +2548,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         // 重置该页分镜状态为 error，不让它们卡在 'generating'
         resetPageTasksToError(pageTasks, errorMsg);
         failedPages.push({ index: p, pageTasks, refs, error: errorMsg });
-        toast.warning(`第 ${p + 1}/${taskPages.length} 页失败，将自动重试：${errorMsg.substring(0, 60)}`);
+        toast.warning(`Page ${p + 1}/${taskPages.length} failed and will retry automatically: ${errorMsg.substring(0, 60)}`);
         // 继续下一页，不中断
       }
     }
@@ -2556,7 +2556,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // 第二轮：自动重试失败的页面（延迟 5 秒后重试，给 API 恢复时间）
     if (failedPages.length > 0 && !mergedAbortRef.current) {
       console.log(`[MergedGen] ${failedPages.length} 页失败，5 秒后自动重试...`);
-      toast.info(`${failedPages.length} 页生成失败，5 秒后自动重试...`);
+      toast.info(`${failedPages.length} pages failed. Retrying automatically in 5 seconds...`);
       await new Promise(r => setTimeout(r, 5000));
 
       for (const fp of failedPages) {
@@ -2564,7 +2564,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
         const pageFirstCount = fp.pageTasks.filter(t => t.type === 'first').length;
         const pageEndCount = fp.pageTasks.filter(t => t.type === 'end').length;
-        const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount}首帧` : '', pageEndCount > 0 ? `${pageEndCount}尾帧` : ''].filter(Boolean).join('+');
+        const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount} first frames` : '', pageEndCount > 0 ? `${pageEndCount} end frames` : ''].filter(Boolean).join(' + ');
 
         console.log(`[MergedGen] 自动重试第 ${fp.index + 1} 页（${pageInfo}）`);
         try {
@@ -2572,13 +2572,13 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           const freshRefs = collectRefsFromTasks(fp.pageTasks);
           await generateGridAndSlice(fp.pageTasks, freshRefs);
           succeededCount++;
-          toast.success(`第 ${fp.index + 1} 页重试成功（${pageInfo}）`);
+          toast.success(`Page ${fp.index + 1} retry succeeded (${pageInfo})`);
         } catch (retryErr: any) {
           const retryMsg = retryErr.message || String(retryErr);
           console.error(`[MergedGen] 第 ${fp.index + 1} 页重试仍然失败:`, retryMsg);
           // 再次重置为 error 状态
-          resetPageTasksToError(fp.pageTasks, `重试失败: ${retryMsg}`);
-          toast.error(`第 ${fp.index + 1} 页重试失败: ${retryMsg.substring(0, 80)}`);
+          resetPageTasksToError(fp.pageTasks, `Retry failed: ${retryMsg}`);
+          toast.error(`Page ${fp.index + 1} retry failed: ${retryMsg.substring(0, 80)}`);
         }
       }
     }
@@ -2587,11 +2587,11 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const totalPages = taskPages.length;
     if (!mergedAbortRef.current) {
       if (succeededCount === totalPages) {
-        toast.success('九宫格合并生成全部完成！');
+        toast.success('3x3 merged generation completed');
       } else if (succeededCount > 0) {
-        toast.warning(`合并生成部分完成：${succeededCount}/${totalPages} 页成功，${totalPages - succeededCount} 页失败`);
+        toast.warning(`Merged generation partially completed: ${succeededCount}/${totalPages} pages succeeded, ${totalPages - succeededCount} failed`);
       } else {
-        toast.error(`合并生成全部失败（${totalPages} 页），请检查 API 服务后重试`);
+        toast.error(`Merged generation failed for all ${totalPages} pages. Please check the API service and try again.`);
       }
     }
     setIsMergedRunning(false);
@@ -2617,20 +2617,20 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // 使用服务映射配置
     const featureConfig = getFeatureConfig('character_generation');
     if (!featureConfig) {
-      throw new Error('请先在设置中配置图片生成服务映射');
+      throw new Error('Please configure the image generation service mapping in Settings');
     }
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      throw new Error('请先在设置中配置图片生成模型');
+      throw new Error('Please configure the image generation model in Settings');
     }
     const apiKeyToUse = apiKey || featureConfig.keyManager.getCurrentKey() || '';
     if (!apiKeyToUse) {
-      throw new Error('请先在设置中配置图片生成服务映射');
+      throw new Error('Please configure the image generation service mapping in Settings');
     }
     const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!imageBaseUrl) {
-      throw new Error('请先在设置中配置图片生成服务映射');
+      throw new Error('Please configure the image generation service mapping in Settings');
     }
 
     // Call image generation API with smart routing
@@ -2690,7 +2690,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       }
     }
 
-    if (!directUrl) throw new Error('任务完成但没有图片 URL');
+    if (!directUrl) throw new Error('The task completed but did not return an image URL');
 
     const frameType = isEndFrame ? 'end' as const : 'first' as const;
     const persistResult = await persistSceneImage(directUrl, sceneId, frameType);
@@ -2713,31 +2713,31 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     // Must have end frame prompt
     const promptToUse = scene.endFramePromptZh?.trim() || scene.endFramePrompt?.trim() || '';
     if (!promptToUse) {
-      toast.warning("请先填写尾帧提示词后再生成");
+      toast.warning("Please fill in the end-frame prompt before generating");
       return;
     }
 
     // 使用服务映射配置
     const featureConfig = getFeatureConfig('character_generation');
     if (!featureConfig) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     const keyManager = featureConfig.keyManager;
     const apiKey = keyManager.getCurrentKey() || '';
     if (!apiKey) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     const platform = featureConfig.platform;
     const model = featureConfig.models?.[0];
     if (!model) {
-      toast.error('请先在设置中配置图片生成模型');
+      toast.error('Please configure the image generation model in Settings');
       return;
     }
     const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
     if (!imageBaseUrl) {
-      toast.error('请先在设置中配置图片生成服务映射');
+      toast.error('Please configure the image generation service mapping in Settings');
       return;
     }
     
@@ -2836,13 +2836,13 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         const folderId = getImageFolderId();
         addMediaFromUrl({
           url: persistResult.localPath,
-          name: `分镜 ${sceneId + 1} - 尾帧`,
+          name: `Scene ${sceneId + 1} - End Frame`,
           type: 'image',
           source: 'ai-image',
           folderId,
           projectId: mediaProjectId,
         });
-        toast.success(`分镜 ${sceneId + 1} 尾帧生成完成，已保存到素材库`);
+        toast.success(`Scene ${sceneId + 1} end frame generated and saved to the media library`);
         setIsGenerating(false);
         return;
       }
@@ -2870,7 +2870,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           });
 
           if (!statusResponse.ok) {
-            if (statusResponse.status === 404) throw new Error('任务不存在');
+            if (statusResponse.status === 404) throw new Error('Task not found');
             throw new Error(`Failed to check task status: ${statusResponse.status}`);
           }
 
@@ -2886,7 +2886,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             }
             imageUrl = imageUrl || normalizeUrlValue(statusData.output_url) || normalizeUrlValue(statusData.url);
 
-            if (!imageUrl) throw new Error('任务完成但没有图片 URL');
+            if (!imageUrl) throw new Error('The task completed but did not return an image URL');
             
             // 持久化到本地 + 图床
             const persistResult = await persistSceneImage(imageUrl, sceneId, 'end');
@@ -2895,25 +2895,25 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             const folderId = getImageFolderId();
             addMediaFromUrl({
               url: persistResult.localPath,
-              name: `分镜 ${sceneId + 1} - 尾帧`,
+              name: `Scene ${sceneId + 1} - End Frame`,
               type: 'image',
               source: 'ai-image',
               folderId,
               projectId: mediaProjectId,
             });
-            toast.success(`分镜 ${sceneId + 1} 尾帧生成完成，已保存到素材库`);
+            toast.success(`Scene ${sceneId + 1} end frame generated and saved to the media library`);
             setIsGenerating(false);
             return;
           }
 
           if (status === 'failed' || status === 'error') {
-            const errorMsg = statusData.error || statusData.message || '尾帧生成失败';
+            const errorMsg = statusData.error || statusData.message || 'End-frame generation failed';
             throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
           }
 
           await new Promise(r => setTimeout(r, pollInterval));
         }
-        throw new Error('尾帧生成超时');
+        throw new Error('End-frame generation timed out');
       }
 
       throw new Error('Invalid API response');
@@ -2925,7 +2925,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         endFrameProgress: 0,
         endFrameError: err.message,
       });
-      toast.error(`分镜 ${sceneId + 1} 尾帧生成失败: ${err.message}`);
+      toast.error(`Scene ${sceneId + 1} end-frame generation failed: ${err.message}`);
     }
 
     setIsGenerating(false);
@@ -2936,13 +2936,13 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     try {
       if (type === 'video') {
         if (!scene.videoUrl) {
-          toast.error("没有可保存的视频");
+          toast.error("No video available to save");
           return;
         }
         const folderId = getVideoFolderId();
         addMediaFromUrl({
           url: scene.videoUrl,
-          name: `分镜 ${scene.id + 1} - AI视频`,
+          name: `Scene ${scene.id + 1} - AI Video`,
           type: 'video',
           source: 'ai-video',
           thumbnailUrl: scene.imageDataUrl,
@@ -2950,22 +2950,22 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           folderId,
           projectId: mediaProjectId,
         });
-        toast.success(`分镜 ${scene.id + 1} 视频已保存到素材库`);
+        toast.success(`Scene ${scene.id + 1} video saved to the media library`);
       } else {
         if (!scene.imageDataUrl) {
-          toast.error("没有可保存的图片");
+          toast.error("No image available to save");
           return;
         }
         const folderId = getImageFolderId();
         addMediaFromUrl({
           url: scene.imageDataUrl,
-          name: `分镜 ${scene.id + 1} - AI图片`,
+          name: `Scene ${scene.id + 1} - AI Image`,
           type: 'image',
           source: 'ai-image',
           folderId,
           projectId: mediaProjectId,
         });
-        toast.success(`分镜 ${scene.id + 1} 图片已保存到素材库`);
+        toast.success(`Scene ${scene.id + 1} image saved to the media library`);
       }
     } catch (error) {
       const err = error as Error;
@@ -2984,7 +2984,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         {onBack && (
           <Button variant="outline" onClick={onBack} className="mt-2">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            返回
+            Back
           </Button>
         )}
       </div>
@@ -3816,7 +3816,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         result={quadGridResult}
         frameType={quadGridTarget?.type || "start"}
         currentSceneId={quadGridTarget?.sceneId ?? 0}
-        availableScenes={splitScenes.map(s => ({ id: s.id, label: `分镜 ${s.id + 1}` }))}
+        availableScenes={splitScenes.map(s => ({ id: s.id, label: `Scene ${s.id + 1}` }))}
         onApply={handleApplyQuadGrid}
         onCopyToScene={handleCopyQuadGridToScene}
       />

@@ -632,7 +632,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     updateSplitSceneImageStatus(sceneId, {
       imageStatus: 'idle',
       imageProgress: 0,
-      imageError: '用户已取消',
+      imageError: 'Canceled by user',
     });
     setIsGenerating(false);
     setCurrentGeneratingId(null);
@@ -646,7 +646,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     updateSplitSceneVideo(sceneId, {
       videoStatus: 'idle',
       videoProgress: 0,
-      videoError: '用户已取消',
+      videoError: 'Canceled by user',
     });
     setIsGenerating(false);
     setCurrentGeneratingId(null);
@@ -660,7 +660,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     updateSplitSceneEndFrameStatus(sceneId, {
       endFrameStatus: 'idle',
       endFrameProgress: 0,
-      endFrameError: '用户已取消',
+      endFrameError: 'Canceled by user',
     });
     setIsGenerating(false);
     toast.info(`Scene ${sceneId + 1} end frame generation stopped`);
@@ -2761,7 +2761,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       if (!gridImageUrl) {
         console.error('[MergedGen] 无法获取图片 URL, apiResult:', apiResult);
         if (taskId) {
-          throw new Error(`九宫格生成超时（任务 ${taskId} 在 3 分钟内未完成），API 服务可能繁忙，请稍后重试`);
+          throw new Error(`Merged grid generation timed out (task ${taskId} did not finish within 3 minutes). The API service may be busy, so please try again shortly.`);
         }
         throw new Error('No grid image URL was returned. Check the API response.');
       }
@@ -2853,7 +2853,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       // 统计当前页的首帧/尾帧数量
       const pageFirstCount = pageTasks.filter(t => t.type === 'first').length;
       const pageEndCount = pageTasks.filter(t => t.type === 'end').length;
-      const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount}首帧` : '', pageEndCount > 0 ? `${pageEndCount}尾帧` : ''].filter(Boolean).join('+');
+      const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount} start frames` : '', pageEndCount > 0 ? `${pageEndCount} end frames` : ''].filter(Boolean).join(' + ');
       
       console.log(`[MergedGen] 第 ${p + 1}/${taskPages.length} 页，${pageTasks.length} 个任务（${pageInfo}），${refs.length} 张参考图`);
       
@@ -2885,7 +2885,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
         const pageFirstCount = fp.pageTasks.filter(t => t.type === 'first').length;
         const pageEndCount = fp.pageTasks.filter(t => t.type === 'end').length;
-        const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount}首帧` : '', pageEndCount > 0 ? `${pageEndCount}尾帧` : ''].filter(Boolean).join('+');
+        const pageInfo = [pageFirstCount > 0 ? `${pageFirstCount} start frames` : '', pageEndCount > 0 ? `${pageEndCount} end frames` : ''].filter(Boolean).join(' + ');
 
         console.log(`[MergedGen] Retrying page ${fp.index + 1} (${pageInfo})`);
         try {
