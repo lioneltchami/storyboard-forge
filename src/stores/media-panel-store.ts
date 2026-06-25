@@ -58,13 +58,13 @@ export interface StageConfig {
 }
 export const stages: StageConfig[] = [
   { id: "script", label: "Script", phase: "Phase 01", icon: FileTextIcon, tabs: ["script"] },
-  { id: "assets", label: "Characters & Scenes", phase: "Phase 02", icon: UsersIcon, tabs: ["characters", "scenes"] },
+  { id: "assets", label: "Characters and Scenes", phase: "Phase 02", icon: UsersIcon, tabs: ["characters", "scenes"] },
   { id: "director", label: "Director Workspace", phase: "Phase 03", icon: ClapperboardIcon, tabs: ["director"] },
   { id: "export", label: "Final Export", phase: "Phase 04", icon: FilmIcon, tabs: ["export"] },
 ];
 
 export const tabs: { [key in Tab]: { icon: LucideIcon; label: string; stage?: Stage } } = {
-  dashboard: { icon: FileTextIcon, label: "Project" },
+  dashboard: { icon: FileTextIcon, label: "Dashboard" },
   overview: { icon: LayoutDashboardIcon, label: "Overview" },
   script: { icon: FileTextIcon, label: "Script", stage: "script" },
   characters: { icon: UsersIcon, label: "Characters", stage: "assets" },
