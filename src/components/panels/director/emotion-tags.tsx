@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * 情绪标签选择组件
- * 支持多选、有序排列，用于控制视频生成的氛围和语气
+ * Emotion tag selector
+ * Supports multi-select and ordering to guide mood and tone during video generation.
  */
 
 import { useState } from "react";
@@ -25,7 +25,7 @@ interface EmotionTagsProps {
   disabled?: boolean;
 }
 
-// 获取标签信息
+// Get tag metadata
 function getTagInfo(tagId: EmotionTag) {
   const allTags = [
     ...EMOTION_PRESETS.basic,
@@ -38,22 +38,22 @@ function getTagInfo(tagId: EmotionTag) {
 export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // 添加标签
+  // Add a tag
   const addTag = (tagId: EmotionTag) => {
     if (!value.includes(tagId)) {
       onChange([...value, tagId]);
     }
   };
 
-  // 移除标签
+  // Remove a tag
   const removeTag = (tagId: EmotionTag) => {
     onChange(value.filter(t => t !== tagId));
   };
 
-  // 检查是否已选中
+  // Check whether a tag is selected
   const isSelected = (tagId: EmotionTag) => value.includes(tagId);
 
-  // 渲染标签分类
+  // Render a tag group
   const renderTagGroup = (
     title: string, 
     tags: readonly { id: string; label: string; emoji: string }[]
@@ -93,7 +93,7 @@ export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
 
   return (
     <div className="space-y-2">
-      {/* 已选标签（有序显示） */}
+      {/* Selected tags shown in order */}
       {value.length > 0 && (
         <div className="flex flex-wrap gap-1.5 items-center">
           {value.map((tagId, index) => {
@@ -121,7 +121,7 @@ export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
         </div>
       )}
 
-      {/* 添加标签按钮 */}
+      {/* Add tag button */}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -147,7 +147,7 @@ export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
         </PopoverContent>
       </Popover>
 
-      {/* 提示文字 */}
+      {/* Helper text */}
       {value.length === 0 && (
         <p className="text-xs text-muted-foreground">
           Add emotion tags to control mood and delivery
