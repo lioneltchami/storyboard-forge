@@ -58,7 +58,7 @@ Open the `Script` panel. You can begin in two ways:
 - Import a script: paste or import a complete screenplay into the editor
 - AI creation: use AI assistance to create a script from scratch
 
-For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE.md](./SCRIPT_FORMAT_EXAMPLE.md).
+For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md).
 
 The system will automatically analyze the script into structured scenes, storyboard shots, characters, dialogue, and related elements.
 
@@ -141,4 +141,4 @@ The S-Class workflow also handles first-frame stitching, three-layer prompt fusi
 
 Questions or issues:
 - Email: [memecalculate@gmail.com](mailto:memecalculate@gmail.com)
-- Repo overview: [README](../README.md)
+- Repo overview: [README_EN](../README_EN.md)

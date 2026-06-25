@@ -162,11 +162,11 @@ This project is open-sourced under the [GNU AGPL-3.0](LICENSE) license. You are 
 
 ### Commercial Use
 
-If you need closed-source usage or integration into commercial products, please contact us for a [Commercial License](COMMERCIAL_LICENSE.md).
+If you need closed-source usage or integration into commercial products, please contact us for a [Commercial License](COMMERCIAL_LICENSE.md). That document is still Chinese-first at the moment.
 
 ## Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for details.
+Contributions are welcome. The current [Contributing Guide](CONTRIBUTING.md) is still Chinese-first, so English contributor documentation is not yet fully localized.
 
 ## Contact
 
