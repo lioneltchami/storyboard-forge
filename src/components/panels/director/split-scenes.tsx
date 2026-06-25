@@ -998,10 +998,10 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     try {
       // Build variation labels based on type
       const variationLabels = variationType === 'angle'
-        ? ['正面偏左', '正面偏右', '侧面特写', '全景俯瞰']
+        ? ['Left-front', 'Right-front', 'Side close-up', 'Aerial wide shot']
         : variationType === 'composition'
-          ? ['全身远景', '半身中景', '面部特写', '环境交代']
-          : ['动作起始', '动作过程', '动作高潮', '动作结束'];
+          ? ['Full-body wide', 'Medium shot', 'Face close-up', 'Establishing shot']
+          : ['Action start', 'Action in progress', 'Action peak', 'Action end'];
 
       const variationPrompts = variationType === 'angle'
         ? ['slight left angle view', 'slight right angle view', 'side profile close-up', 'wide aerial overview']

@@ -35,6 +35,7 @@ import type { ReactNode } from "react";
 import { extractBrandFromModel, getBrandInfo } from "@/lib/brand-mapping";
 import { getBrandIcon } from "./brand-icons";
 import { getModelDisplayName } from "@/lib/freedom/model-display-names";
+import { getProviderDisplayName } from "@/lib/api-key-manager";
 
 /**
  * Provider options - platforms and models available for each feature.
@@ -699,7 +700,7 @@ export function FeatureBindingPanel() {
                                         {getModelDisplayName(option.model)}
                                       </span>
                                       <span className="text-[10px] text-muted-foreground ml-auto">
-                                        {option.name}
+                                        {getProviderDisplayName(option.name, option.platform)}
                                       </span>
                                     </label>
                                   );

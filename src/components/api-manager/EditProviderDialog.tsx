@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import type { IProvider } from "@/lib/api-key-manager";
-import { getApiKeyCount } from "@/lib/api-key-manager";
+import { getApiKeyCount, getProviderDisplayName } from "@/lib/api-key-manager";
 
 interface EditProviderDialogProps {
   open: boolean;
@@ -41,6 +41,8 @@ export function EditProviderDialog({
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
+
+  const platformLabel = getProviderDisplayName(provider?.name || provider?.platform || "API", provider?.platform) || provider?.platform || "API";
 
   // Initialize form when provider changes
   useEffect(() => {
@@ -92,7 +94,7 @@ export function EditProviderDialog({
           {/* Platform (read-only) */}
           <div className="space-y-2">
             <Label className="text-muted-foreground">Platform</Label>
-            <Input value={provider?.platform || ""} disabled className="bg-muted" />
+            <Input value={platformLabel} disabled className="bg-muted" />
           </div>
 
           {/* Name */}

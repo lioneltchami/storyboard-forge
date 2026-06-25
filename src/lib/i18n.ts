@@ -42,8 +42,8 @@ type MessageTree = {
     systemSettings: string;
     useHelp: string;
     projectOverview: string;
-    phaseLabel: (phase: string) => string;
-    episodeLabel: (episode: number) => string;
+    phaseLabel: (vars: { phase: string }) => string;
+    episodeLabel: (vars: { episode: number }) => string;
   };
   dashboard: {
     title: string;
@@ -57,17 +57,17 @@ type MessageTree = {
     editTitle: string;
     renameProject: string;
     confirmDeleteTitle: string;
-    confirmDeleteBody: (count: number) => string;
-    deleteSelected: (count: number) => string;
-    selectedCount: (count: number) => string;
-    projectCount: (count: number) => string;
-    deleteProject: (name: string) => string;
+    confirmDeleteBody: (vars: { count: number }) => string;
+    deleteSelected: (vars: { count: number }) => string;
+    selectedCount: (vars: { count: number }) => string;
+    projectCount: (vars: { count: number }) => string;
+    deleteProject: (vars: { name: string }) => string;
     duplicateProject: string;
     rename: string;
   };
   update: {
-    newVersion: (version: string) => string;
-    currentToLatest: (current: string, latest: string) => string;
+    newVersion: (vars: { version: string }) => string;
+    currentToLatest: (vars: { current: string; latest: string }) => string;
     releaseNotes: string;
     publishedAt: string;
     downloadMethod: string;
@@ -84,7 +84,7 @@ type MessageTree = {
   };
   projectHeader: {
     returnToSeries: string;
-    episode: (index: number) => string;
+    episode: (vars: { index: number }) => string;
   };
   settings: {
     apiConfiguration: string;
@@ -99,7 +99,7 @@ type MessageTree = {
     testConnection: string;
     connectionTestSuccess: string;
     connectionTestFailed: string;
-    configured: (name: string) => string;
+    configured: (vars: { name: string }) => string;
     pleaseConfigureKey: string;
     pleaseConfigureBaseUrl: string;
     pleaseUseDesktopApp: string;
@@ -125,7 +125,7 @@ type MessageTree = {
     storyCore: string;
     worldBuilding: string;
     productionSettings: string;
-    episodeCatalog: (count: number) => string;
+    episodeCatalog: (vars: { count: number }) => string;
     titleLabel: string;
     logline: string;
     outline: string;
@@ -143,8 +143,8 @@ type MessageTree = {
     noneSet: string;
     noEpisodeData: string;
     newEpisode: string;
-    episodeTitlePlaceholder: (index: number) => string;
-    sceneCount: (count: number) => string;
+    episodeTitlePlaceholder: (vars: { index: number }) => string;
+    sceneCount: (vars: { count: number }) => string;
     deleteConfirm: string;
     sectionStepLabel: string;
   };
@@ -195,8 +195,8 @@ export const messages: Record<Locale, MessageTree> = {
       systemSettings: "System settings",
       useHelp: "Usage help",
       projectOverview: "Project overview",
-      phaseLabel: (phase) => `Phase ${phase}`,
-      episodeLabel: (episode) => `Episode ${episode}`,
+      phaseLabel: ({ phase }) => `Phase ${phase}`,
+      episodeLabel: ({ episode }) => `Episode ${episode}`,
     },
     dashboard: {
       title: "Moyin Creator",
@@ -210,17 +210,17 @@ export const messages: Record<Locale, MessageTree> = {
       editTitle: "Rename title",
       renameProject: "Rename project",
       confirmDeleteTitle: "Confirm batch delete",
-      confirmDeleteBody: (count) => `You are about to delete ${count} projects. This action cannot be undone. Continue?`,
-      deleteSelected: (count) => `Delete selected (${count})`,
-      selectedCount: (count) => `Selected ${count}`,
-      projectCount: (count) => `${count} projects`,
-      deleteProject: (name) => `Delete "${name}"`,
+      confirmDeleteBody: ({ count }) => `You are about to delete ${count} projects. This action cannot be undone. Continue?`,
+      deleteSelected: ({ count }) => `Delete selected (${count})`,
+      selectedCount: ({ count }) => `Selected ${count}`,
+      projectCount: ({ count }) => `${count} projects`,
+      deleteProject: ({ name }) => `Delete "${name}"`,
       duplicateProject: "Duplicate project",
       rename: "Rename",
     },
     update: {
-      newVersion: (version) => `New version found v${version}`,
-      currentToLatest: (current, latest) => `Current v${current}, upgrade available to v${latest}.`,
+      newVersion: ({ version }) => `New version found v${version}`,
+      currentToLatest: ({ current, latest }) => `Current v${current}, upgrade available to v${latest}.`,
       releaseNotes: "Release notes",
       publishedAt: "Published at",
       downloadMethod: "Download method",
@@ -237,7 +237,7 @@ export const messages: Record<Locale, MessageTree> = {
     },
     projectHeader: {
       returnToSeries: "Back to series view",
-      episode: (index) => `Episode ${index}`,
+      episode: ({ index }) => `Episode ${index}`,
     },
     settings: {
       apiConfiguration: "API configuration",
@@ -252,7 +252,7 @@ export const messages: Record<Locale, MessageTree> = {
       testConnection: "Test connection",
       connectionTestSuccess: "Connection test succeeded",
       connectionTestFailed: "Connection test failed",
-      configured: (name) => `${name} is configured`,
+      configured: ({ name }) => `${name} is configured`,
       pleaseConfigureKey: "Please configure an API key first",
       pleaseConfigureBaseUrl: "Please configure the Base URL first",
       pleaseUseDesktopApp: "Use this feature in the desktop app.",
@@ -278,7 +278,7 @@ export const messages: Record<Locale, MessageTree> = {
       storyCore: "Story core",
       worldBuilding: "World building",
       productionSettings: "Production settings",
-      episodeCatalog: (count) => `Episode catalog (${count} episodes)`,
+      episodeCatalog: ({ count }) => `Episode catalog (${count} episodes)`,
       titleLabel: "Title",
       logline: "Logline",
       outline: "Outline",
@@ -296,8 +296,8 @@ export const messages: Record<Locale, MessageTree> = {
       noneSet: "Not set",
       noEpisodeData: "No episode data yet",
       newEpisode: "New episode",
-      episodeTitlePlaceholder: (index) => `Episode ${index} title...`,
-      sceneCount: (count) => `${count} scenes`,
+      episodeTitlePlaceholder: ({ index }) => `Episode ${index} title...`,
+      sceneCount: ({ count }) => `${count} scenes`,
       deleteConfirm: "Confirm delete?",
       sectionStepLabel: "Step",
     },
@@ -346,8 +346,8 @@ export const messages: Record<Locale, MessageTree> = {
       systemSettings: "系统设置",
       useHelp: "使用帮助",
       projectOverview: "项目概览",
-      phaseLabel: (phase) => `Phase ${phase}`,
-      episodeLabel: (episode) => `第${episode}集`,
+      phaseLabel: ({ phase }) => `Phase ${phase}`,
+      episodeLabel: ({ episode }) => `第${episode}集`,
     },
     dashboard: {
       title: "魔因漫创",
@@ -361,17 +361,17 @@ export const messages: Record<Locale, MessageTree> = {
       editTitle: "重命名标题",
       renameProject: "重命名项目",
       confirmDeleteTitle: "确认批量删除",
-      confirmDeleteBody: (count) => `即将删除 ${count} 个项目，此操作不可撤销。确定继续？`,
-      deleteSelected: (count) => `删除选中 (${count})`,
-      selectedCount: (count) => `已选 ${count}`,
-      projectCount: (count) => `共 ${count} 个项目`,
-      deleteProject: (name) => `删除「${name}」`,
+      confirmDeleteBody: ({ count }) => `即将删除 ${count} 个项目，此操作不可撤销。确定继续？`,
+      deleteSelected: ({ count }) => `删除选中 (${count})`,
+      selectedCount: ({ count }) => `已选 ${count}`,
+      projectCount: ({ count }) => `共 ${count} 个项目`,
+      deleteProject: ({ name }) => `删除「${name}」`,
       duplicateProject: "复制项目",
       rename: "重命名",
     },
     update: {
-      newVersion: (version) => `发现新版本 v${version}`,
-      currentToLatest: (current, latest) => `当前版本 v${current}，可升级到 v${latest}。`,
+      newVersion: ({ version }) => `发现新版本 v${version}`,
+      currentToLatest: ({ current, latest }) => `当前版本 v${current}，可升级到 v${latest}。`,
       releaseNotes: "更新说明",
       publishedAt: "发布时间",
       downloadMethod: "下载方式",
@@ -388,7 +388,7 @@ export const messages: Record<Locale, MessageTree> = {
     },
     projectHeader: {
       returnToSeries: "返回全剧视图",
-      episode: (index) => `第${index}集`,
+      episode: ({ index }) => `第${index}集`,
     },
     settings: {
       apiConfiguration: "API 配置",
@@ -403,7 +403,7 @@ export const messages: Record<Locale, MessageTree> = {
       testConnection: "连接测试",
       connectionTestSuccess: "连接测试成功",
       connectionTestFailed: "连接测试失败",
-      configured: (name) => `${name} 已配置`,
+      configured: ({ name }) => `${name} 已配置`,
       pleaseConfigureKey: "请先配置 API Key",
       pleaseConfigureBaseUrl: "请先配置 Base URL",
       pleaseUseDesktopApp: "请在桌面应用中使用此功能",
@@ -429,7 +429,7 @@ export const messages: Record<Locale, MessageTree> = {
       storyCore: "故事核心",
       worldBuilding: "世界观",
       productionSettings: "制作设定",
-      episodeCatalog: (count) => `分集目录 (${count} 集)`,
+      episodeCatalog: ({ count }) => `分集目录 (${count} 集)`,
       titleLabel: "标题",
       logline: "Logline",
       outline: "大纲",
@@ -447,8 +447,8 @@ export const messages: Record<Locale, MessageTree> = {
       noneSet: "未设置",
       noEpisodeData: "暂无分集数据",
       newEpisode: "新建集",
-      episodeTitlePlaceholder: (index) => `第${index}集 标题...`,
-      sceneCount: (count) => `${count} 场景`,
+      episodeTitlePlaceholder: ({ index }) => `第${index}集 标题...`,
+      sceneCount: ({ count }) => `${count} 场景`,
       deleteConfirm: "确认删除?",
       sectionStepLabel: "步骤",
     },
@@ -501,4 +501,3 @@ export function formatRelativeTime(timestamp: number, locale: Locale): string {
   if (diff < 604800000) return locale === "en" ? `${Math.floor(diff / 86400000)} d ago` : `${Math.floor(diff / 86400000)} 天前`;
   return formatDateTime(timestamp, locale);
 }
-

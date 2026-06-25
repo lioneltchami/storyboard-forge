@@ -40,7 +40,7 @@ export interface IProvider {
 export const DEFAULT_PROVIDERS: Omit<IProvider, 'id' | 'apiKey'>[] = [
   {
     platform: 'memefast',
-    name: '魔因API',
+    name: 'MemeFast',
     baseUrl: 'https://memefast.top',
     model: [
       'deepseek-v3.2',
@@ -65,6 +65,16 @@ export const DEFAULT_PROVIDERS: Omit<IProvider, 'id' | 'apiKey'>[] = [
     capabilities: ['image_generation', 'vision'],
   },
 ];
+
+const PROVIDER_DISPLAY_NAME_ALIASES: Record<string, string> = {
+  '魔因API': 'MemeFast',
+  '魔因 API': 'MemeFast',
+};
+
+export function getProviderDisplayName(providerName: string, platform?: string): string {
+  if (platform === 'memefast') return 'MemeFast';
+  return PROVIDER_DISPLAY_NAME_ALIASES[providerName] ?? providerName;
+}
 
 // ==================== Model Classification ====================
 
@@ -240,7 +250,7 @@ export function getApiKeyCount(apiKey: string): number {
  * Mask an API key for display
  */
 export function maskApiKey(key: string): string {
-  if (!key || key.length === 0) return '未设置';
+  if (!key || key.length === 0) return 'Not set';
   if (key.length <= 10) return `${key.substring(0, 4)}***`;
   return `${key.substring(0, 8)}...${key.substring(key.length - 4)}`;
 }

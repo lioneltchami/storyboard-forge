@@ -12,6 +12,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   isVisibleImageHostProvider,
+  findImageHostPreset,
   useAPIConfigStore,
   type IProvider,
   type ImageHostProvider,
@@ -80,12 +81,43 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { uploadToImageHost } from "@/lib/image-host";
+import { getProviderDisplayName } from "@/lib/api-key-manager";
 import { UpdateDialog } from "@/components/UpdateDialog";
 import type { AvailableUpdateInfo } from "@/types/update";
 import packageJson from "../../../package.json";
 
 const APP_NAME = "Moyin Creator";
 const APP_TAGLINE = "AI-powered anime video creation";
+
+function cleanDisplayText(value: unknown, fallback: string): string {
+  if (typeof value !== "string") return fallback;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "[object Object]" || trimmed === "undefined") {
+    return fallback;
+  }
+  return trimmed;
+}
+
+function getProviderLabel(provider: Pick<IProvider, "name" | "platform">): string {
+  return cleanDisplayText(
+    getProviderDisplayName(provider.name, provider.platform),
+    "Provider",
+  );
+}
+
+function getProviderPlatformLabel(provider: Pick<IProvider, "name" | "platform">): string {
+  return cleanDisplayText(
+    getProviderDisplayName(provider.name, provider.platform),
+    cleanDisplayText(provider.platform, "Provider"),
+  );
+}
+
+function getImageHostLabel(provider: Pick<ImageHostProvider, "name" | "platform">): string {
+  return cleanDisplayText(
+    provider.name,
+    cleanDisplayText(findImageHostPreset(provider.platform)?.name, provider.platform),
+  );
+}
 
 // Platform icon mapping
 const PLATFORM_ICONS: Record<string, React.ReactNode> = {
@@ -262,12 +294,13 @@ export function SettingsPanel() {
     setTestingImageHostId(provider.id);
     try {
       const testImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      const providerLabel = getImageHostLabel(provider);
       const result = await uploadToImageHost(testImage, {
         expiration: 60,
         providerId: provider.id,
       });
       if (result.success) {
-        toast.success(`Image host ${provider.name} connection test succeeded`);
+        toast.success(`Image host ${providerLabel} connection test succeeded`);
       } else {
         toast.error(`Connection test failed: ${result.error || "Unknown error"}`);
       }
@@ -286,6 +319,7 @@ export function SettingsPanel() {
       return;
     }
 
+    const providerLabel = getProviderLabel(provider);
     setTestingProvider(provider.id);
     setTestResults((prev) => ({ ...prev, [provider.id]: null }));
 
@@ -340,7 +374,7 @@ export function SettingsPanel() {
       } else {
         // For providers without chat endpoint info, just mark as configured
         setTestResults((prev) => ({ ...prev, [provider.id]: true }));
-        toast.success(`${provider.name} is configured`);
+        toast.success(`${providerLabel} is configured`);
         setTestingProvider(null);
         return;
       }
@@ -811,7 +845,7 @@ export function SettingsPanel() {
                               </div>
                               <div className="text-left">
                                 <h4 className="font-medium text-foreground flex items-center gap-2">
-                                  {provider.name}
+                                  {getProviderLabel(provider)}
                                   {provider.platform === 'memefast' && (
                                     <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded font-normal">
                                       Recommended
@@ -824,7 +858,7 @@ export function SettingsPanel() {
                                   )}
                                 </h4>
                                 <p className="text-xs text-muted-foreground">
-                                  {provider.platform}
+                                  {getProviderPlatformLabel(provider)}
                                 </p>
                               </div>
                             </div>
@@ -925,7 +959,7 @@ export function SettingsPanel() {
                                         Confirm deletion
                                       </AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Delete {provider.name}? This action cannot be undone.
+                                        Delete {getProviderLabel(provider)}? This action cannot be undone.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
@@ -1242,7 +1276,7 @@ export function SettingsPanel() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-foreground">{provider.name}</span>
+                                <span className="font-medium text-foreground">{getImageHostLabel(provider)}</span>
                                 {configured ? (
                                   <span className="text-xs px-2 py-0.5 bg-green-500/10 text-green-500 rounded">
                                     Configured
@@ -1254,7 +1288,7 @@ export function SettingsPanel() {
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                {provider.platform} · {endpoint || "No endpoint set"}
+                                {getImageHostLabel(provider)} · {cleanDisplayText(endpoint, "No endpoint set")}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {provider.apiKeyOptional && keyCount === 0

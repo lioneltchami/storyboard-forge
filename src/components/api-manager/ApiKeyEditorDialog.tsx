@@ -55,6 +55,15 @@ interface ApiKeyEditorDialogProps {
   providerName?: string;
 }
 
+function cleanDisplayText(value: unknown, fallback: string): string {
+  if (typeof value !== "string") return fallback;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "[object Object]" || trimmed === "undefined") {
+    return fallback;
+  }
+  return trimmed;
+}
+
 export function ApiKeyEditorDialog({
   open,
   onOpenChange,
@@ -216,7 +225,7 @@ export function ApiKeyEditorDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit {providerName} keys</DialogTitle>
+          <DialogTitle>Edit {cleanDisplayText(providerName, "API")} keys</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
