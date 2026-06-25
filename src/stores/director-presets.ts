@@ -2,13 +2,13 @@
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
- * Director Presets — 导演面板预设常量
+ * Director Presets
  *
- * 从 director-store.ts 中抽离的所有预设常量和派生类型。
- * 供 split-scenes.tsx、split-scene-card.tsx、prompt-builder.ts 等模块导入。
+ * Shared preset constants and derived types extracted from director-store.ts.
+ * Imported by modules such as split-scenes.tsx, split-scene-card.tsx, and prompt-builder.ts.
  */
 
-// ==================== 景别预设 (Shot Size) ====================
+// ==================== Shot Size Presets ====================
 
 export const SHOT_SIZE_PRESETS = [
   { id: 'ws', label: 'Wide Shot', labelEn: 'Wide Shot', abbr: 'WS', promptToken: 'wide shot, establishing shot, distant view' },
@@ -23,7 +23,7 @@ export const SHOT_SIZE_PRESETS = [
 
 export type ShotSizeType = typeof SHOT_SIZE_PRESETS[number]['id'];
 
-// ==================== 时长预设 (Duration) ====================
+// ==================== Duration Presets ====================
 
 export const DURATION_PRESETS = [
   { id: 4, label: '4s', value: 4 },
@@ -37,13 +37,13 @@ export const DURATION_PRESETS = [
   { id: 12, label: '12s', value: 12 },
 ] as const;
 
-// 时长类型: 4-12 秒
+// Duration type: 4-12 seconds
 export type DurationType = number;
 
-// ==================== 音效标签预设 (Sound Effects) ====================
+// ==================== Sound Effect Presets ====================
 
 export const SOUND_EFFECT_PRESETS = {
-  // 自然环境
+  // Nature ambience
   nature: [
     { id: 'wind', label: 'Wind', promptToken: 'wind blowing sound' },
     { id: 'rain', label: 'Rain', promptToken: 'rain falling sound' },
@@ -52,7 +52,7 @@ export const SOUND_EFFECT_PRESETS = {
     { id: 'water', label: 'Running Water', promptToken: 'water flowing sound' },
     { id: 'waves', label: 'Ocean Waves', promptToken: 'ocean waves crashing' },
   ],
-  // 人物动作
+  // Character actions
   action: [
     { id: 'footsteps', label: 'Footsteps', promptToken: 'footsteps sound' },
     { id: 'breathing', label: 'Breathing', promptToken: 'heavy breathing' },
@@ -60,7 +60,7 @@ export const SOUND_EFFECT_PRESETS = {
     { id: 'fighting', label: 'Fight Impact', promptToken: 'fighting impact sounds' },
     { id: 'running', label: 'Running', promptToken: 'running footsteps' },
   ],
-  // 氛围效果
+  // Atmospheric effects
   atmosphere: [
     { id: 'suspense', label: 'Suspense', promptToken: 'suspenseful ambient sound' },
     { id: 'dramatic', label: 'Dramatic', promptToken: 'dramatic sound effect' },
@@ -68,7 +68,7 @@ export const SOUND_EFFECT_PRESETS = {
     { id: 'tense', label: 'Tense', promptToken: 'tense atmosphere sound' },
     { id: 'epic', label: 'Epic', promptToken: 'epic cinematic sound' },
   ],
-  // 城市环境
+  // Urban ambience
   urban: [
     { id: 'traffic', label: 'Traffic', promptToken: 'traffic noise' },
     { id: 'crowd', label: 'Crowd', promptToken: 'crowd murmuring' },
@@ -83,9 +83,9 @@ export type SoundEffectTag =
   | typeof SOUND_EFFECT_PRESETS.atmosphere[number]['id']
   | typeof SOUND_EFFECT_PRESETS.urban[number]['id'];
 
-// ==================== 拍摄控制预设（每个分镜独立） ====================
+// ==================== Shot Control Presets (per scene) ====================
 
-// 灯光风格预设 (Gaffer)
+// Lighting Style Presets (Gaffer)
 export const LIGHTING_STYLE_PRESETS = [
   { id: 'high-key' as const, label: 'High-Key', labelEn: 'High-Key', emoji: '☀️', promptToken: 'high-key lighting, bright and even,' },
   { id: 'low-key' as const, label: 'Low-Key', labelEn: 'Low-Key', emoji: '🌑', promptToken: 'low-key lighting, dramatic shadows, film noir,' },
@@ -97,7 +97,7 @@ export const LIGHTING_STYLE_PRESETS = [
   { id: 'moonlight' as const, label: 'Moonlight', labelEn: 'Moonlight', emoji: '🌙', promptToken: 'moonlight, soft cold blue illumination,' },
 ] as const;
 
-// 灯光方向预设
+// Lighting Direction Presets
 export const LIGHTING_DIRECTION_PRESETS = [
   { id: 'front' as const, label: 'Front', labelEn: 'Front', emoji: '⬆️', promptToken: 'front lighting,' },
   { id: 'side' as const, label: 'Side', labelEn: 'Side', emoji: '➡️', promptToken: 'dramatic side lighting,' },
@@ -108,7 +108,7 @@ export const LIGHTING_DIRECTION_PRESETS = [
   { id: 'three-point' as const, label: 'Three-Point', labelEn: 'Three-Point', emoji: '🔺', promptToken: 'three-point lighting setup,' },
 ] as const;
 
-// 色温预设
+// Color Temperature Presets
 export const COLOR_TEMPERATURE_PRESETS = [
   { id: 'warm' as const, label: 'Warm 3200K', labelEn: 'Warm', emoji: '🟠', promptToken: 'warm color temperature 3200K,' },
   { id: 'neutral' as const, label: 'Neutral 5500K', labelEn: 'Neutral', emoji: '⚪', promptToken: 'neutral daylight 5500K,' },
@@ -118,7 +118,7 @@ export const COLOR_TEMPERATURE_PRESETS = [
   { id: 'mixed' as const, label: 'Mixed Temperature', labelEn: 'Mixed', emoji: '🎭', promptToken: 'mixed warm and cool lighting,' },
 ] as const;
 
-// 景深预设 (Focus Puller)
+// Depth of Field Presets (Focus Puller)
 export const DEPTH_OF_FIELD_PRESETS = [
   { id: 'ultra-shallow' as const, label: 'Ultra Shallow f/1.4', labelEn: 'Ultra Shallow', emoji: '🔍', promptToken: 'extremely shallow depth of field, f/1.4, dreamy bokeh,' },
   { id: 'shallow' as const, label: 'Shallow f/2.8', labelEn: 'Shallow', emoji: '👤', promptToken: 'shallow depth of field, soft background bokeh,' },
@@ -127,7 +127,7 @@ export const DEPTH_OF_FIELD_PRESETS = [
   { id: 'split-diopter' as const, label: 'Split Diopter', labelEn: 'Split Diopter', emoji: '🪞', promptToken: 'split diopter lens, foreground and background both in focus,' },
 ] as const;
 
-// 转焦预设
+// Focus Transition Presets
 export const FOCUS_TRANSITION_PRESETS = [
   { id: 'none' as const, label: 'Fixed Focus', labelEn: 'None', promptToken: '' },
   { id: 'rack-to-fg' as const, label: 'Rack to Foreground', labelEn: 'Rack to FG', promptToken: 'rack focus to foreground,' },
@@ -136,7 +136,7 @@ export const FOCUS_TRANSITION_PRESETS = [
   { id: 'pull-focus' as const, label: 'Pull Focus', labelEn: 'Pull Focus', promptToken: 'pull focus following subject movement,' },
 ] as const;
 
-// 器材预设 (Camera Rig)
+// Camera Rig Presets
 export const CAMERA_RIG_PRESETS = [
   { id: 'tripod' as const, label: 'Tripod', labelEn: 'Tripod', emoji: '📐', promptToken: 'static tripod shot,' },
   { id: 'handheld' as const, label: 'Handheld', labelEn: 'Handheld', emoji: '🤲', promptToken: 'handheld camera, slight shake, documentary feel,' },
@@ -148,7 +148,7 @@ export const CAMERA_RIG_PRESETS = [
   { id: 'slider' as const, label: 'Slider', labelEn: 'Slider', emoji: '↔️', promptToken: 'slider shot, short smooth lateral movement,' },
 ] as const;
 
-// 运动速度预设
+// Movement Speed Presets
 export const MOVEMENT_SPEED_PRESETS = [
   { id: 'very-slow' as const, label: 'Very Slow', labelEn: 'Very Slow', promptToken: 'very slow camera movement,' },
   { id: 'slow' as const, label: 'Slow', labelEn: 'Slow', promptToken: 'slow camera movement,' },
@@ -157,7 +157,7 @@ export const MOVEMENT_SPEED_PRESETS = [
   { id: 'very-fast' as const, label: 'Very Fast', labelEn: 'Very Fast', promptToken: 'very fast camera movement,' },
 ] as const;
 
-// 氛围特效预设 (On-set SFX)
+// Atmospheric Effect Presets (On-set SFX)
 export const ATMOSPHERIC_EFFECT_PRESETS = {
   weather: [
     { id: 'rain' as const, label: 'Rain', emoji: '🌧️', promptToken: 'rain' },
@@ -185,14 +185,14 @@ export const ATMOSPHERIC_EFFECT_PRESETS = {
   ],
 } as const;
 
-// 特效强度预设
+// Effect Intensity Presets
 export const EFFECT_INTENSITY_PRESETS = [
   { id: 'subtle' as const, label: 'Subtle', labelEn: 'Subtle', promptToken: 'subtle' },
   { id: 'moderate' as const, label: 'Moderate', labelEn: 'Moderate', promptToken: '' },
   { id: 'heavy' as const, label: 'Heavy', labelEn: 'Heavy', promptToken: 'heavy' },
 ] as const;
 
-// 播放速度预设 (Speed Ramping)
+// Playback Speed Presets (Speed Ramping)
 export const PLAYBACK_SPEED_PRESETS = [
   { id: 'slow-motion-4x' as const, label: 'Super Slow 0.25x', labelEn: 'Super Slow', emoji: '🐌', promptToken: 'ultra slow motion, 120fps,' },
   { id: 'slow-motion-2x' as const, label: 'Slow Motion 0.5x', labelEn: 'Slow Mo', emoji: '🐢', promptToken: 'slow motion, 60fps,' },
@@ -201,7 +201,7 @@ export const PLAYBACK_SPEED_PRESETS = [
   { id: 'timelapse' as const, label: 'Timelapse', labelEn: 'Timelapse', emoji: '⏱️', promptToken: 'timelapse, time passing rapidly,' },
 ] as const;
 
-// ==================== 镜头运动预设 (Camera Movement) ====================
+// ==================== Camera Movement Presets ====================
 
 export const CAMERA_MOVEMENT_PRESETS = [
   { id: 'none' as const, label: 'None', labelEn: 'None', promptToken: '' },
@@ -226,7 +226,7 @@ export const CAMERA_MOVEMENT_PRESETS = [
 
 export type CameraMovementType = typeof CAMERA_MOVEMENT_PRESETS[number]['id'];
 
-// ==================== 特殊拍摄手法预设 (Special Technique) ====================
+// ==================== Special Technique Presets ====================
 
 export const SPECIAL_TECHNIQUE_PRESETS = [
   { id: 'none' as const, label: 'None', labelEn: 'None', promptToken: '' },
@@ -246,10 +246,10 @@ export const SPECIAL_TECHNIQUE_PRESETS = [
 
 export type SpecialTechniqueType = typeof SPECIAL_TECHNIQUE_PRESETS[number]['id'];
 
-// ==================== 情绪标签预设 ====================
+// ==================== Emotion Presets ====================
 
 export const EMOTION_PRESETS = {
-  // 基础情绪
+  // Basic emotions
   basic: [
     { id: 'happy', label: 'Happy', emoji: '😊' },
     { id: 'sad', label: 'Sad', emoji: '😢' },
@@ -258,7 +258,7 @@ export const EMOTION_PRESETS = {
     { id: 'fearful', label: 'Fearful', emoji: '😨' },
     { id: 'calm', label: 'Calm', emoji: '😐' },
   ],
-  // 氛围情绪
+  // Atmosphere emotions
   atmosphere: [
     { id: 'tense', label: 'Tense', emoji: '😰' },
     { id: 'excited', label: 'Excited', emoji: '🤩' },
@@ -267,7 +267,7 @@ export const EMOTION_PRESETS = {
     { id: 'funny', label: 'Funny', emoji: '😂' },
     { id: 'touching', label: 'Touching', emoji: '🥹' },
   ],
-  // 语气情绪
+  // Tone emotions
   tone: [
     { id: 'serious', label: 'Serious', emoji: '😑' },
     { id: 'relaxed', label: 'Relaxed', emoji: '😌' },
@@ -282,7 +282,7 @@ export type EmotionTag = typeof EMOTION_PRESETS.basic[number]['id']
   | typeof EMOTION_PRESETS.atmosphere[number]['id'] 
   | typeof EMOTION_PRESETS.tone[number]['id'];
 
-// ==================== 拍摄角度预设 (Camera Angle) ====================
+// ==================== Camera Angle Presets ====================
 
 export const CAMERA_ANGLE_PRESETS = [
   { id: 'eye-level' as const, label: 'Eye Level', labelEn: 'Eye Level', emoji: '👁️', promptToken: 'eye level angle,' },
@@ -298,7 +298,7 @@ export const CAMERA_ANGLE_PRESETS = [
 
 export type CameraAngleType = typeof CAMERA_ANGLE_PRESETS[number]['id'];
 
-// ==================== 镜头焦距预设 (Focal Length) ====================
+// ==================== Focal Length Presets ====================
 
 export const FOCAL_LENGTH_PRESETS = [
   { id: '8mm' as const, label: '8mm Fisheye', labelEn: '8mm Fisheye', emoji: '🐟', promptToken: '8mm fisheye lens, extreme barrel distortion, ultra wide field of view,' },
@@ -315,7 +315,7 @@ export const FOCAL_LENGTH_PRESETS = [
 
 export type FocalLengthType = typeof FOCAL_LENGTH_PRESETS[number]['id'];
 
-// ==================== 摄影技法预设 (Photography Technique) ====================
+// ==================== Photography Technique Presets ====================
 
 export const PHOTOGRAPHY_TECHNIQUE_PRESETS = [
   { id: 'long-exposure' as const, label: 'Long Exposure', labelEn: 'Long Exposure', emoji: '🌊', promptToken: 'long exposure, motion blur, light trails, smooth water,' },

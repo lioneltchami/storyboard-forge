@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * 景别选择器组件 (Shot Size Selector)
- * 用于选择镜头的景别类型：远景、中景、近景、特写等
+ * Shot size selector
+ * Used to choose the framing type for a shot, such as wide, medium, or close-up.
  */
 
 import {
@@ -40,12 +40,12 @@ export function ShotSizeSelector({
       <SelectTrigger className={`h-7 text-xs ${className || ""}`}>
         <div className="flex items-center gap-1.5">
           <Camera className="h-3 w-3 text-muted-foreground" />
-          <SelectValue placeholder="Shot size" />
+          <SelectValue placeholder="Select shot size" />
         </div>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">
-          <span className="text-muted-foreground">Not set</span>
+          <span className="text-muted-foreground">No shot size</span>
         </SelectItem>
         {SHOT_SIZE_PRESETS.map((preset) => (
           <SelectItem key={preset.id} value={preset.id}>
@@ -63,7 +63,7 @@ export function ShotSizeSelector({
 }
 
 /**
- * 景别标签显示组件（只读）
+ * Read-only shot size label
  */
 export function ShotSizeLabel({ shotSize }: { shotSize: ShotSizeType | null }) {
   if (!shotSize) return null;

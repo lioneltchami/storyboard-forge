@@ -138,7 +138,7 @@ export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
           <div className="space-y-3">
             <p className="text-sm font-medium">Choose emotion tags</p>
             <p className="text-xs text-muted-foreground">
-              Add tags in sequence and the video will follow that emotional progression
+              Add tags in sequence to guide the video&apos;s emotional progression
             </p>
             {renderTagGroup("Core emotions", EMOTION_PRESETS.basic)}
             {renderTagGroup("Atmosphere", EMOTION_PRESETS.atmosphere)}
@@ -150,12 +150,12 @@ export function EmotionTags({ value, onChange, disabled }: EmotionTagsProps) {
       {/* Helper text */}
       {value.length === 0 && (
         <p className="text-xs text-muted-foreground">
-          Add emotion tags to control mood and delivery
+          Add emotion tags to shape mood and delivery
         </p>
       )}
       {value.length > 1 && (
         <p className="text-xs text-muted-foreground">
-          Emotions will shift in this order: {value.map((t, i) => getTagInfo(t)?.label).filter(Boolean).join(" → ")}
+          Emotion order: {value.map((t, i) => getTagInfo(t)?.label).filter(Boolean).join(" → ")}
         </p>
       )}
     </div>
