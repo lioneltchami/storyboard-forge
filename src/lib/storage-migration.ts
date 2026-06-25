@@ -1,6 +1,7 @@
 // Copyright (c) 2025 hotflow2024
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Storage Migration: Monolithic → Per-Project Files
  * 
@@ -13,8 +14,171 @@
  */
 
 import { fileStorage } from './indexed-db-storage';
+import bundledDemoProjectStore from '../../demo-data/projects/moyin-project-store.json';
+import bundledDemoCharacterLibrary from '../../demo-data/projects/moyin-character-library.json';
+import bundledDemoScript from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/script.json';
+import bundledDemoDirector from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/director.json';
+import bundledDemoScenes from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/scenes.json';
+import bundledDemoSclass from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/sclass.json';
+import bundledDemoMedia from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/media.json';
+import bundledDemoCharacters from '../../demo-data/projects/_p/a4bbe260-0127-49c7-9230-e766402663c7/characters.json';
 
 const MIGRATION_FLAG_KEY = '_p/_migrated';
+const DEMO_ENGLISH_MIGRATION_FLAG_KEY = '_p/_demo_english_migrated';
+const DEMO_PROJECT_ID = 'a4bbe260-0127-49c7-9230-e766402663c7';
+
+function hasChineseText(value: unknown): boolean {
+  return typeof value === 'string' && /[\u4e00-\u9fff]/.test(value);
+}
+
+function containsChinese(value: unknown): boolean {
+  if (typeof value === 'string') return hasChineseText(value);
+  if (Array.isArray(value)) return value.some(containsChinese);
+  if (value && typeof value === 'object') {
+    return Object.values(value).some(containsChinese);
+  }
+  return false;
+}
+
+function readState(payload: any): any {
+  return payload?.state ?? payload;
+}
+
+async function writeProjectJson(key: string, value: unknown): Promise<void> {
+  await window.fileStorage!.setItem(key, JSON.stringify(value));
+}
+
+async function migrateSeededDemoProjectToEnglish(): Promise<void> {
+  if (!window.fileStorage) return;
+
+  try {
+    if (await window.fileStorage.exists(DEMO_ENGLISH_MIGRATION_FLAG_KEY)) {
+      return;
+    }
+  } catch {
+    // If exists() is unavailable, continue and inspect the data directly.
+  }
+
+  const projectStoreRaw = await window.fileStorage.getItem('moyin-project-store');
+  if (!projectStoreRaw) return;
+
+  let currentProjectStore: any;
+  try {
+    currentProjectStore = JSON.parse(projectStoreRaw);
+  } catch (error) {
+    console.warn('[Migration] Failed to parse project store while checking demo locale:', error);
+    return;
+  }
+
+  const currentProjectStoreState = readState(currentProjectStore);
+  const currentDemoProject = currentProjectStoreState?.projects?.find?.((project: any) => project?.id === DEMO_PROJECT_ID);
+  const referenceProjectStoreState = readState(bundledDemoProjectStore);
+  const referenceDemoProject = referenceProjectStoreState?.projects?.find?.((project: any) => project?.id === DEMO_PROJECT_ID);
+
+  const projectKeys = ['script', 'director', 'scenes', 'sclass', 'media', 'characters'] as const;
+  const currentProjectPayloads = await Promise.all(
+    projectKeys.map(async (key) => {
+      const raw = await window.fileStorage.getItem(`_p/${DEMO_PROJECT_ID}/${key}`);
+      return [key, raw] as const;
+    })
+  );
+
+  const hasLegacyChinese =
+    Boolean(currentDemoProject && hasChineseText(currentDemoProject.name)) ||
+    currentProjectPayloads.some(([, raw]) => {
+      if (!raw) return false;
+      try {
+        return containsChinese(JSON.parse(raw));
+      } catch {
+        return false;
+      }
+    });
+
+  if (!hasLegacyChinese) {
+    await writeProjectJson(DEMO_ENGGLISH_MIGRATION_FLAG_KEY, {
+      migratedAt: new Date().toISOString(),
+      demoProjectId: DEMO_PROJECT_ID,
+      skipped: true,
+    });
+    console.log('[Migration] Demo project already English; skipping locale repair.');
+    return;
+  }
+
+  console.log('[Migration] Repairing seeded demo project locale from bundled English fixtures...');
+
+  const projectPayloads: Record<string, any> = {
+    script: bundledDemoScript,
+    director: bundledDemoDirector,
+    scenes: bundledDemoScenes,
+    sclass: bundledDemoSclass,
+    media: bundledDemoMedia,
+    characters: bundledDemoCharacters,
+  };
+
+  for (const [key, payload] of Object.entries(projectPayloads)) {
+    await writeProjectJson(`_p/${DEMO_PROJECT_ID}/${key}`, payload);
+  }
+
+  if (currentProjectStoreState?.projects && referenceDemoProject) {
+    const nextProjects = currentProjectStoreState.projects.map((project: any) => (
+      project?.id === DEMO_PROJECT_ID
+        ? {
+            ...project,
+            name: referenceDemoProject.name,
+            createdAt: referenceDemoProject.createdAt ?? project.createdAt,
+            updatedAt: referenceDemoProject.updatedAt ?? project.updatedAt,
+          }
+        : project
+    ));
+
+    await writeProjectJson('moyin-project-store', {
+      ...currentProjectStore,
+      state: {
+        ...currentProjectStoreState,
+        projects: nextProjects,
+        activeProjectId: currentProjectStoreState.activeProjectId ?? referenceDemoProject.id,
+      },
+    });
+  }
+
+  const currentCharacterLibraryRaw = await window.fileStorage.getItem('moyin-character-library');
+  if (currentCharacterLibraryRaw) {
+    try {
+      const currentCharacterLibrary = JSON.parse(currentCharacterLibraryRaw);
+      const currentCharacterState = readState(currentCharacterLibrary);
+      const referenceCharacterState = readState(bundledDemoCharacterLibrary);
+
+      if (currentCharacterState?.characters && Array.isArray(referenceCharacterState?.characters)) {
+        const referenceDemoCharacters = referenceCharacterState.characters.filter((character: any) => character?.projectId === DEMO_PROJECT_ID);
+        const referenceDemoCharacterIds = new Set(referenceDemoCharacters.map((character: any) => character.id));
+
+        const nextCharacters = [
+          ...currentCharacterState.characters.filter((character: any) => (
+            character?.projectId !== DEMO_PROJECT_ID && !referenceDemoCharacterIds.has(character?.id)
+          )),
+          ...referenceDemoCharacters,
+        ];
+
+        await writeProjectJson('moyin-character-library', {
+          ...currentCharacterLibrary,
+          state: {
+            ...currentCharacterState,
+            characters: nextCharacters,
+          },
+        });
+      }
+    } catch (error) {
+      console.warn('[Migration] Failed to normalize character library for demo project:', error);
+    }
+  }
+
+  await writeProjectJson(DEMO_ENGGLISH_MIGRATION_FLAG_KEY, {
+    migratedAt: new Date().toISOString(),
+    demoProjectId: DEMO_PROJECT_ID,
+    source: 'bundled-demo-data',
+  });
+  console.log('[Migration] Seeded demo project locale repair complete.');
+}
 
 /**
  * Run migration if needed. Should be called early in app initialization,
@@ -23,6 +187,8 @@ const MIGRATION_FLAG_KEY = '_p/_migrated';
 export async function migrateToProjectStorage(): Promise<void> {
   // Only run in Electron
   if (!window.fileStorage) return;
+
+  await migrateSeededDemoProjectToEnglish();
 
   // Check migration flag
   try {
@@ -40,6 +206,7 @@ export async function migrateToProjectStorage(): Promise<void> {
   console.log('[Migration] Starting per-project migration...');
 
   try {
+
     // 1. Read project index to get all project IDs
     const projectStoreRaw = await fileStorage.getItem('moyin-project-store');
     if (!projectStoreRaw) {
@@ -61,8 +228,8 @@ export async function migrateToProjectStorage(): Promise<void> {
     console.log(`[Migration] Found ${projectIds.length} projects: ${projectIds.map(id => id.substring(0, 8)).join(', ')}`);
 
     // 2. Migrate Record-based stores (script, director)
-    await migrateRecordStore('moyin-script-store', 'script', projectIds);
-    await migrateRecordStore('moyin-director-store', 'director', projectIds);
+    await migrateRecordStore('moyin-script-store', 'script');
+    await migrateRecordStore('moyin-director-store', 'director');
 
     // 3. Migrate flat-array stores (media, characters, scenes)
     await migrateFlatStore('moyin-media-store', 'media', projectIds, {
@@ -107,7 +274,6 @@ export async function migrateToProjectStorage(): Promise<void> {
 async function migrateRecordStore(
   legacyKey: string,
   storeName: string,
-  projectIds: string[],
 ): Promise<void> {
   const raw = await fileStorage.getItem(legacyKey);
   if (!raw) {

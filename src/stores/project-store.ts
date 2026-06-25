@@ -26,6 +26,11 @@ interface ProjectStore {
   ensureDefaultProject: () => void;
 }
 
+type PersistedProjectStore = {
+  projects?: Project[];
+  activeProjectId?: string | null;
+};
+
 // Default project for desktop app
 const DEFAULT_PROJECT: Project = {
   id: "default-project",
@@ -99,7 +104,7 @@ export const useProjectStore = create<ProjectStore>()(
         });
         // Clean up per-project storage directory
         if (window.fileStorage?.removeDir) {
-          window.fileStorage.removeDir(`_p/${id}`).catch((err: any) =>
+          window.fileStorage.removeDir(`_p/${id}`).catch((err: unknown) =>
             console.warn(`[ProjectStore] Failed to remove project dir _p/${id}:`, err)
           );
         }
@@ -122,7 +127,7 @@ export const useProjectStore = create<ProjectStore>()(
         projects: state.projects,
         activeProjectId: state.activeProjectId,
       }),
-      migrate: (persisted: any) => {
+      migrate: (persisted: PersistedProjectStore | undefined) => {
         if (persisted?.projects && persisted.projects.length > 0) {
           return persisted;
         }
@@ -179,29 +184,40 @@ async function discoverProjectsFromDisk(): Promise<void> {
       missingIds.map((id) => id.substring(0, 8))
     );
 
-    // 尝试从每个遗漏项目的 director / script store 文件中提取项目名
-    const recoveredProjects: Project[] = [];
-    for (const pid of missingIds) {
-      let name = `Recovered Project (${pid.substring(0, 8)})`;
+      // 尝试从每个遗漏项目的 director / script 文件中提取项目名
+      const recoveredProjects: Project[] = [];
+      for (const pid of missingIds) {
+        let name = `Recovered Project (${pid.substring(0, 8)})`;
       const createdAt = Date.now();
 
-      // 尝试从 script store 获取名称
+      // 尝试从 script 文件获取名称
       try {
-        const scriptRaw = await window.fileStorage.getItem(`_p/${pid}/script-store`);
-        if (scriptRaw) {
+        const scriptCandidates = [
+          `_p/${pid}/script`,
+          `_p/${pid}/script-store`,
+        ];
+        for (const scriptKey of scriptCandidates) {
+          const scriptRaw = await window.fileStorage.getItem(scriptKey);
+          if (!scriptRaw) continue;
           const parsed = JSON.parse(scriptRaw);
           const state = parsed?.state ?? parsed;
           // script-store 的 projects 字段中可能有项目信息
           if (state?.projects?.[pid]?.title) {
             name = state.projects[pid].title;
+            break;
           }
         }
       } catch { /* ignore */ }
 
-      // 尝试从 director store 获取创建时间等信息
+      // 尝试从 director 文件获取创建时间等信息
       try {
-        const directorRaw = await window.fileStorage.getItem(`_p/${pid}/director-store`);
-        if (directorRaw) {
+        const directorCandidates = [
+          `_p/${pid}/director`,
+          `_p/${pid}/director-store`,
+        ];
+        for (const directorKey of directorCandidates) {
+          const directorRaw = await window.fileStorage.getItem(directorKey);
+          if (!directorRaw) continue;
           const parsed = JSON.parse(directorRaw);
           const state = parsed?.state ?? parsed;
           if (state?.projects?.[pid]?.screenplay) {
@@ -214,6 +230,7 @@ async function discoverProjectsFromDisk(): Promise<void> {
               const preview = screenplay.substring(0, 20).replace(/\n/g, ' ').trim();
               if (preview) name = preview + '...';
             }
+            break;
           }
         }
       } catch { /* ignore */ }

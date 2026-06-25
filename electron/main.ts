@@ -1595,6 +1595,8 @@ ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filt
 })
 
 // ==================== Demo Project Seed ====================
+const DEMO_PROJECT_ID = 'a4bbe260-0127-49c7-9230-e766402663c7'
+const LEGACY_DEMO_PROJECT_TITLE = '灌篮少女（演示）'
 
 /**
  * Get the path to bundled demo-data.
@@ -1614,6 +1616,107 @@ function getDemoDataPath(): string {
  */
 function copyDirSync(src: string, dest: string) {
   fs.cpSync(src, dest, { recursive: true, force: false, errorOnExist: false })
+}
+
+function readJsonFile<T>(filePath: string): T | null {
+  try {
+    if (!fs.existsSync(filePath)) return null
+    const raw = fs.readFileSync(filePath, 'utf-8')
+    return JSON.parse(raw) as T
+  } catch (error) {
+    console.warn('[Demo Migration] Failed to read JSON file:', filePath, error)
+    return null
+  }
+}
+
+function writeJsonFile(filePath: string, value: unknown) {
+  ensureDir(path.dirname(filePath))
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf-8')
+}
+
+function getBundledDemoProjectRoot() {
+  return path.join(getDemoDataPath(), 'projects', '_p', DEMO_PROJECT_ID)
+}
+
+function getInstalledDemoProjectRoot() {
+  return path.join(getProjectDataRoot(), '_p', DEMO_PROJECT_ID)
+}
+
+function getBundledDemoProjectName(): string {
+  const bundledProjectStorePath = path.join(getDemoDataPath(), 'projects', 'moyin-project-store.json')
+  const bundledStore = readJsonFile<{ state?: { projects?: Array<{ id?: string; name?: string }> } }>(bundledProjectStorePath)
+  const bundledProject = bundledStore?.state?.projects?.find((project) => project.id === DEMO_PROJECT_ID)
+  return bundledProject?.name?.trim() || 'Basketball Girl (Demo)'
+}
+
+function replaceDirectoryContents(sourceDir: string, targetDir: string) {
+  if (!fs.existsSync(sourceDir)) {
+    throw new Error(`Source directory does not exist: ${sourceDir}`)
+  }
+
+  fs.rmSync(targetDir, { recursive: true, force: true })
+  fs.cpSync(sourceDir, targetDir, { recursive: true, force: true })
+}
+
+function migratePersistedDemoProject() {
+  const projectDataRoot = getProjectDataRoot()
+  const projectStorePath = path.join(projectDataRoot, 'moyin-project-store.json')
+  const bundledDemoRoot = getBundledDemoProjectRoot()
+  const installedDemoRoot = getInstalledDemoProjectRoot()
+
+  if (!fs.existsSync(projectStorePath)) {
+    console.log('[Demo Migration] No persisted project store found, skipping.')
+    return
+  }
+
+  if (!fs.existsSync(bundledDemoRoot)) {
+    console.warn('[Demo Migration] Bundled demo project data is missing, skipping.')
+    return
+  }
+
+  const projectStore = readJsonFile<{ state?: { projects?: Array<{ id?: string; name?: string; updatedAt?: number; createdAt?: number }>; activeProjectId?: string | null }; version?: number }>(projectStorePath)
+  const storeState = projectStore?.state ?? {}
+  const projects = Array.isArray(storeState.projects) ? storeState.projects : []
+  const demoProject = projects.find((project) => project?.id === DEMO_PROJECT_ID)
+
+  if (!demoProject) {
+    console.log('[Demo Migration] Demo project not present in store, skipping.')
+    return
+  }
+
+  if (demoProject.name?.trim() !== LEGACY_DEMO_PROJECT_TITLE) {
+    console.log('[Demo Migration] Demo project already migrated or renamed, skipping.')
+    return
+  }
+
+  const bundledProjectName = getBundledDemoProjectName()
+  console.log('[Demo Migration] Legacy seeded demo detected, refreshing demo files...')
+
+  try {
+    replaceDirectoryContents(bundledDemoRoot, installedDemoRoot)
+
+    const nextProjects = projects.map((project) =>
+      project?.id === DEMO_PROJECT_ID
+        ? {
+            ...project,
+            name: bundledProjectName,
+            updatedAt: Date.now(),
+          }
+        : project
+    )
+
+    writeJsonFile(projectStorePath, {
+      ...projectStore,
+      state: {
+        ...storeState,
+        projects: nextProjects,
+      },
+    })
+
+    console.log(`[Demo Migration] Refreshed demo project ${DEMO_PROJECT_ID} and renamed store entry to "${bundledProjectName}".`)
+  } catch (error) {
+    console.error('[Demo Migration] Failed to refresh seeded demo project:', error)
+  }
 }
 
 /**
@@ -1673,6 +1776,7 @@ protocol.registerSchemesAsPrivileged([{
 app.whenReady().then(() => {
   // Seed demo project on first run (before window creation)
   seedDemoProject()
+  migratePersistedDemoProject()
 
   scheduleAutoClean()
   // Handle local-image:// protocol
