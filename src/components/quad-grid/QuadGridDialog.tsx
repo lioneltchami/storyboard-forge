@@ -4,8 +4,8 @@
 "use client";
 
 /**
- * Quad Grid Dialog - 四宫格生成对话框
- * 基于锚点图生成2x2一致性变体
+ * Quad Grid Dialog - 2x2 consistency variant generator
+ * Builds consistent variations from an anchor image
  */
 
 import { useState } from "react";
@@ -41,21 +41,21 @@ const VARIATION_OPTIONS: {
 }[] = [
   {
     type: "angle",
-    label: "视角变体",
-    description: "同一场景的4个不同视角",
-    variations: ["正面偏左", "正面偏右", "侧面特写", "全景俯瞰"],
+    label: "Angle Variants",
+    description: "Four different viewpoints of the same scene",
+    variations: ["Front-left", "Front-right", "Side close-up", "Wide overhead"],
   },
   {
     type: "composition",
-    label: "构图变体",
-    description: "同一场景的4种不同构图",
-    variations: ["全身远景", "半身中景", "面部特写", "环境交代"],
+    label: "Composition Variants",
+    description: "Four different compositions of the same scene",
+    variations: ["Full-body wide shot", "Half-body medium shot", "Face close-up", "Environmental establishing shot"],
   },
   {
     type: "moment",
-    label: "时刻变体",
-    description: "动作的4个时间节点",
-    variations: ["动作起始", "动作过程", "动作高潮", "动作结束"],
+    label: "Moment Variants",
+    description: "Four time points in an action sequence",
+    variations: ["Action start", "Action in progress", "Action climax", "Action end"],
   },
 ];
 
@@ -76,9 +76,9 @@ export function QuadGridDialog({
     onGenerate(selectedType, useCharacterRef);
   };
 
-  // 生成期间禁止关闭对话框
+  // Prevent closing the dialog while generation is active
   const handleOpenChange = (newOpen: boolean) => {
-    if (isGenerating && !newOpen) return; // 生成中不允许关闭
+    if (isGenerating && !newOpen) return; // Do not allow closing during generation
     onOpenChange(newOpen);
   };
 
@@ -92,33 +92,33 @@ export function QuadGridDialog({
         <DialogHeader className="pb-2">
           <DialogTitle className="text-sm text-white flex items-center gap-2">
             <Grid2X2 className="h-4 w-4 text-cyan-400" />
-            四宫格生成 - {frameType === "start" ? "首帧" : "尾帧"}
+            2x2 Grid Generation - {frameType === "start" ? "First Frame" : "Last Frame"}
           </DialogTitle>
           <DialogDescription className="text-xs text-zinc-400">
-            基于当前图片生成4张一致性变体，继承人物/场景/光色
+            Generate four consistent variations from the current image, preserving character, scene, and lighting
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* 预览图 */}
+          {/* Preview image */}
           {previewUrl && (
             <div className="flex justify-center">
               <div className="relative w-40 aspect-video rounded overflow-hidden border border-zinc-700">
                 <img
                   src={previewUrl}
-                  alt="锚点图"
+                  alt="Anchor image"
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-1 left-1 text-[10px] bg-cyan-500/80 text-white px-1.5 py-0.5 rounded">
-                  锚点图
+                  Anchor
                 </span>
               </div>
             </div>
           )}
 
-          {/* 变体类型选择 */}
+          {/* Variation type selection */}
           <div className="space-y-2">
-            <Label className="text-xs text-zinc-400">选择变体类型</Label>
+            <Label className="text-xs text-zinc-400">Choose variation type</Label>
             <div className="grid grid-cols-3 gap-2">
               {VARIATION_OPTIONS.map((option) => (
                 <button
@@ -143,11 +143,11 @@ export function QuadGridDialog({
             </div>
           </div>
 
-          {/* 预览4格内容 */}
+          {/* Preview 4-grid content */}
           {selectedOption && (
             <div className="p-3 rounded bg-zinc-800/50 border border-zinc-700">
               <div className="text-[10px] text-zinc-500 mb-2">
-                将生成 2×2 四宫格：
+                This will generate a 2×2 grid:
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {selectedOption.variations.map((v, i) => (
@@ -162,7 +162,7 @@ export function QuadGridDialog({
             </div>
           )}
 
-          {/* 选项 */}
+          {/* Option */}
           <div className="flex items-center space-x-2 px-1">
             <Checkbox 
               id="use-char-ref" 
@@ -174,16 +174,16 @@ export function QuadGridDialog({
               htmlFor="use-char-ref" 
               className="text-xs text-zinc-400 font-normal cursor-pointer select-none leading-none"
             >
-              参考角色库形象（若画面人物混乱请关闭此项）
+              Reference the character library image (turn this off if the scene characters look confused)
             </Label>
           </div>
 
-          {/* 按钮 */}
+          {/* Buttons */}
           <div className="flex gap-2 pt-2">
             {isGenerating ? (
               <div className="flex-1 flex items-center justify-center gap-2 h-8 bg-cyan-500/20 rounded border border-cyan-500/50">
                 <Loader2 className="h-4 w-4 text-cyan-400 animate-spin" />
-                <span className="text-sm text-cyan-400">正在生成四宫格，请稍候...</span>
+                <span className="text-sm text-cyan-400">Generating the 2x2 grid, please wait...</span>
               </div>
             ) : (
               <>
@@ -193,7 +193,7 @@ export function QuadGridDialog({
                   onClick={() => onOpenChange(false)}
                   className="flex-1 h-8 text-xs bg-transparent border-zinc-700 hover:bg-zinc-800 text-white"
                 >
-                  取消
+                  Cancel
                 </Button>
                 <Button
                   size="sm"
@@ -201,7 +201,7 @@ export function QuadGridDialog({
                   className="flex-1 h-8 text-xs bg-cyan-500 hover:bg-cyan-600 text-black"
                 >
                   <Sparkles className="h-3 w-3 mr-1" />
-                  生成四宫格
+                  Generate 2x2 Grid
                 </Button>
               </>
             )}

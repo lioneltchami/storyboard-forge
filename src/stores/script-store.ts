@@ -153,7 +153,7 @@ const defaultInputDraft: ScriptInputDraft = {
 
 const defaultProjectData = (): ScriptProjectData => ({
   rawScript: "",
-  language: "涓枃",
+  language: "Chinese",
   targetDuration: "60s",
   styleId: "2d_ghibli",
   inputDraft: { ...defaultInputDraft },
@@ -564,7 +564,7 @@ export const useScriptStore = create<ScriptStore>()(
         });
       },
 
-      // ==================== Episode Bundle 鍘熷瓙鎿嶄綔 ====================
+      // ==================== Episode bundle primitive operations ====================
 
       addEpisodeBundle: (projectId, title, synopsis) => {
         get().ensureProject(projectId);
@@ -580,13 +580,13 @@ export const useScriptStore = create<ScriptStore>()(
           const newEpisode: Episode = {
             id: newEpisodeId,
             index: newIndex,
-            title: title || `第${newIndex}集`,
+            title: title || `Episode ${newIndex}`,
             description: synopsis || '',
             sceneIds: [],
           };
           const newRawScript: EpisodeRawScript = {
             episodeIndex: newIndex,
-            title: title || `第${newIndex}集`,
+            title: title || `Episode ${newIndex}`,
             synopsis: synopsis || '',
             keyEvents: [],
             rawContent: '',
@@ -624,7 +624,7 @@ export const useScriptStore = create<ScriptStore>()(
           const reindexedRaw = newRawScripts.map((e, i) => ({
             ...e,
             episodeIndex: i + 1,
-            title: e.title.replace(/^第\d+集/, `第${i + 1}集`),
+            title: e.title.replace(/^(?:第\d+集|Episode \d+)/, `Episode ${i + 1}`),
           }));
           return {
             projects: {

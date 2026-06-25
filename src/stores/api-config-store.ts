@@ -611,7 +611,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
 
             const response = await fetch(pricingUrl);
             if (!response.ok) {
-              return { success: false, count: 0, error: `pricing_new API 返回 ${response.status}` };
+              return { success: false, count: 0, error: `pricing_new API returned ${response.status}` };
             }
 
             const json = await response.json();
@@ -696,7 +696,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
                 });
 
                 if (!response.ok) {
-                  lastError = `key#${ki + 1} API 返回 ${response.status}`;
+                  lastError = `key#${ki + 1} API returned ${response.status}`;
                   console.warn(`[APIConfig] ${lastError}`);
                   continue;
                 }
@@ -719,7 +719,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
                 }
                 console.log(`[APIConfig] key#${ki + 1} contributed models, total so far: ${allModelIds.size}`);
               } catch (e) {
-                lastError = `key#${ki + 1} 网络请求失败`;
+                lastError = `key#${ki + 1} network request failed`;
                 console.warn(`[APIConfig] ${lastError}:`, e);
               }
             }
@@ -734,7 +734,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
             }
 
             if (!anySuccess) {
-              return { success: false, count: 0, error: lastError || 'API 返回异常' };
+              return { success: false, count: 0, error: lastError || 'Unexpected API response' };
             }
           }
 

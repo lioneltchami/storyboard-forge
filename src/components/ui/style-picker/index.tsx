@@ -30,7 +30,7 @@ import {
 } from "@/lib/constants/visual-styles";
 import { useCustomStyleStore } from "@/stores/custom-style-store";
 
-// 风格分类对应的背景色（图片已移除，使用色块占位）
+// Background colors for style categories (images were removed, so we use color blocks as placeholders)
 const CATEGORY_COLORS: Record<string, string> = {
   '3d': 'bg-blue-500/20 text-blue-600',
   '2d': 'bg-green-500/20 text-green-600',
@@ -65,12 +65,12 @@ export function StylePicker({
   trigger,
   className,
   disabled = false,
-  placeholder = "选择风格",
+  placeholder = "Choose a style",
 }: StylePickerProps) {
   const [hoveredStyle, setHoveredStyle] = useState<StylePreset | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // 用户自定义风格（用户数据，存储在 localStorage）
+  // User-defined styles (user data stored in localStorage)
   const customStyles = useCustomStyleStore((s) => s.styles);
   const customAsPresets: StylePreset[] = useMemo(() =>
     customStyles.map((s) => ({
@@ -86,13 +86,13 @@ export function StylePicker({
     [customStyles]
   );
 
-  // 获取当前选中的风格（内置 + 自定义）
+  // Resolve the currently selected style (built-in + custom)
   const selectedStyle = useMemo(() => getStyleById(value), [value]);
 
-  // 预览的风格（悬停优先，否则显示选中的）
+  // Preview style (hovered item wins, otherwise use the selected one)
   const previewStyle = hoveredStyle || selectedStyle || VISUAL_STYLE_PRESETS[0];
 
-  // 处理选择
+  // Handle selection
   const handleSelect = (style: StylePreset) => {
     onChange(style.id as VisualStyleId);
     if (popover) {
@@ -100,19 +100,19 @@ export function StylePicker({
     }
   };
 
-  // 内容面板
+  // Content panel
   const pickerContent = (
     <div className={cn("flex", popover ? "w-[520px] h-[400px]" : "w-full h-full", className)}>
-      {/* 左侧：风格列表 */}
+      {/* Left: style list */}
       <ScrollArea className="w-[240px] border-r border-border">
         <div className="p-2">
           {STYLE_CATEGORIES.map((category) => (
             <div key={category.id} className="mb-4">
-              {/* 分类标题 */}
+              {/* Category header */}
               <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-b border-border/50 mb-2">
                 {category.name}
               </div>
-              {/* 风格列表 */}
+              {/* Style list */}
               <div className="space-y-1">
                 {category.styles.map((style) => (
                   <StyleItem
@@ -128,11 +128,11 @@ export function StylePicker({
             </div>
           ))}
 
-          {/* 用户自定义风格（用户个人资产） */}
+          {/* User-defined styles (personal assets) */}
           {customAsPresets.length > 0 && (
             <div className="mb-4">
               <div className="px-2 py-1.5 text-xs font-medium text-primary border-b border-primary/30 mb-2">
-                我的风格
+                My Styles
               </div>
               <div className="space-y-1">
                 {customAsPresets.map((style) => (
@@ -152,9 +152,9 @@ export function StylePicker({
         </div>
       </ScrollArea>
 
-      {/* 右侧：预览信息 */}
+      {/* Right: preview info */}
       <div className="flex-1 p-4 flex flex-col">
-        {/* 色块占位 + 风格名称 */}
+        {/* Color block placeholder + style name */}
         <div className={cn(
           "flex-1 flex flex-col items-center justify-center rounded-lg mb-3",
           CATEGORY_COLORS[previewStyle.category] || 'bg-muted/30'
@@ -162,7 +162,7 @@ export function StylePicker({
           <div className="text-2xl font-bold mb-2">{previewStyle.name}</div>
           <div className="text-xs opacity-70">{previewStyle.category.toUpperCase()} · {previewStyle.mediaType}</div>
         </div>
-        {/* 风格信息 */}
+        {/* Style info */}
         <div className="text-center">
           <div className="font-medium text-sm mb-1">{previewStyle.name}</div>
           <div className="text-xs text-muted-foreground line-clamp-2">
@@ -173,7 +173,7 @@ export function StylePicker({
     </div>
   );
 
-  // 下拉模式
+  // Popover mode
   if (popover) {
     return (
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -191,13 +191,13 @@ export function StylePicker({
             >
               <div className="flex items-center gap-2">
                 {selectedStyle && (
-                  <span className={cn(
-                    "w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold",
-                    selectedStyle.id.startsWith('custom_style_')
-                      ? 'bg-primary/20 text-primary'
-                      : CATEGORY_COLORS[selectedStyle.category] || 'bg-muted'
-                  )}>
-                    {selectedStyle.id.startsWith('custom_style_') ? '★' : selectedStyle.category === '3d' ? '3D' : selectedStyle.category === '2d' ? '2D' : selectedStyle.category === 'real' ? '真' : '定'}
+                    <span className={cn(
+                      "w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold",
+                      selectedStyle.id.startsWith('custom_style_')
+                        ? 'bg-primary/20 text-primary'
+                        : CATEGORY_COLORS[selectedStyle.category] || 'bg-muted'
+                    )}>
+                    {selectedStyle.id.startsWith('custom_style_') ? '★' : selectedStyle.category === '3d' ? '3D' : selectedStyle.category === '2d' ? '2D' : selectedStyle.category === 'real' ? 'Real' : 'Fixed'}
                   </span>
                 )}
                 <span className={!selectedStyle ? "text-muted-foreground" : ""}>
@@ -226,12 +226,12 @@ export function StylePicker({
     );
   }
 
-  // 内嵌模式
+  // Inline mode
   return pickerContent;
 }
 
 /**
- * 单个风格项
+ * Single style item
  */
 interface StyleItemProps {
   style: StylePreset;
@@ -254,16 +254,16 @@ function StyleItem({ style, isSelected, isCustom, onSelect, onHover, onLeave }: 
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      {/* 色块占位 */}
+      {/* Color block placeholder */}
       <span className={cn(
         "w-10 h-10 rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0",
         isCustom ? 'bg-primary/20 text-primary' : CATEGORY_COLORS[style.category] || 'bg-muted'
       )}>
-        {isCustom ? '★' : style.category === '3d' ? '3D' : style.category === '2d' ? '2D' : style.category === 'real' ? '真' : '定'}
+        {isCustom ? '★' : style.category === '3d' ? '3D' : style.category === '2d' ? '2D' : style.category === 'real' ? 'Real' : 'Fixed'}
       </span>
-      {/* 名称 */}
+      {/* Name */}
       <span className="flex-1 text-left text-sm truncate">{style.name}</span>
-      {/* 选中标记 */}
+      {/* Selected marker */}
       {isSelected && (
         <Check className="w-4 h-4 text-primary flex-shrink-0" />
       )}
