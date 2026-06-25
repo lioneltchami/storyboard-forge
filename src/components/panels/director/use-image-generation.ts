@@ -97,20 +97,20 @@ export async function callImageGenerationApi(
 ): Promise<{ imageUrl: string; httpUrl: string }> {
   const featureConfig = getImageApiConfig();
   if (!featureConfig) {
-    throw new Error('请先在设置中配置图片生成服务映射');
+    throw new Error('Please configure the image generation service mapping in Settings');
   }
   const platform = featureConfig.platform;
   const model = featureConfig.models?.[0];
   if (!model) {
-    throw new Error('请先在设置中配置图片生成模型');
+    throw new Error('Please configure an image generation model in Settings');
   }
   const apiKeyToUse = apiKey || featureConfig.keyManager?.getCurrentKey?.() || '';
   if (!apiKeyToUse) {
-    throw new Error('请先在设置中配置图片生成服务映射');
+    throw new Error('Please configure the image generation service mapping in Settings');
   }
   const imageBaseUrl = featureConfig.baseUrl?.replace(/\/+$/, '');
   if (!imageBaseUrl) {
-    throw new Error('请先在设置中配置图片生成服务映射');
+    throw new Error('Please configure the image generation service mapping in Settings');
   }
   // Call image generation API with smart routing (auto-selects chat/completions or images/generations)
   const imageKeyManager = featureConfig.keyManager;
@@ -161,7 +161,7 @@ export async function callImageGenerationApi(
       });
 
       if (!statusResponse.ok) {
-        if (statusResponse.status === 404) throw new Error('任务不存在');
+        if (statusResponse.status === 404) throw new Error('Task not found');
         throw new Error(`Failed to check task status: ${statusResponse.status}`);
       }
 
@@ -177,7 +177,7 @@ export async function callImageGenerationApi(
         }
         imageUrl = imageUrl || normalizeUrl(statusData.output_url) || normalizeUrl(statusData.result_url) || normalizeUrl(statusData.url);
 
-        if (!imageUrl) throw new Error('任务完成但没有图片 URL');
+        if (!imageUrl) throw new Error('Task completed but returned no image URL');
         
         const httpUrl = imageUrl;
         let finalImageUrl = imageUrl;
@@ -190,7 +190,7 @@ export async function callImageGenerationApi(
       }
 
       if (status === 'failed' || status === 'error') {
-        const errorMsg = statusData.error || statusData.message || statusData.data?.error || '图片生成失败';
+        const errorMsg = statusData.error || statusData.message || statusData.data?.error || 'Image generation failed';
         throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
       }
 
@@ -199,7 +199,7 @@ export async function callImageGenerationApi(
         signal?.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('用户已取消')); }, { once: true });
       });
     }
-    throw new Error('图片生成超时');
+    throw new Error('Image generation timed out');
   }
 
   throw new Error('Invalid API response: no image URL or task ID');
@@ -316,7 +316,7 @@ export async function sliceGridImage(gridImageUrl: string, count: number): Promi
       }
       resolve(results);
     };
-    img.onerror = () => reject(new Error('加载九宫格图片失败'));
+    img.onerror = () => reject(new Error('Failed to load grid image'));
     img.src = gridImageUrl;
   });
 }

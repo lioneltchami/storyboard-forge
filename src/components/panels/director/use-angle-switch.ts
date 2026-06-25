@@ -71,7 +71,7 @@ export function useAngleSwitch({
 
     const imageUrl = type === "start" ? scene.imageDataUrl : scene.endFrameImageUrl;
     if (!imageUrl) {
-      toast.error(`请先生成${type === "start" ? "首帧" : "尾帧"}`);
+      toast.error(`Please generate the ${type === "start" ? "first frame" : "end frame"} first`);
       return;
     }
 
@@ -98,7 +98,7 @@ export function useAngleSwitch({
     const runninghubBaseUrl = runninghubProvider?.baseUrl?.trim();
     const runninghubAppId = runninghubProvider?.model?.[0];
     if (!runninghubKey || !runninghubBaseUrl || !runninghubAppId) {
-      toast.error("请先在设置中配置 RunningHub（API Key / Base URL / 模型AppId）");
+      toast.error("Please configure RunningHub in Settings (API Key / Base URL / Model App ID)");
       setAngleSwitchOpen(false);
       return;
     }
@@ -108,7 +108,7 @@ export function useAngleSwitch({
 
     const originalImage = angleSwitchTarget.type === "start" ? scene.imageDataUrl : scene.endFrameImageUrl;
     if (!originalImage) {
-      toast.error("找不到原图");
+      toast.error("Original image not found");
       return;
     }
 
@@ -154,9 +154,9 @@ export function useAngleSwitch({
       setAngleSwitchOpen(false);
       setAngleSwitchResultOpen(true);
 
-      toast.success("视角切换生成完成");
+      toast.success("Angle switch generated");
     } catch (error) {
-      toast.error(`视角切换失败: ${(error as Error).message}`);
+      toast.error(`Angle switch failed: ${(error as Error).message}`);
     } finally {
       setIsAngleSwitching(false);
     }
@@ -187,7 +187,7 @@ export function useAngleSwitch({
     setAngleSwitchResult(null);
     setAngleSwitchTarget(null);
     setSelectedHistoryIndex(-1);
-    toast.success("视角已应用");
+    toast.success("Angle applied");
   }, [angleSwitchResult, angleSwitchTarget, splitScenes, selectedHistoryIndex, updateSplitSceneImage, updateSplitSceneEndFrame]);
 
   // Helper to get history for current target
