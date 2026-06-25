@@ -287,7 +287,7 @@ export function EpisodeTree({
       return next;
     });
     setLocalKeptCharacters(prev => prev.filter(c => c.id !== charId));
-    setLocalFilteredCharacters(prev => [...prev, { name: char.name, reason: '用户手动移除' }]);
+    setLocalFilteredCharacters(prev => [...prev, { name: char.name, reason: 'Manually removed by user' }]);
   }, [localKeptCharacters]);
   
   // 从过滤列表恢复角色到保留列表

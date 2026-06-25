@@ -352,7 +352,7 @@ export function ScreenplayInput({ onGenerateStoryboard }: ScreenplayInputProps) 
     let fullPrompt = prompt;
     if (selectedCharacters.length > 0) {
       const characterDescriptions = selectedCharacters
-      .map(c => `角色"${c.characterName}": ${c.visualTraits || '由AI根据名字设计'}`)
+      .map(c => `Character "${c.characterName}": ${c.visualTraits || 'Designed by AI from the name'}`)
         .join("; ");
       fullPrompt = `${prompt}\n\n包含以下角色: ${characterDescriptions}`;
     }
@@ -408,7 +408,7 @@ export function ScreenplayInput({ onGenerateStoryboard }: ScreenplayInputProps) 
         const actualStyleTokens = getSelectedStyleTokens();
         const rawCharacterImages = getCharacterReferenceImages();
         const characterDescriptions = selectedCharacters.map(
-          c => `${c.characterName}: ${c.visualTraits || '由AI根据名字设计'}`
+          c => `${c.characterName}: ${c.visualTraits || 'Designed by AI from the name'}`
         );
 
         // Upload base64 images to get HTTP URLs (API only accepts URLs)
