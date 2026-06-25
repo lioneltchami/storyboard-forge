@@ -480,7 +480,7 @@ export async function parseScript(
 
 ${rawScript}
 
-语言：${options.language || '中文'}${sceneCountHint}`;
+语言：${options.language || 'English'}${sceneCountHint}`;
 
   const response = await callChatAPI(PARSE_SYSTEM_PROMPT, userPrompt, options);
   const cleaned = cleanJsonString(response);
@@ -491,8 +491,8 @@ ${rawScript}
     // Validate and transform scenes with detailed visual design
     const scenes = (parsed.scenes || []).map((s: any, i: number) => ({
       id: s.id || `scene_${i + 1}`,
-      name: s.name || s.location || `场景${i + 1}`,
-      location: s.location || '未知地点',
+      name: s.name || s.location || `Scene ${i + 1}`,
+      location: s.location || 'Unknown location',
       time: normalizeTimeValue(s.time),
       atmosphere: s.atmosphere || '',
       visualPrompt: s.visualPrompt || '', // 用于场景概念图生成
@@ -522,7 +522,7 @@ ${rawScript}
     let episodes = (parsed.episodes || []).map((e: any, i: number) => ({
       id: e.id || `ep_${i + 1}`,
       index: e.index || i + 1,
-      title: e.title || `第${i + 1}集`,
+      title: e.title || `Episode ${i + 1}`,
       description: e.description,
       sceneIds: e.sceneIds || [],
     }));
@@ -532,7 +532,7 @@ ${rawScript}
       episodes = [{
         id: 'ep_1',
         index: 1,
-        title: parsed.title || '第1集',
+        title: parsed.title || 'Episode 1',
         description: parsed.logline,
         sceneIds: scenes.map((s: any) => s.id),
       }];
@@ -547,10 +547,10 @@ ${rawScript}
     }
 
     const scriptData: ScriptData = {
-      title: parsed.title || '未命名剧本',
+      title: parsed.title || 'Untitled Script',
       genre: parsed.genre,
       logline: parsed.logline,
-      language: options.language || '中文',
+      language: options.language || 'English',
       characters,
       scenes,
       episodes,
@@ -582,7 +582,7 @@ export async function generateShotList(
     return [];
   }
 
-  const lang = options.language || scriptData.language || '中文';
+  const lang = options.language || scriptData.language || 'English';
   const allShots: Shot[] = [];
   
   // 计算每个场景应该生成的分镜数
@@ -631,7 +631,7 @@ export async function generateShotList(
 
     const sceneContent = paragraphs.trim() 
       ? paragraphs 
-      : `场景${sceneIndex + 1}: ${scene.name || scene.location}，${scene.atmosphere || ''}环境`;
+      : `Scene ${sceneIndex + 1}: ${scene.name || scene.location}, ${scene.atmosphere || ''} atmosphere`;
 
     const userPrompt = `为场景 ${sceneIndex + 1} 生成电影级别的详细分镜。
 输出语言: ${lang}
@@ -925,7 +925,7 @@ export async function generateScriptFromIdea(
   idea: string,
   options: ScriptGenerationOptions
 ): Promise<string> {
-  const { language = '中文', targetDuration = '60s', sceneCount, shotCount, styleId } = options;
+  const { language = 'English', targetDuration = '60s', sceneCount, shotCount, styleId } = options;
   
   // 根据时长生成参考范围（不是硬限制，是给 AI 的参考）
   const durationSeconds = targetDuration === 'auto' ? 0 : (parseInt(targetDuration) || 60);

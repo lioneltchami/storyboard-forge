@@ -81,6 +81,12 @@ const SHOT_COUNT_OPTIONS = [
   { value: "custom", label: "Custom..." },
 ];
 
+const normalizeScriptLanguage = (value?: string) => {
+  if (value === "中文") return "Chinese";
+  if (value === "日本語") return "Japanese";
+  return value || "English";
+};
+
 interface ScriptInputProps {
   rawScript: string;
   language: string;
@@ -499,7 +505,7 @@ export function ScriptInput({
             <div className="space-y-1">
               <Label className="text-xs">Script language</Label>
               <Select
-                value={language}
+                value={normalizeScriptLanguage(language)}
                 onValueChange={onLanguageChange}
                 disabled={parseStatus === "parsing"}
               >
@@ -507,9 +513,9 @@ export function ScriptInput({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="中文">Chinese</SelectItem>
+                  <SelectItem value="Chinese">Chinese</SelectItem>
                   <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="日本語">Japanese</SelectItem>
+                  <SelectItem value="Japanese">Japanese</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -671,7 +677,7 @@ export function ScriptInput({
               <div className="space-y-1">
                 <Label className="text-xs">Language</Label>
                 <Select
-                  value={language}
+                  value={normalizeScriptLanguage(language)}
                   onValueChange={onLanguageChange}
                   disabled={parseStatus === "parsing"}
                 >
@@ -679,9 +685,9 @@ export function ScriptInput({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="中文">Chinese</SelectItem>
+                    <SelectItem value="Chinese">Chinese</SelectItem>
                     <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="日本語">Japanese</SelectItem>
+                    <SelectItem value="Japanese">Japanese</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -151,9 +151,18 @@ const defaultInputDraft: ScriptInputDraft = {
   updatedAt: 0,
 };
 
+const normalizeScriptLanguage = (language?: string): string => {
+  if (language === "中文") return "Chinese";
+  if (language === "日本語") return "Japanese";
+  if (language === "Chinese" || language === "English" || language === "Japanese") {
+    return language;
+  }
+  return language || "English";
+};
+
 const defaultProjectData = (): ScriptProjectData => ({
   rawScript: "",
-  language: "Chinese",
+  language: "English",
   targetDuration: "60s",
   styleId: "2d_ghibli",
   inputDraft: { ...defaultInputDraft },
@@ -206,6 +215,7 @@ const normalizeScriptProjectData = (projectId: string, projectData: any): Script
   const normalizedProject: ScriptProjectData = {
     ...defaults,
     ...projectData,
+    language: normalizeScriptLanguage(projectData?.language ?? defaults.language),
     inputDraft: {
       ...defaultInputDraft,
       ...(projectData?.inputDraft || {}),
@@ -300,7 +310,7 @@ export const useScriptStore = create<ScriptStore>()(
             ...state.projects,
             [projectId]: {
               ...state.projects[projectId],
-              language,
+              language: normalizeScriptLanguage(language),
               updatedAt: Date.now(),
             },
           },
