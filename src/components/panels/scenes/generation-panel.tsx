@@ -2859,7 +2859,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                 <p className="text-[10px] text-muted-foreground">
                   {(() => {
                     const dims = getLayoutDimensions(contactSheetLayout, contactSheetAspectRatio);
-                    return `${dims.rows}行${dims.cols}列 = ${dims.rows * dims.cols}格`;
+                    return `${dims.rows} rows × ${dims.cols} columns = ${dims.rows * dims.cols} cells`;
                   })()}
                 </p>
               </div>
@@ -3015,7 +3015,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                       Split into {(() => {
                         const currentPageVps = pendingViewpoints.filter(v => v.pageIndex === currentPageIndex);
                         return currentPageVps.length > 0 ? currentPageVps.length : extractedViewpoints.length || 6;
-                      })()} 个视角
+                      })()} viewpoints
                     </>
                   )}
                 </Button>
