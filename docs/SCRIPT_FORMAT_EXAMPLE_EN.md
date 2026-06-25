@@ -2,6 +2,8 @@
 
 > Use this as the English reference format when preparing scripts for Moyin Creator.
 
+> This is a structure reference, not a localization guarantee. The app may still keep some prompts, labels, and deeper references Chinese-first while accepting the same import structure.
+
 ---
 
 ## Format overview
@@ -86,3 +88,9 @@ Example:
 2. Import it into the `Script` panel.
 3. Run scene, shot, and character calibration.
 4. Continue into `Scenes`, `Director`, or `S-Class`.
+
+## Notes for English users
+
+- Keep the episode and scene structure consistent, even if the content is written in English.
+- The importer cares more about structure than exact wording.
+- If a workflow step appears Chinese-first in the UI or docs, treat this file as the English structural reference and use the workflow guide for the current product behavior.

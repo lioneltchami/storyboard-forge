@@ -36,6 +36,13 @@
 
 Each stage's output automatically flows into the next — no manual glue required. Supports multiple mainstream AI models, ideal for batch production of short dramas, anime series, trailers, and more.
 
+## Language Notes
+
+- The product can be used with an English-facing UI, but some workflow surfaces are still Chinese-first.
+- Prompt language is intentionally separate from the UI language. Many generation and calibration flows keep Chinese narration / instructions while using English for model-facing visual prompts.
+- For workflow details, use [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md). It is the best English-facing starting point, but some deeper reference material is still Chinese-first.
+- For script import structure, see [docs/SCRIPT_FORMAT_EXAMPLE_EN.md](docs/SCRIPT_FORMAT_EXAMPLE_EN.md). The English companion covers the structure that the importer expects.
+
 ## Features
 
 ### ⭐ S-Class Module — Seedance 2.0 Multimodal Creation
@@ -110,6 +117,10 @@ npm run dev
 ### Configure API Key
 
 After launching, go to **Settings → API Configuration** and enter your AI provider API key to start using the tool.
+
+### Workflow Reference
+
+If you are new to the app, start with [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md). It covers the baseline script-to-video flow in English and notes where the current experience still remains Chinese-first. For script formatting, use [docs/SCRIPT_FORMAT_EXAMPLE_EN.md](docs/SCRIPT_FORMAT_EXAMPLE_EN.md).
 
 ### Build
 

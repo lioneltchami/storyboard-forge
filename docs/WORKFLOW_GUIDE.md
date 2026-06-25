@@ -7,6 +7,8 @@
 
 Moyin Creator includes multiple workflows. Each panel can be combined freely or used on its own for different creative scenarios. This guide covers the most common baseline workflow and is the recommended place for new users to start.
 
+> Language note: the UI can be used in English, but the app is still partially Chinese-first in its prompts, labels, and some reference materials. That split is intentional in the current release: UI language and prompt language are not the same setting.
+
 ---
 
 ## Workflow overview
@@ -58,7 +60,7 @@ Open the `Script` panel. You can begin in two ways:
 - Import a script: paste or import a complete screenplay into the editor
 - AI creation: use AI assistance to create a script from scratch
 
-For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md).
+For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md). Use the Chinese-first example only if you need a fuller sample of narrative style.
 
 The system will automatically analyze the script into structured scenes, storyboard shots, characters, dialogue, and related elements.
 
@@ -136,6 +138,13 @@ The S-Class workflow also handles first-frame stitching, three-layer prompt fusi
 - Fine-tune parameters freely. Prompts, first frames, and last frames can all be adjusted manually per shot.
 - Use S-Class when you need multi-shot narrative continuity.
 - Use Director when you want finer shot-by-shot control.
+- If you are working in English, keep an eye on prompt language separately from UI language. English UI does not automatically change the underlying script-analysis or prompt-generation contract.
+
+## English reference files
+
+- [README_EN.md](../README_EN.md): product overview and quick start
+- [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md): import structure reference
+- [SCRIPT_FORMAT_EXAMPLE.md](./SCRIPT_FORMAT_EXAMPLE.md): Chinese-first full example, useful when you need a longer narrative sample
 
 ---
 

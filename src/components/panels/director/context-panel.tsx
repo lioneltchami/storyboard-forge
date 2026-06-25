@@ -5,7 +5,7 @@
 
 /**
  * Director Context Panel Component
- * 全局右栏 - AI导演模式：显示剧本层级树，让用户选择要生成的内容
+ * Global right panel for AI director mode: shows the script hierarchy tree so users can choose what to generate.
  */
 
 import { useState, useMemo, useCallback } from "react";
@@ -63,7 +63,7 @@ export function DirectorContextPanel() {
   const splitScenes = projectData?.splitScenes || [];
   const storyboardStatus = projectData?.storyboardStatus || 'idle';
   
-  // 获取场景库数据
+  // Get scene library data
   const { scenes } = useSceneStore();
   const sceneLibraryScenes = useMemo(() => {
     if (resourceSharing.shareScenes) return scenes;
@@ -94,22 +94,22 @@ export function DirectorContextPanel() {
     }
   }, [addScenesFromScript, setStoryboardConfig, projectData?.storyboardConfig?.visualStyleId, scriptProject?.styleId]);
 
-  // 如果没有episodes，创建一个默认的
+  // If there are no episodes, create a default one
   const episodes = useMemo(() => {
     if (!scriptData) return [];
     if (scriptData.episodes && scriptData.episodes.length > 0) {
       return scriptData.episodes;
     }
-    // 默认单集
+    // Default single episode
     return [{
       id: "default",
       index: 1,
-      title: scriptData.title || "第1集",
+      title: scriptData.title || "Episode 1",
       sceneIds: scriptData.scenes.map((s) => s.id),
     }];
   }, [scriptData]);
 
-  // 按场景分组的shots
+  // Shots grouped by scene
   const shotsByScene = useMemo(() => {
     const map: Record<string, Shot[]> = {};
     shots.forEach((shot) => {
@@ -142,7 +142,7 @@ export function DirectorContextPanel() {
     });
   };
 
-  // 获取角色库中的所有角色
+  // Get all characters from the character library
   const { characters } = useCharacterLibraryStore();
   const libraryCharacters = useMemo(() => {
     if (resourceSharing.shareCharacters) return characters;
@@ -150,7 +150,7 @@ export function DirectorContextPanel() {
     return characters.filter((c) => c.projectId === activeProjectId);
   }, [characters, resourceSharing.shareCharacters, activeProjectId]);
   
-  // 将剧本角色ID或角色名称映射到角色库ID
+  // Map script character IDs or names to character library IDs
   const mapScriptCharacterIdsToLibraryIds = (scriptCharIds: string[], characterNames?: string[]): string[] => {
     const libraryIds: string[] = [];
     const addedIds = new Set<string>(); // 避免重复
@@ -208,8 +208,8 @@ export function DirectorContextPanel() {
     return libraryIds;
   };
   
-  // 根据分镜和场景信息查找匹配的场景库视角
-  // 优先使用AI分析的shotIds关联，保底用分镜序号对应视角序号
+  // Find a matching scene library viewpoint from shot and scene info
+  // Prefer AI-linked shotIds, fall back to shot index -> viewpoint index
   const findMatchingSceneAndViewpointQuick = (shot: Shot, scene: ScriptScene, shotIndexInScene?: number): ViewpointMatchResult | null => {
     const sceneName = scene.name || '';
     
@@ -301,7 +301,7 @@ export function DirectorContextPanel() {
     };
   };
   
-  // 在场景库中查找匹配的视角
+  // Find a matching viewpoint in the scene library
   const findViewpointInLibrary = (sceneName: string, viewpointName: string): ViewpointMatchResult | null => {
     console.log(`[findViewpointInLibrary] 查找场景: "${sceneName}", 视角: "${viewpointName}"`);
     console.log(`[findViewpointInLibrary] 场景库总数: ${sceneLibraryScenes.length}`);
@@ -361,12 +361,12 @@ export function DirectorContextPanel() {
     };
   };
   
-  // 异步版本：关键词 + AI 匹配（用于批量添加）
+  // Async version: keyword + AI matching for batch add
   const findMatchingSceneAndViewpointWithAI = async (sceneName: string, actionSummary: string): Promise<ViewpointMatchResult | null> => {
     return matchSceneAndViewpoint(sceneName, actionSummary, sceneLibraryScenes, true);
   };
 
-  // 添加单个分镜到分镜编辑（模式二）
+  // Add a single shot to the split-scene editor (mode 2)
   const handleAddShotToSplitScenes = (shot: Shot, scene: ScriptScene) => {
     // Debug: 检查 Shot 中的三层提示词数据
     console.log('[ContextPanel] Adding shot to split scenes:', {
@@ -464,11 +464,11 @@ export function DirectorContextPanel() {
       photographyTechnique: shot.photographyTechnique,
     }]);
     
-    const matchInfo = sceneMatch ? ` (匹配: ${sceneMatch.matchedSceneName})` : '';
-    toast.success(`已添加分镜到编辑列表${matchInfo}`);
+    const matchInfo = sceneMatch ? ` (matched: ${sceneMatch.matchedSceneName})` : '';
+    toast.success(`Shot added to editor list${matchInfo}`);
   };
 
-  // 添加整个场景的所有分镜到分镜编辑（模式二）
+  // Add all shots from a scene to the split-scene editor (mode 2)
   const handleAddSceneToSplitScenes = (scene: ScriptScene) => {
     const sceneShots = shotsByScene[scene.id] || [];
     
@@ -488,7 +488,7 @@ export function DirectorContextPanel() {
       );
 
       addScenesAndSyncStyle([{
-        sceneName: scene.name || scene.location || '未命名场景',
+        sceneName: scene.name || scene.location || 'Untitled scene',
         sceneLocation: scene.location || '',
         promptZh: fallbackPromptZh,
         promptEn: fallbackPromptEn,
@@ -515,8 +515,8 @@ export function DirectorContextPanel() {
         sceneReferenceImage: matchedScene?.referenceImage || matchedScene?.referenceImageBase64,
       }]);
 
-      const matchInfo = matchedScene ? `（已匹配场景库：${matchedScene.name}）` : '';
-      toast.success(`该场景暂无分镜，已创建 1 条场景分镜${matchInfo}`);
+      const matchInfo = matchedScene ? ` (matched scene library: ${matchedScene.name})` : '';
+      toast.success(`No shots found for this scene. Created 1 scene shot${matchInfo}`);
       return;
     }
     
@@ -605,11 +605,11 @@ export function DirectorContextPanel() {
     });
     
     addScenesAndSyncStyle(scenesToAdd);
-    const matchInfo = matchedCount > 0 ? ` (${matchedCount}个已匹配场景库)` : '';
-    toast.success(`已添加 ${scenesToAdd.length} 个分镜到编辑列表${matchInfo}`);
+    const matchInfo = matchedCount > 0 ? ` (${matchedCount} matched to the scene library)` : '';
+    toast.success(`Added ${scenesToAdd.length} shots to the editor list${matchInfo}`);
   };
 
-  // 发送单个分镜到AI导演输入（模式一）
+  // Send a single shot to AI director input (mode 1)
   const handleSendShot = (shot: Shot, scene: ScriptScene) => {
     // 构建故事提示
     const parts: string[] = [];
@@ -644,7 +644,7 @@ export function DirectorContextPanel() {
     setSelectedSceneId(null);
   };
 
-  // 发送整个场景到AI导演输入
+  // Send an entire scene to AI director input
   const handleSendScene = (scene: ScriptScene) => {
     const sceneShots = shotsByScene[scene.id] || [];
 
@@ -693,20 +693,20 @@ export function DirectorContextPanel() {
     setSelectedShotId(null);
   };
 
-  // 没有剧本数据时显示提示
+  // Show a prompt when there is no script data
   if (!scriptData) {
     return (
       <div className="h-full min-w-0 flex flex-col overflow-x-hidden">
         <div className="p-3 border-b">
           <h3 className="font-medium text-sm flex items-center gap-2">
             <FileVideo className="h-4 w-4" />
-            剧本结构
+            Script structure
           </h3>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center text-muted-foreground text-sm">
-            <p>暂无剧本数据</p>
-            <p className="mt-1">请先在剧本面板解析剧本</p>
+            <p>No script data yet</p>
+            <p className="mt-1">Parse a script in the Script panel first</p>
           </div>
         </div>
         <div className="p-3 border-t">
@@ -717,21 +717,21 @@ export function DirectorContextPanel() {
             onClick={handleBackToScript}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            去剧本面板
+            Go to Script panel
           </Button>
         </div>
       </div>
     );
   }
 
-  // 计算整体进度
+  // Calculate overall progress
   const overallProgress = calculateProgress(
     shots.map((s) => ({ status: getShotCompletionStatus(s) }))
   );
 
   return (
     <div className="h-full min-w-0 flex flex-col overflow-x-hidden">
-      {/* 标题和进度 */}
+      {/* Title and progress */}
       <div className="p-3 border-b">
         <div className="flex items-center justify-between">
           <div>
@@ -741,25 +741,25 @@ export function DirectorContextPanel() {
             )}
           </div>
           <span className="text-xs text-muted-foreground">
-            进度: {overallProgress}
+            Progress: {overallProgress}
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          点击场景/分镜可发送到AI导演输入
+          Click a scene or shot to send it to AI director input
         </p>
-        {/* 分镜编辑计数 */}
+        {/* Split-scene editor count */}
         {splitScenes.length > 0 && (
           <div className="mt-2 px-2 py-1 bg-green-500/10 rounded text-xs text-green-600 flex items-center gap-1">
             <Plus className="h-3 w-3" />
-            <span>已添加 {splitScenes.length} 个分镜到编辑列表</span>
+            <span>{splitScenes.length} shots added to the editor list</span>
           </div>
         )}
       </div>
 
-      {/* 树形结构 */}
+      {/* Tree structure */}
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
-          {/* 集列表 */}
+          {/* Episode list */}
           {episodes.map((episode) => {
             const episodeScenes = scriptData.scenes.filter((s) =>
               episode.sceneIds.includes(s.id)
@@ -773,7 +773,7 @@ export function DirectorContextPanel() {
 
             return (
               <div key={episode.id} className="space-y-0.5">
-                {/* 集标题 */}
+                {/* Episode title */}
                 <button
                   onClick={() => toggleEpisode(episode.id)}
                   className="w-full flex items-center gap-1 px-2 py-1.5 rounded hover:bg-muted text-left"
@@ -792,7 +792,7 @@ export function DirectorContextPanel() {
                   </span>
                 </button>
 
-                {/* 场景列表 */}
+                {/* Scene list */}
                 {expandedEpisodes.has(episode.id) && (
                   <div className="ml-4 space-y-0.5">
                     {episodeScenes.map((scene) => {
@@ -804,7 +804,7 @@ export function DirectorContextPanel() {
 
                       return (
                         <div key={scene.id} className="space-y-0.5">
-                          {/* 场景标题 */}
+                          {/* Scene title */}
                           <div className="flex items-center group">
                             <button
                               onClick={() => toggleScene(scene.id)}
@@ -840,11 +840,11 @@ export function DirectorContextPanel() {
                                 e.stopPropagation();
                                 handleAddSceneToSplitScenes(scene);
                               }}
-                              title="添加所有分镜到分镜编辑"
+                              title="Add all shots to the split-scene editor"
                             >
                               <Plus className="h-3 w-3 text-green-500" />
                             </Button>
-                            {/* 发送场景按钮 */}
+                            {/* Send scene button */}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -853,13 +853,13 @@ export function DirectorContextPanel() {
                                 e.stopPropagation();
                                 handleSendScene(scene);
                               }}
-                              title="发送整个场景到AI导演生成图片"
+                              title="Send the entire scene to AI director for image generation"
                             >
                               <Send className="h-3 w-3 text-primary" />
                             </Button>
                           </div>
 
-                          {/* 分镜列表 */}
+                          {/* Shot list */}
                           {expandedScenes.has(scene.id) && sceneShots.length > 0 && (
                             <div className="ml-4 space-y-0.5">
                               {sceneShots.map((shot) => {
@@ -874,19 +874,19 @@ export function DirectorContextPanel() {
                                         "flex-1 flex items-center gap-2 px-2 py-1 rounded hover:bg-muted text-left",
                                         isShotSelected && "bg-primary/10 ring-1 ring-primary/30"
                                       )}
-                                      title="单击: 发送到AI导演输入 | 双击: 直接添加到分镜编辑"
+                                      title="Click: send to AI director input | Double-click: add directly to the split-scene editor"
                                     >
                                       <span className="text-xs font-mono text-muted-foreground w-5">
                                         {String(shot.index).padStart(2, "0")}
                                       </span>
                                       <span className="text-xs flex-1 truncate">
-                                        {shot.shotSize || "镜头"} - {shot.actionSummary?.slice(0, 20)}...
+                                        {shot.shotSize || "Shot"} - {shot.actionSummary?.slice(0, 20)}...
                                       </span>
                                       <StatusIcon
                                         status={getShotCompletionStatus(shot)}
                                       />
                                     </button>
-                                    {/* 添加到分镜按钮 */}
+                                    {/* Add-to-editor button */}
                                     <Button
                                       variant="ghost"
                                       size="sm"
@@ -895,7 +895,7 @@ export function DirectorContextPanel() {
                                         e.stopPropagation();
                                         handleAddShotToSplitScenes(shot, scene);
                                       }}
-                                      title="添加到分镜编辑"
+                                      title="Add to split-scene editor"
                                     >
                                       <Plus className="h-3 w-3 text-green-500" />
                                     </Button>
@@ -915,12 +915,12 @@ export function DirectorContextPanel() {
         </div>
       </ScrollArea>
 
-      {/* 底部操作 */}
+      {/* Bottom actions */}
       <div className="p-3 border-t space-y-2">
-        {/* 模式说明 */}
+        {/* Mode guide */}
         <div className="text-[10px] text-muted-foreground space-y-1">
-          <p><span className="text-green-500">+</span> 添加到分镜（单独生成图片）</p>
-          <p><span className="text-primary">→</span> 发送到输入（批量生成省钱）</p>
+          <p><span className="text-green-500">+</span> Add to editor, generate images separately</p>
+          <p><span className="text-primary">→</span> Send to input, batch generation saves money</p>
         </div>
         <Button
           variant="outline"
@@ -929,7 +929,7 @@ export function DirectorContextPanel() {
           onClick={handleBackToScript}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          返回剧本
+          Back to script
         </Button>
       </div>
     </div>
