@@ -276,7 +276,7 @@ export function ScriptView() {
 
   // Local state fallbacks
   const rawScript = scriptProject?.rawScript || "";
-  const language = scriptProject?.language || "中文";
+  const language = scriptProject?.language || "English";
   const targetDuration = scriptProject?.targetDuration || "60s";
   const styleId = scriptProject?.styleId || DEFAULT_STYLE_ID;
   const sceneCount = scriptProject?.sceneCount;
@@ -1110,11 +1110,11 @@ export function ScriptView() {
                   gender: baseChar.gender,
                   age: stage.ageDescription,
                   personality: baseChar.personality,
-                  role: `${stage.stageDescription}\n\n原始角色背景：${baseChar.role || ''}`,
+                  role: `${stage.stageDescription}\n\nOriginal character background: ${baseChar.role || ''}`,
                   traits: baseChar.traits,
                   appearance: baseChar.appearance,
                   relationships: baseChar.relationships,
-                  tags: [...(baseChar.tags || []), stage.name, '阶段角色'],
+                  tags: [...(baseChar.tags || []), stage.name, 'Stage character'],
                   // 多阶段关联
                   baseCharacterId: baseChar.id,
                   stageInfo: {
@@ -1146,8 +1146,8 @@ export function ScriptView() {
                 stageCharacterIds: stageCharIds,
                 consistencyElements: analysis.consistencyElements,
                 // 标记为父角色，不需要单独生成形象，只作为阶段角色的分组
-                tags: [...(baseChar.tags || []).filter(t => t !== 'protagonist'), '父角色'],
-                notes: `此角色有 ${stageCharIds.length} 个阶段版本，请分别为各阶段版本生成形象`,
+                tags: [...(baseChar.tags || []).filter(t => t !== 'protagonist'), 'Parent character'],
+                notes: `This character has ${stageCharIds.length} stage versions. Please generate an image for each version separately.`,
               };
               
               console.log(`[StageAnalysis] 为角色 ${analysis.characterName} 创建了 ${analysis.stages.length} 个阶段角色`);
@@ -1344,7 +1344,7 @@ export function ScriptView() {
       
       if (!baseUrl || !model) {
         toast.error('Configure the “script analysis” Base URL and model in Settings first');
-        setParseStatus(projectId, "error", "缺少 Base URL 或模型配置");
+        setParseStatus(projectId, "error", "Missing Base URL or model configuration");
         return;
       }
 
@@ -1406,7 +1406,7 @@ export function ScriptView() {
       const model = featureConfig.models?.[0];
       if (!baseUrl || !model) {
         toast.error('Configure the “script analysis” Base URL and model in Settings first');
-        setParseStatus(projectId, "error", "缺少 Base URL 或模型配置");
+        setParseStatus(projectId, "error", "Missing Base URL or model configuration");
         return;
       }
 
@@ -1519,7 +1519,7 @@ export function ScriptView() {
         const model = featureConfig.models?.[0];
         if (!baseUrl || !model) {
           toast.error('Configure the “script analysis” Base URL and model in Settings first');
-          setShotStatus(projectId, "error", "缺少 Base URL 或模型配置");
+          setShotStatus(projectId, "error", "Missing Base URL or model configuration");
           return;
         }
 

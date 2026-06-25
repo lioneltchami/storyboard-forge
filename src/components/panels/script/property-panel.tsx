@@ -155,67 +155,67 @@ export function PropertyPanel({
   // 复制场景数据
   const handleCopySceneData = async () => {
     if (!scene) return;
-    
+
     const lines: string[] = [];
-    lines.push(`# 场景设定：${scene.name || scene.location}`);
+    lines.push(`# Scene setup: ${scene.name || scene.location}`);
     lines.push('');
-    
-    // 基础信息
-    lines.push(`## 基础信息`);
-    lines.push(`地点：${scene.location}`);
-    if (scene.time) lines.push(`时间：${scene.time}`);
-    if (scene.atmosphere) lines.push(`氛围：${scene.atmosphere}`);
+
+    // Basic info
+    lines.push(`## Basic info`);
+    lines.push(`Location: ${scene.location}`);
+    if (scene.time) lines.push(`Time: ${scene.time}`);
+    if (scene.atmosphere) lines.push(`Atmosphere: ${scene.atmosphere}`);
     lines.push('');
-    
-    // 场景设计（AI校准后）
+
+    // Scene design (after AI calibration)
     if (scene.architectureStyle || scene.lightingDesign || scene.colorPalette || scene.eraDetails) {
-      lines.push(`## 场景设计`);
-      if (scene.architectureStyle) lines.push(`建筑风格：${scene.architectureStyle}`);
-      if (scene.lightingDesign) lines.push(`光影设计：${scene.lightingDesign}`);
-      if (scene.colorPalette) lines.push(`色彩基调：${scene.colorPalette}`);
-      if (scene.eraDetails) lines.push(`时代特征：${scene.eraDetails}`);
-      if (scene.keyProps && scene.keyProps.length > 0) lines.push(`关键道具：${scene.keyProps.join('、')}`);
-      if (scene.spatialLayout) lines.push(`空间布局：${scene.spatialLayout}`);
+      lines.push(`## Scene design`);
+      if (scene.architectureStyle) lines.push(`Architecture style: ${scene.architectureStyle}`);
+      if (scene.lightingDesign) lines.push(`Lighting design: ${scene.lightingDesign}`);
+      if (scene.colorPalette) lines.push(`Color palette: ${scene.colorPalette}`);
+      if (scene.eraDetails) lines.push(`Era details: ${scene.eraDetails}`);
+      if (scene.keyProps && scene.keyProps.length > 0) lines.push(`Key props: ${scene.keyProps.join('、')}`);
+      if (scene.spatialLayout) lines.push(`Spatial layout: ${scene.spatialLayout}`);
       lines.push('');
     }
-    
-    // 视觉提示词（按提示词语言显示）
+
+    // Visual prompt (displayed according to prompt language)
     const includeZhScenePrompt = promptLanguage !== 'en';
     const includeEnScenePrompt = promptLanguage !== 'zh';
     if ((includeZhScenePrompt && scene.visualPrompt) || (includeEnScenePrompt && scene.visualPromptEn)) {
-      lines.push(`## 视觉提示词`);
-      if (includeZhScenePrompt && scene.visualPrompt) lines.push(`中文：${scene.visualPrompt}`);
+      lines.push(`## Visual prompt`);
+      if (includeZhScenePrompt && scene.visualPrompt) lines.push(`Chinese: ${scene.visualPrompt}`);
       if (includeEnScenePrompt && scene.visualPromptEn) lines.push(`English: ${scene.visualPromptEn}`);
       lines.push('');
     }
-    
-    // 多视角联合图（AI视角分析的产出）
+
+    // Multi-view contact sheet (output from AI viewpoint analysis)
     if (scene.viewpoints && scene.viewpoints.length > 0) {
-      lines.push(`## 多视角联合图（AI分析）`);
-      lines.push(`视角数量：${scene.viewpoints.length} 个`);
+      lines.push(`## Multi-view contact sheet (AI analysis)`);
+      lines.push(`Viewpoint count: ${scene.viewpoints.length}`);
       lines.push('');
       scene.viewpoints.forEach((vp, idx) => {
-        lines.push(`### 视角 ${idx + 1}: ${vp.name}`);
+        lines.push(`### Viewpoint ${idx + 1}: ${vp.name}`);
         lines.push(`- ID: ${vp.id}`);
-        if (vp.nameEn) lines.push(`- 英文名: ${vp.nameEn}`);
-        if (vp.keyProps && vp.keyProps.length > 0) lines.push(`- 关键道具: ${vp.keyProps.join('、')}`);
-        if (vp.shotIds && vp.shotIds.length > 0) lines.push(`- 关联分镜ID: ${vp.shotIds.join(', ')}`);
-        lines.push(`- 网格位置: ${vp.gridIndex}`);
+        if (vp.nameEn) lines.push(`- English name: ${vp.nameEn}`);
+        if (vp.keyProps && vp.keyProps.length > 0) lines.push(`- Key props: ${vp.keyProps.join('、')}`);
+        if (vp.shotIds && vp.shotIds.length > 0) lines.push(`- Linked shot IDs: ${vp.shotIds.join(', ')}`);
+        lines.push(`- Grid position: ${vp.gridIndex}`);
         lines.push('');
       });
     }
-    
-    // 出场统计
+
+    // Appearance stats
     if (scene.importance || scene.appearanceCount || scene.episodeNumbers?.length) {
-      lines.push(`## 出场统计`);
+      lines.push(`## Appearance stats`);
       if (scene.importance) {
-        const importanceLabel = scene.importance === 'main' ? '主场景' : 
-                               scene.importance === 'secondary' ? '次要场景' : '过渡场景';
-        lines.push(`重要程度：${importanceLabel}`);
+        const importanceLabel = scene.importance === 'main' ? 'Main scene' :
+                               scene.importance === 'secondary' ? 'Secondary scene' : 'Transition scene';
+        lines.push(`Importance: ${importanceLabel}`);
       }
-      if (scene.appearanceCount) lines.push(`出场次数：${scene.appearanceCount} 次`);
+      if (scene.appearanceCount) lines.push(`Appearances: ${scene.appearanceCount}`);
       if (scene.episodeNumbers && scene.episodeNumbers.length > 0) {
-        lines.push(`出现集数：第 ${scene.episodeNumbers.join(', ')} 集`);
+        lines.push(`Episode numbers: ${scene.episodeNumbers.join(', ')}`);
       }
       lines.push('');
     }
@@ -234,150 +234,150 @@ export function PropertyPanel({
   // 复制角色数据
   const handleCopyCharacterData = async () => {
     if (!character) return;
-    
-    // 格式化角色数据
+
+    // Format character data
     const lines: string[] = [];
-    lines.push(`# 角色设定：${character.name}`);
+    lines.push(`# Character setup: ${character.name}`);
     lines.push('');
-    
-    // 基本信息（优先显示）
+
+    // Basic info (shown first)
     if (character.gender || character.age) {
-      lines.push(`## 基本信息`);
+      lines.push(`## Basic info`);
       const basicInfo: string[] = [];
-      if (character.gender) basicInfo.push(`性别：${character.gender}`);
-      if (character.age) basicInfo.push(`年龄：${character.age}`);
+      if (character.gender) basicInfo.push(`Gender: ${character.gender}`);
+      if (character.age) basicInfo.push(`Age: ${character.age}`);
       lines.push(basicInfo.join(' | '));
       lines.push('');
     }
-    
-    // 身份/背景（主要描述）
+
+    // Identity / background (primary description)
     if (character.role) {
-      lines.push(`## 身份/背景`);
+      lines.push(`## Identity / background`);
       lines.push(character.role);
       lines.push('');
     }
-    
-    // 性格特征
+
+    // Personality traits
     if (character.personality) {
-      lines.push(`## 性格特征`);
+      lines.push(`## Personality traits`);
       lines.push(character.personality);
       lines.push('');
     }
-    
-    // 核心特质
+
+    // Core traits
     if (character.traits) {
-      lines.push(`## 核心特质`);
+      lines.push(`## Core traits`);
       lines.push(character.traits);
       lines.push('');
     }
-    
-    // 外貌特征
+
+    // Appearance
     if (character.appearance) {
-      lines.push(`## 外貌特征`);
+      lines.push(`## Appearance`);
       lines.push(character.appearance);
       lines.push('');
     }
-    
-    // 技能/能力
+
+    // Skills / abilities
     if (character.skills) {
-      lines.push(`## 技能/能力`);
+      lines.push(`## Skills / abilities`);
       lines.push(character.skills);
       lines.push('');
     }
-    
-    // 关键行为/事迹
+
+    // Key actions / events
     if (character.keyActions) {
-      lines.push(`## 关键行为/事迹`);
+      lines.push(`## Key actions / events`);
       lines.push(character.keyActions);
       lines.push('');
     }
-    
-    // 人物关系
+
+    // Relationships
     if (character.relationships) {
-      lines.push(`## 人物关系`);
+      lines.push(`## Relationships`);
       lines.push(character.relationships);
       lines.push('');
     }
-    
-    // === 6层身份锚点（角色一致性）===
+
+    // === Six-layer identity anchors (character consistency) ===
     if (character.identityAnchors) {
       const anchors = character.identityAnchors;
-      lines.push(`## 6层身份锚点`);
-      
-      // ① 骨相层
+      lines.push(`## Six-layer identity anchors`);
+
+      // 1. Bone structure layer
       const boneFeatures: string[] = [];
-      if (anchors.faceShape) boneFeatures.push(`脸型: ${anchors.faceShape}`);
-      if (anchors.jawline) boneFeatures.push(`下颌线: ${anchors.jawline}`);
-      if (anchors.cheekbones) boneFeatures.push(`颧骨: ${anchors.cheekbones}`);
+      if (anchors.faceShape) boneFeatures.push(`Face shape: ${anchors.faceShape}`);
+      if (anchors.jawline) boneFeatures.push(`Jawline: ${anchors.jawline}`);
+      if (anchors.cheekbones) boneFeatures.push(`Cheekbones: ${anchors.cheekbones}`);
       if (boneFeatures.length > 0) {
-        lines.push(`① 骨相层：${boneFeatures.join(', ')}`);
+        lines.push(`1. Bone structure: ${boneFeatures.join(', ')}`);
       }
-      
-      // ② 五官层
+
+      // 2. Facial features layer
       const facialFeatures: string[] = [];
-      if (anchors.eyeShape) facialFeatures.push(`眼型: ${anchors.eyeShape}`);
-      if (anchors.eyeDetails) facialFeatures.push(`眼部细节: ${anchors.eyeDetails}`);
-      if (anchors.noseShape) facialFeatures.push(`鼻型: ${anchors.noseShape}`);
-      if (anchors.lipShape) facialFeatures.push(`唇型: ${anchors.lipShape}`);
+      if (anchors.eyeShape) facialFeatures.push(`Eye shape: ${anchors.eyeShape}`);
+      if (anchors.eyeDetails) facialFeatures.push(`Eye details: ${anchors.eyeDetails}`);
+      if (anchors.noseShape) facialFeatures.push(`Nose shape: ${anchors.noseShape}`);
+      if (anchors.lipShape) facialFeatures.push(`Lip shape: ${anchors.lipShape}`);
       if (facialFeatures.length > 0) {
-        lines.push(`② 五官层：${facialFeatures.join(', ')}`);
+        lines.push(`2. Facial features: ${facialFeatures.join(', ')}`);
       }
-      
-      // ③ 辨识标记层（最强锚点）
+
+      // 3. Distinctive marks layer (strongest anchor)
       if (anchors.uniqueMarks && anchors.uniqueMarks.length > 0) {
-        lines.push(`③ 辨识标记层（最强锚点）：${anchors.uniqueMarks.join('; ')}`);
+        lines.push(`3. Distinctive marks (strongest anchor): ${anchors.uniqueMarks.join('; ')}`);
       }
-      
-      // ④ 色彩锚点层
+
+      // 4. Color anchor layer
       if (anchors.colorAnchors) {
         const colors: string[] = [];
-        if (anchors.colorAnchors.iris) colors.push(`虹膜: ${anchors.colorAnchors.iris}`);
-        if (anchors.colorAnchors.hair) colors.push(`发色: ${anchors.colorAnchors.hair}`);
-        if (anchors.colorAnchors.skin) colors.push(`肤色: ${anchors.colorAnchors.skin}`);
-        if (anchors.colorAnchors.lips) colors.push(`唇色: ${anchors.colorAnchors.lips}`);
+        if (anchors.colorAnchors.iris) colors.push(`Iris: ${anchors.colorAnchors.iris}`);
+        if (anchors.colorAnchors.hair) colors.push(`Hair color: ${anchors.colorAnchors.hair}`);
+        if (anchors.colorAnchors.skin) colors.push(`Skin tone: ${anchors.colorAnchors.skin}`);
+        if (anchors.colorAnchors.lips) colors.push(`Lip color: ${anchors.colorAnchors.lips}`);
         if (colors.length > 0) {
-          lines.push(`④ 色彩锚点层（Hex）：${colors.join(', ')}`);
+          lines.push(`4. Color anchors (Hex): ${colors.join(', ')}`);
         }
       }
-      
-      // ⑤ 皮肤纹理层
+
+      // 5. Skin texture layer
       if (anchors.skinTexture) {
-        lines.push(`⑤ 皮肤纹理层：${anchors.skinTexture}`);
+        lines.push(`5. Skin texture: ${anchors.skinTexture}`);
       }
-      
-      // ⑥ 发型锚点层
+
+      // 6. Hairstyle anchor layer
       const hairFeatures: string[] = [];
-      if (anchors.hairStyle) hairFeatures.push(`发型: ${anchors.hairStyle}`);
-      if (anchors.hairlineDetails) hairFeatures.push(`发际线: ${anchors.hairlineDetails}`);
+      if (anchors.hairStyle) hairFeatures.push(`Hairstyle: ${anchors.hairStyle}`);
+      if (anchors.hairlineDetails) hairFeatures.push(`Hairline: ${anchors.hairlineDetails}`);
       if (hairFeatures.length > 0) {
-        lines.push(`⑥ 发型锚点层：${hairFeatures.join(', ')}`);
+        lines.push(`6. Hairstyle anchor layer: ${hairFeatures.join(', ')}`);
       }
-      
+
       lines.push('');
     }
-    
-    // === 负面提示词 ===
+
+    // === Negative prompts ===
     if (character.negativePrompt) {
-      lines.push(`## 负面提示词`);
+      lines.push(`## Negative prompts`);
       if (character.negativePrompt.avoid && character.negativePrompt.avoid.length > 0) {
-        lines.push(`要避免：${character.negativePrompt.avoid.join(', ')}`);
+        lines.push(`Avoid: ${character.negativePrompt.avoid.join(', ')}`);
       }
       if (character.negativePrompt.styleExclusions && character.negativePrompt.styleExclusions.length > 0) {
-        lines.push(`风格排除：${character.negativePrompt.styleExclusions.join(', ')}`);
+        lines.push(`Style exclusions: ${character.negativePrompt.styleExclusions.join(', ')}`);
       }
       lines.push('');
     }
-    
-    // 角色标签
+
+    // Character tags
     if (character.tags && character.tags.length > 0) {
-      lines.push(`## 角色标签`);
+      lines.push(`## Character tags`);
       lines.push(character.tags.map(t => `#${t}`).join(' '));
       lines.push('');
     }
-    
-    // 角色备注
+
+    // Character notes
     if (character.notes) {
-      lines.push(`## 角色备注`);
+      lines.push(`## Character notes`);
       lines.push(character.notes);
       lines.push('');
     }
@@ -396,78 +396,78 @@ export function PropertyPanel({
   // 复制集分镜数据
   const handleCopyEpisodeShots = async () => {
     if (!episode || episodeShots.length === 0) return;
-    
-    // 情绪标签中文映射
+
+    // Emotion label mapping
     const emotionLabels: Record<string, string> = {
-      happy: '开心', sad: '悲伤', angry: '愤怒', surprised: '惊讶', fearful: '恐惧', calm: '平静',
-      tense: '紧张', excited: '兴奋', mysterious: '神秘', romantic: '浪漫', funny: '搞笑', touching: '感动',
-      serious: '严肃', relaxed: '轻松', playful: '调侃', gentle: '温柔', passionate: '激昂', low: '低沉'
+      happy: 'Happy', sad: 'Sad', angry: 'Angry', surprised: 'Surprised', fearful: 'Fearful', calm: 'Calm',
+      tense: 'Tense', excited: 'Excited', mysterious: 'Mysterious', romantic: 'Romantic', funny: 'Funny', touching: 'Touching',
+      serious: 'Serious', relaxed: 'Relaxed', playful: 'Playful', gentle: 'Gentle', passionate: 'Passionate', low: 'Low'
     };
-    
-    // 格式化分镜数据
+
+    // Format shot data
     const lines: string[] = [];
-    lines.push(`# 第${episode.index}集：${episode.title.replace(/^第\d+集[：:]?/, '')}`);
+    lines.push(`# Episode ${episode.index}: ${episode.title.replace(/^第\d+集[：:]?/, '')}`);
     lines.push('');
     if (episode.synopsis) {
-      lines.push(`## 本集大纲`);
+      lines.push(`## Episode synopsis`);
       lines.push(episode.synopsis);
       lines.push('');
     }
-    lines.push(`## 分镜列表 (共 ${episodeShots.length} 个)`);
+    lines.push(`## Shot list (${episodeShots.length} total)`);
     lines.push('');
-    
+
     episodeShots.forEach((s, idx) => {
-      lines.push(`### 分镜 ${String(idx + 1).padStart(2, '0')}`);
+      lines.push(`### Shot ${String(idx + 1).padStart(2, '0')}`);
       if (s.shotSize || s.cameraMovement) {
-        lines.push(`**镜头**: ${[s.shotSize, s.cameraMovement].filter(Boolean).join(' | ')}`);
+        lines.push(`**Shot**: ${[s.shotSize, s.cameraMovement].filter(Boolean).join(' | ')}`);
       }
       if ((s as any).visualDescription) {
-        lines.push(`**视觉描述**: ${(s as any).visualDescription}`);
+        lines.push(`**Visual description**: ${(s as any).visualDescription}`);
       }
       if (s.actionSummary) {
-        lines.push(`**动作**: ${s.actionSummary}`);
+        lines.push(`**Action**: ${s.actionSummary}`);
       }
       if (s.dialogue) {
-        lines.push(`**对白**: 「${s.dialogue}」`);
+        lines.push(`**Dialogue**: "${s.dialogue}"`);
       }
       if (s.characterNames && s.characterNames.length > 0) {
-        lines.push(`**出场角色**: ${s.characterNames.join('、')}`);
+        lines.push(`**Characters**: ${s.characterNames.join('、')}`);
       }
       if (s.emotionTags && s.emotionTags.length > 0) {
         const tags = s.emotionTags.map(t => emotionLabels[t] || t).join('、');
-        lines.push(`**情绪**: ${tags}`);
+        lines.push(`**Mood**: ${tags}`);
       }
       if (promptLanguage !== 'zh' && (s as any).visualPrompt) {
-        lines.push(`**英文Prompt**: ${(s as any).visualPrompt}`);
+        lines.push(`**English prompt**: ${(s as any).visualPrompt}`);
       }
-      // 三层提示词系统
+      // Three-layer prompt system
       if (s.imagePromptZh || s.imagePrompt) {
         if (promptLanguage === 'zh') {
-          lines.push(`**首帧提示词**: ${s.imagePromptZh || ''}`);
+          lines.push(`**First-frame prompt**: ${s.imagePromptZh || ''}`);
         } else if (promptLanguage === 'en') {
-          lines.push(`**首帧提示词**: ${s.imagePrompt || ''}`);
+          lines.push(`**First-frame prompt**: ${s.imagePrompt || ''}`);
         } else {
-          lines.push(`**首帧提示词**: ${s.imagePromptZh || ''} ${s.imagePrompt ? `(EN: ${s.imagePrompt})` : ''}`);
+          lines.push(`**First-frame prompt**: ${s.imagePromptZh || ''} ${s.imagePrompt ? `(English: ${s.imagePrompt})` : ''}`);
         }
       }
       if (s.videoPromptZh || s.videoPrompt) {
         if (promptLanguage === 'zh') {
-          lines.push(`**视频提示词**: ${s.videoPromptZh || ''}`);
+          lines.push(`**Video prompt**: ${s.videoPromptZh || ''}`);
         } else if (promptLanguage === 'en') {
-          lines.push(`**视频提示词**: ${s.videoPrompt || ''}`);
+          lines.push(`**Video prompt**: ${s.videoPrompt || ''}`);
         } else {
-          lines.push(`**视频提示词**: ${s.videoPromptZh || ''} ${s.videoPrompt ? `(EN: ${s.videoPrompt})` : ''}`);
+          lines.push(`**Video prompt**: ${s.videoPromptZh || ''} ${s.videoPrompt ? `(English: ${s.videoPrompt})` : ''}`);
         }
       }
       if (s.needsEndFrame) {
-        lines.push(`**需要尾帧**: 是`);
+        lines.push(`**Needs end frame**: Yes`);
         if (s.endFramePromptZh || s.endFramePrompt) {
           if (promptLanguage === 'zh') {
-            lines.push(`**尾帧提示词**: ${s.endFramePromptZh || ''}`);
+            lines.push(`**End-frame prompt**: ${s.endFramePromptZh || ''}`);
           } else if (promptLanguage === 'en') {
-            lines.push(`**尾帧提示词**: ${s.endFramePrompt || ''}`);
+            lines.push(`**End-frame prompt**: ${s.endFramePrompt || ''}`);
           } else {
-            lines.push(`**尾帧提示词**: ${s.endFramePromptZh || ''} ${s.endFramePrompt ? `(EN: ${s.endFramePrompt})` : ''}`);
+            lines.push(`**End-frame prompt**: ${s.endFramePromptZh || ''} ${s.endFramePrompt ? `(English: ${s.endFramePrompt})` : ''}`);
           }
         }
       }
@@ -497,13 +497,13 @@ export function PropertyPanel({
 
     // 景别中文映射
     const shotSizeLabels: Record<string, string> = {
-      'ECU': '特写', 'CU': '近景', 'MCU': '中近景', 'MS': '中景',
-      'MLS': '中远景', 'LS': '远景', 'ELS': '大远景', 'POV': '主观镜头'
+      'ECU': 'Extreme close-up', 'CU': 'Close-up', 'MCU': 'Medium close-up', 'MS': 'Medium shot',
+      'MLS': 'Medium long shot', 'LS': 'Long shot', 'ELS': 'Extreme long shot', 'POV': 'Point of view'
     };
-    // 镜头运动中文映射（兼容旧值+新预设ID）
+    // Camera movement labels
     const cameraLabelsLegacy: Record<string, string> = {
-      'Static': '固定', 'Pan': '横摇', 'Tilt': '俯仰', 'Dolly': '推拉',
-      'Zoom': '变焦', 'Tracking': '跟拍', 'Crane': '升降', 'Handheld': '手持'
+      'Static': 'Static', 'Pan': 'Pan', 'Tilt': 'Tilt', 'Dolly': 'Dolly',
+      'Zoom': 'Zoom', 'Tracking': 'Tracking', 'Crane': 'Crane', 'Handheld': 'Handheld'
     };
     const cameraLabels = (id: string) => {
       const preset = CAMERA_MOVEMENT_PRESETS.find(p => p.id === id);
@@ -516,89 +516,89 @@ export function PropertyPanel({
 
     const lines: string[] = [];
     lines.push('═══════════════════════════════════════');
-    lines.push(`分镜 ${shot.index} - 三层提示词数据`);
+    lines.push(`Shot ${shot.index} - Three-layer prompt data`);
     lines.push('═══════════════════════════════════════');
     lines.push('');
 
     // 基础信息
-    lines.push('【基础信息】');
+    lines.push('[Basic Info]');
     if (shot.shotSize) {
-      lines.push(`景别: ${shotSizeLabels[shot.shotSize] || shot.shotSize} (${shot.shotSize})`);
+      lines.push(`Shot size: ${shotSizeLabels[shot.shotSize] || shot.shotSize} (${shot.shotSize})`);
     }
     if (shot.cameraMovement) {
-      lines.push(`镜头运动: ${cameraLabels(shot.cameraMovement)}`);
+      lines.push(`Camera movement: ${cameraLabels(shot.cameraMovement)}`);
     }
     if (shot.specialTechnique && shot.specialTechnique !== 'none') {
-      lines.push(`特殊拍摄: ${specialTechniqueLabel(shot.specialTechnique)}`);
+      lines.push(`Special technique: ${specialTechniqueLabel(shot.specialTechnique)}`);
     }
     if (shot.duration) {
-      lines.push(`时长: ${shot.duration}秒`);
+      lines.push(`Duration: ${shot.duration}s`);
     }
     if (shot.characterNames && shot.characterNames.length > 0) {
-      lines.push(`出场角色: ${shot.characterNames.join('、')}`);
+      lines.push(`Characters: ${shot.characterNames.join(', ')}`);
     }
-    // 对白字段始终显示，无对白时明确标注“无”，防止AI视频模型幻觉
-    lines.push(`对白: ${shot.dialogue ? `「${shot.dialogue}」` : '无'}`);
+    // Always show the dialogue field so an empty value stays explicit.
+    lines.push(`Dialogue: ${shot.dialogue ? `"${shot.dialogue}"` : 'None'}`);
     if (shot.actionSummary) {
-      lines.push(`动作描述: ${shot.actionSummary}`);
+      lines.push(`Action description: ${shot.actionSummary}`);
     }
     lines.push('');
 
-    // 视觉描述
+    // Visual description
     if ((shot as any).visualDescription) {
-      lines.push('【视觉描述】');
+      lines.push('[Visual Description]');
       lines.push((shot as any).visualDescription);
       lines.push('');
     }
 
-    // 音频设计
+    // Audio design
     if (shot.ambientSound || shot.soundEffect) {
-      lines.push('【音频设计】');
+      lines.push('[Audio Design]');
       if (shot.ambientSound) {
-        lines.push(`环境音: ${shot.ambientSound}`);
+        lines.push(`Ambient sound: ${shot.ambientSound}`);
       }
       if (shot.soundEffect) {
-        lines.push(`音效: ${shot.soundEffect}`);
+        lines.push(`Sound effect: ${shot.soundEffect}`);
       }
       lines.push('');
     }
 
-    // 叙事驱动设计（基于《电影语言的语法》）
+    // Narrative design (based on "The Grammar of Film Language")
     const hasNarrative = (shot as any).narrativeFunction || (shot as any).shotPurpose || 
                          (shot as any).visualFocus || (shot as any).cameraPosition || 
                          (shot as any).characterBlocking || (shot as any).rhythm;
     if (hasNarrative) {
-      lines.push('【叙事驱动设计】基于《电影语言的语法》');
+      lines.push('[Narrative Design] Based on "The Grammar of Film Language"');
       if ((shot as any).narrativeFunction) {
-        lines.push(`叙事功能: ${(shot as any).narrativeFunction}`);
+        lines.push(`Narrative function: ${(shot as any).narrativeFunction}`);
       }
       if ((shot as any).shotPurpose) {
-        lines.push(`镜头目的: ${(shot as any).shotPurpose}`);
+        lines.push(`Shot purpose: ${(shot as any).shotPurpose}`);
       }
       if ((shot as any).visualFocus) {
-        lines.push(`视觉焦点: ${(shot as any).visualFocus}`);
+        lines.push(`Visual focus: ${(shot as any).visualFocus}`);
       }
       if ((shot as any).cameraPosition) {
-        lines.push(`机位描述: ${(shot as any).cameraPosition}`);
+        lines.push(`Camera position: ${(shot as any).cameraPosition}`);
       }
       if ((shot as any).characterBlocking) {
-        lines.push(`人物布局: ${(shot as any).characterBlocking}`);
+        lines.push(`Blocking: ${(shot as any).characterBlocking}`);
       }
       if ((shot as any).rhythm) {
-        lines.push(`节奏: ${(shot as any).rhythm}`);
+        lines.push(`Rhythm: ${(shot as any).rhythm}`);
       }
       lines.push('');
     }
 
     if (!hasTri) {
-      lines.push('⚠️ 该分镜尚未生成三层提示词，请先执行"AI校准分镜"。');
+      lines.push('⚠️ This shot has not generated tri-layer prompts yet. Please run "AI calibration for shot" first.');
     } else {
-      // ===== 首帧提示词 =====
+      // ===== First-frame prompt =====
       lines.push('───────────────────────────────────────');
-      lines.push('【首帧提示词】用于生成视频的第一帧图片');
+      lines.push('[First-Frame Prompt] Used to generate the first frame image');
       lines.push('───────────────────────────────────────');
       if (promptLanguage !== 'en' && shot.imagePromptZh) {
-        lines.push(`中文: ${shot.imagePromptZh}`);
+        lines.push(`Chinese: ${shot.imagePromptZh}`);
       }
       if (promptLanguage !== 'zh' && shot.imagePrompt) {
         lines.push(`English: ${shot.imagePrompt}`);
@@ -608,16 +608,16 @@ export function PropertyPanel({
         (promptLanguage === 'en' && !shot.imagePrompt) ||
         (promptLanguage === 'zh+en' && !shot.imagePrompt && !shot.imagePromptZh)
       ) {
-        lines.push('(未生成)');
+        lines.push('(Not generated)');
       }
       lines.push('');
 
-      // ===== 视频提示词 =====
+      // ===== Video prompt =====
       lines.push('───────────────────────────────────────');
-      lines.push('【视频提示词】用于图生视频，描述动作和运动');
+      lines.push('[Video Prompt] Used for image-to-video generation, describing motion and actions');
       lines.push('───────────────────────────────────────');
       if (promptLanguage !== 'en' && shot.videoPromptZh) {
-        lines.push(`中文: ${shot.videoPromptZh}`);
+        lines.push(`Chinese: ${shot.videoPromptZh}`);
       }
       if (promptLanguage !== 'zh' && shot.videoPrompt) {
         lines.push(`English: ${shot.videoPrompt}`);
@@ -627,18 +627,18 @@ export function PropertyPanel({
         (promptLanguage === 'en' && !shot.videoPrompt) ||
         (promptLanguage === 'zh+en' && !shot.videoPrompt && !shot.videoPromptZh)
       ) {
-        lines.push('(未生成)');
+        lines.push('(Not generated)');
       }
       lines.push('');
 
-      // ===== 尾帧提示词 =====
+      // ===== End-frame prompt =====
       lines.push('───────────────────────────────────────');
-      lines.push('【尾帧提示词】用于生成视频的最后一帧（如需要）');
+      lines.push('[End-Frame Prompt] Used to generate the last frame of the video (if needed)');
       lines.push('───────────────────────────────────────');
       if (shot.needsEndFrame) {
-        lines.push('需要尾帧: ✓ 是');
+        lines.push('End frame required: Yes');
         if (promptLanguage !== 'en' && shot.endFramePromptZh) {
-          lines.push(`中文: ${shot.endFramePromptZh}`);
+          lines.push(`Chinese: ${shot.endFramePromptZh}`);
         }
         if (promptLanguage !== 'zh' && shot.endFramePrompt) {
           lines.push(`English: ${shot.endFramePrompt}`);
@@ -648,10 +648,10 @@ export function PropertyPanel({
           (promptLanguage === 'en' && !shot.endFramePrompt) ||
           (promptLanguage === 'zh+en' && !shot.endFramePrompt && !shot.endFramePromptZh)
         ) {
-          lines.push('(未生成)');
+          lines.push('(Not generated)');
         }
       } else {
-        lines.push('需要尾帧: ✗ 否（此分镜不需要单独的尾帧）');
+        lines.push('End frame required: No (this shot does not need a separate end frame)');
       }
     }
 
