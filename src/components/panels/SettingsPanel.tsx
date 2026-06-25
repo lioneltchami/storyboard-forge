@@ -744,7 +744,7 @@ export function SettingsPanel() {
             </div>
           </div>
 
-          {/* Moyin API purchase guidance */}
+          {/* MemeFast purchase guidance */}
           <a
             href="https://memefast.top"
             target="_blank"
@@ -756,7 +756,7 @@ export function SettingsPanel() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-foreground text-sm flex items-center gap-2">
-                Moyin API
+                MemeFast
                 <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded">
                   Recommended
                 </span>
@@ -788,7 +788,7 @@ export function SettingsPanel() {
                   No providers configured yet
                   </h3>
                   <p className="text-sm text-muted-foreground mb-2">
-                  Moyin API is the recommended option for one-stop access to 543+ models.
+                MemeFast is the recommended option for one-stop access to 543+ models.
                   </p>
                 <a
                   href="https://memefast.top"
@@ -797,7 +797,7 @@ export function SettingsPanel() {
                   className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline mb-4"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  Open Moyin API to get a key
+                  Open MemeFast to get a key
                 </a>
                 <Button onClick={() => setAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-1" />
@@ -984,7 +984,7 @@ export function SettingsPanel() {
                           </div>
                         </CollapsibleTrigger>
 
-                        {/* Moyin API purchase guidance */}
+                        {/* MemeFast purchase guidance */}
                         {provider.platform === 'memefast' && !configured && (
                           <div className="px-4 pb-2">
                             <a
@@ -994,7 +994,7 @@ export function SettingsPanel() {
                               className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              Open Moyin API to get a key -&gt;
+                              Open MemeFast to get a key -&gt;
                             </a>
                           </div>
                         )}

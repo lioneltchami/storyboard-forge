@@ -32,7 +32,7 @@ import type { IProvider } from "@/lib/api-key-manager";
 
 /**
  * Platform presets:
- * 1. Moyin API (memefast) - full-service relay (recommended)
+ * 1. MemeFast (memefast) - full-service relay (recommended)
  * 2. RunningHub - viewpoint switching / multi-angle generation
  * 3. Custom - OpenAI-compatible API
  */
@@ -47,7 +47,7 @@ const PLATFORM_PRESETS: Array<{
 }> = [
   {
     platform: "memefast",
-    name: "Moyin API",
+    name: "MemeFast",
     baseUrl: "https://memefast.top",
     description: "Relay access to 543+ models including GPT, Claude, Gemini, DeepSeek, Veo, Sora, and more",
     services: ["Chat", "Image generation", "Video generation", "Image understanding"],
