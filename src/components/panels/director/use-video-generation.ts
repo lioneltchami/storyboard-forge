@@ -107,13 +107,13 @@ export async function convertToHttpUrl(
   
   // For base64/local data URLs, upload to image host
   if (!isImageHostConfigured()) {
-    throw new Error('图床未配置，请在设置中配置图床 API Key');
+    throw new Error('Image host not configured. Please set the image host API key in Settings');
   }
 
   let imageData = url;
   if (url.startsWith('local-image://')) {
     const base64 = await readImageAsBase64(url);
-    if (!base64) throw new Error(`无法读取本地文件: ${url.substring(0, 40)}`);
+    if (!base64) throw new Error(`Unable to read local file: ${url.substring(0, 40)}`);
     imageData = base64;
   }
 
@@ -122,7 +122,7 @@ export async function convertToHttpUrl(
     expiration: 15552000,
   });
   if (!result.success || !result.url) {
-    throw new Error(result.error || '图床上传失败');
+    throw new Error(result.error || 'Image host upload failed');
   }
   return result.url;
 }
@@ -298,20 +298,20 @@ function handleVideoSubmitError(
     const keyHint = nextKey ? `${nextKey.substring(0, 8)}…` : '(none)';
     console.log(`[VideoGen] Rotated to next key: ${keyHint} (due to ${status})`);
   }
-  let errorMessage = `视频 API 错误: ${status}`;
+  let errorMessage = `Video API error: ${status}`;
   try {
     const errorJson = JSON.parse(errorText);
     errorMessage = errorJson.error?.message || errorJson.message || errorMessage;
   } catch { /* ignore */ }
-  if (status === 401 || status === 403) throw new Error('API Key 无效或已过期');
+  if (status === 401 || status === 403) throw new Error('API key is invalid or expired');
   if (status === 429) {
-    const err = new Error('API 请求过于频繁，请稍后重试') as Error & { status?: number };
+    const err = new Error('API requests are too frequent. Please try again later') as Error & { status?: number };
     err.status = 429;
     throw err;
   }
   // 所有 500/502/503/529 均视为可重试的临时服务错误，携带 status 供重试机制识别
   if (status >= 500) {
-    const err = new Error(errorMessage || `上游服务暂时不可用 (${status})`) as Error & { status?: number };
+    const err = new Error(errorMessage || `Upstream service temporarily unavailable (${status})`) as Error & { status?: number };
     err.status = status;
     throw err;
   }
@@ -409,9 +409,9 @@ async function ensureMinImageSize(
 /** AbortSignal 感知的 sleep：若信号触发则立即以 '用户已取消' 拒绝 */
 function sleepOrAbort(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    if (signal?.aborted) return reject(new Error('用户已取消'));
+    if (signal?.aborted) return reject(new Error('User cancelled'));
     const tid = setTimeout(resolve, ms);
-    signal?.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('用户已取消')); }, { once: true });
+    signal?.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('User cancelled')); }, { once: true });
   });
 }
 
@@ -440,15 +440,15 @@ export async function callVideoGenerationApi(
   const featureConfig = getFeatureConfig('video_generation');
   const resolvedPlatform = platform || featureConfig?.platform;
   if (!resolvedPlatform) {
-    throw new Error('请先在设置中配置视频生成服务映射');
+    throw new Error('Please configure the video generation service mapping in Settings');
   }
   const model = featureConfig?.models?.[0];
   if (!model) {
-    throw new Error('请先在设置中配置视频生成模型');
+    throw new Error('Please configure the video generation model in Settings');
   }
   const videoBaseUrl = featureConfig?.baseUrl?.replace(/\/+$/, '');
   if (!videoBaseUrl) {
-    throw new Error('请先在设置中配置视频生成服务映射');
+    throw new Error('Please configure the video generation service mapping in Settings');
   }
 
   // 确保所有输入图片满足视频 API 的最小尺寸要求（如 Seedance ≥ 300px）
@@ -464,7 +464,7 @@ export async function callVideoGenerationApi(
   console.log('[VideoGen] Detected API format:', { model, format, platform: resolvedPlatform });
 
   return retryOperation(() => {
-    if (signal?.aborted) return Promise.reject(new Error('用户已取消'));
+    if (signal?.aborted) return Promise.reject(new Error('User cancelled'));
     // 每次重试动态取当前 key（keyManager.handleError 已 rotate，需要用新 key）
     const currentApiKey = keyManager?.getCurrentKey?.() || apiKey;
     const keyHint = currentApiKey ? `${currentApiKey.substring(0, 8)}…` : '(none)';
@@ -640,7 +640,7 @@ async function callUnifiedVideoApi(
   if (directUrl) return directUrl;
   if (!taskId) {
     console.error('[VideoGen] Cannot extract taskId from submit response:', JSON.stringify(submitData).substring(0, 300));
-    throw new Error(`返回空的任务 ID（响应格式未识别，请检查控制台日志）`);
+    throw new Error(`Returned empty task ID (response format unrecognized, check console logs)`);
   }
 
   // 轮询：直接使用端点类型对应的 URL
@@ -670,16 +670,16 @@ async function callUnifiedVideoApi(
 
     if (status === 'completed' || status === 'succeeded' || status === 'success') {
       const videoUrl = extractVideoUrl(statusData);
-      if (!videoUrl) throw new Error('任务完成但没有视频 URL');
+      if (!videoUrl) throw new Error('Task completed but returned no video URL');
       return videoUrl;
     }
 
     if (status === 'failed' || status === 'error' || status === 'cancelled') {
-      const errorMsg = statusData.error?.message || statusData.error || statusData.message || '视频生成失败';
+      const errorMsg = statusData.error?.message || statusData.error || statusData.message || 'Video generation failed';
       throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
     }
   }
-  throw new Error('视频生成超时');
+  throw new Error('Video generation timed out');
 }
 
 // ==================== Volcengine 豆包/Seedance 格式 ====================
@@ -784,7 +784,7 @@ async function callVolcVideoApi(
   // 检测代理包装的业务级错误（HTTP 200 但 body.status 为 failed/error）
   // 典型场景：MemeFast 中转将上游 451（内容审核）等错误包装为 {status: "failed", message: "..."}
   if (submitData.status === 'failed' || submitData.status === 'error') {
-    const proxyMsg = submitData.message || submitData.error?.message || '视频提交失败（代理返回业务错误）';
+    const proxyMsg = submitData.message || submitData.error?.message || 'Video submission failed (proxy returned a business error)';
     console.error('[VideoGen] Volc: proxy-wrapped business error:', proxyMsg);
     // 尝试从错误信息中提取原始 HTTP 状态码
     const statusMatch = proxyMsg.match(/status\s+(\d+)/);
@@ -813,7 +813,7 @@ async function callVolcVideoApi(
     console.error('[VideoGen] Volc: cannot extract taskId. Full response:', JSON.stringify(submitData));
     // 兜底：将代理返回的错误信息（如有）附加到异常中，避免信息丢失
     const detail = submitData.message || submitData.error?.message || '';
-    throw new Error(detail || `doubao-seedance 返回空的任务 ID（响应格式未识别，请检查控制台日志）`);
+    throw new Error(detail || `doubao-seedance returned an empty task ID (response format unrecognized, check console logs)`);
   }
 
   // 轮询: GET /volc/v1/contents/generations/tasks/{taskId}
@@ -837,7 +837,7 @@ async function callVolcVideoApi(
     );
 
     if (!statusResponse.ok) {
-      if (statusResponse.status === 404) throw new Error('任务不存在');
+      if (statusResponse.status === 404) throw new Error('Task not found');
       console.warn('[VideoGen] Volc query failed:', statusResponse.status);
       await sleepOrAbort(pollInterval, signal);
       continue;
@@ -860,20 +860,20 @@ async function callVolcVideoApi(
         extractVideoUrl(statusData);
       if (!videoUrl) {
         console.error('[VideoGen] Volc: task succeeded but no video URL. statusData:', JSON.stringify(statusData));
-        throw new Error('任务完成但没有视频 URL');
+        throw new Error('Task completed but returned no video URL');
       }
       return videoUrl;
     }
 
     if (status === 'failed' || status === 'expired' || status === 'cancelled') {
-      const errorMsg = statusData.error?.message || statusData.error?.code || '视频生成失败';
+      const errorMsg = statusData.error?.message || statusData.error?.code || 'Video generation failed';
       throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
     }
 
     // queued / running → 继续轮询
     await sleepOrAbort(pollInterval, signal);
   }
-  throw new Error('视频生成超时');
+  throw new Error('Video generation timed out');
 }
 
 // ==================== 通义万象 wan 格式 ====================
@@ -935,7 +935,7 @@ async function callWanVideoApi(
 
   // 百炼响应: { request_id, output: { task_id, task_status: "PENDING" } }
   const taskId = submitData.output?.task_id;
-  if (!taskId) throw new Error('返回空的任务 ID');
+  if (!taskId) throw new Error('Returned empty task ID');
 
   // 轮询: GET /alibailian/api/v1/tasks/{task_id}
   const pollInterval = 5000;
@@ -954,7 +954,7 @@ async function callWanVideoApi(
     );
 
     if (!statusResponse.ok) {
-      if (statusResponse.status === 404) throw new Error('任务不存在');
+      if (statusResponse.status === 404) throw new Error('Task not found');
       console.warn('[VideoGen] Wan query failed:', statusResponse.status);
       await sleepOrAbort(pollInterval, signal);
       continue;
@@ -968,17 +968,17 @@ async function callWanVideoApi(
 
     if (taskStatus === 'SUCCEEDED') {
       const videoUrl = normalizeUrl(statusData.output?.video_url);
-      if (!videoUrl) throw new Error('任务完成但没有视频 URL');
+      if (!videoUrl) throw new Error('Task completed but returned no video URL');
       return videoUrl;
     }
 
     if (taskStatus === 'FAILED') {
-      throw new Error(statusData.output?.message || statusData.output?.error || '视频生成失败');
+      throw new Error(statusData.output?.message || statusData.output?.error || 'Video generation failed');
     }
 
     await sleepOrAbort(pollInterval, signal);
   }
-  throw new Error('视频生成超时');
+  throw new Error('Video generation timed out');
 }
 
 // ==================== Kling 可灵全系列格式 ====================
@@ -1067,7 +1067,7 @@ async function callKlingVideoApi(
 
   // Kling 响应: { code, message, data: { task_id, task_status } }
   const taskId = submitData.data?.task_id;
-  if (!taskId) throw new Error('返回空的任务 ID');
+  if (!taskId) throw new Error('Returned empty task ID');
 
   // 轮询 URL 镜像提交路径: GET /kling/v1/videos/{path}/{task_id}
   const pollUrl = `${baseUrl}/kling/v1/videos/${endpointPath}/${taskId}`;
@@ -1088,7 +1088,7 @@ async function callKlingVideoApi(
     });
 
     if (!statusResponse.ok) {
-      if (statusResponse.status === 404) throw new Error('任务不存在');
+      if (statusResponse.status === 404) throw new Error('Task not found');
       console.warn('[VideoGen] Kling query failed:', statusResponse.status);
       continue;
     }
@@ -1104,15 +1104,15 @@ async function callKlingVideoApi(
         normalizeUrl(statusData.data?.task_result?.videos?.[0]?.url) ||
         normalizeUrl(statusData.data?.task_result?.video_url) ||
         extractVideoUrl(statusData);
-      if (!videoUrl) throw new Error('任务完成但没有视频 URL');
+      if (!videoUrl) throw new Error('Task completed but returned no video URL');
       return videoUrl;
     }
 
     if (taskStatus === 'failed' || taskStatus === 'error') {
-      throw new Error(statusData.data?.task_status_msg || statusData.message || '视频生成失败');
+      throw new Error(statusData.data?.task_status_msg || statusData.message || 'Video generation failed');
     }
   }
-  throw new Error('视频生成超时');
+  throw new Error('Video generation timed out');
 }
 
 // ==================== OpenAI 官方视频格式 (sora-2) ====================
@@ -1167,7 +1167,7 @@ async function callOpenAIOfficialVideoApi(
   const taskId = (submitData.id || submitData.video_id)?.toString();
   const directUrl = extractVideoUrl(submitData);
   if (directUrl) return directUrl;
-  if (!taskId) throw new Error('Sora 返回空任务 ID');
+  if (!taskId) throw new Error('Sora returned empty task ID');
 
   // 轮询: GET /v1/videos/{taskId}
   const pollUrl = `${baseUrl}/v1/videos/${taskId}`;
@@ -1193,15 +1193,15 @@ async function callOpenAIOfficialVideoApi(
 
     if (status === 'completed' || status === 'succeeded' || status === 'success') {
       const videoUrl = extractVideoUrl(statusData) || normalizeUrl(`${baseUrl}/v1/videos/${taskId}/content`);
-      if (!videoUrl) throw new Error('Sora 任务完成但没有视频 URL');
+      if (!videoUrl) throw new Error('Sora task completed but returned no video URL');
       return videoUrl;
     }
 
     if (status === 'failed' || status === 'error') {
-      throw new Error(statusData.error?.message || statusData.error || statusData.message || 'Sora 生成失败');
+      throw new Error(statusData.error?.message || statusData.error || statusData.message || 'Sora generation failed');
     }
   }
-  throw new Error('Sora 生成超时');
+  throw new Error('Sora generation timed out');
 }
 
 // ==================== Replicate 视频格式 ====================
@@ -1259,7 +1259,7 @@ async function callReplicateVideoApi(
   if (directUrl) return directUrl;
 
   const predictionId = submitData.id?.toString();
-  if (!predictionId) throw new Error('Replicate 返回空 prediction ID');
+  if (!predictionId) throw new Error('Replicate returned empty prediction ID');
 
   // 轮询: GET /replicate/v1/predictions/{id}
   const pollUrl = `${rootBase}/replicate/v1/predictions/${predictionId}`;
@@ -1285,15 +1285,15 @@ async function callReplicateVideoApi(
 
     if (status === 'succeeded') {
       const videoUrl = extractVideoUrl(statusData);
-      if (!videoUrl) throw new Error('Replicate 成功但未返回视频 URL');
+      if (!videoUrl) throw new Error('Replicate succeeded but returned no video URL');
       return videoUrl;
     }
 
     if (status === 'failed' || status === 'canceled') {
-      throw new Error(statusData.error || 'Replicate 视频生成失败');
+      throw new Error(statusData.error || 'Replicate video generation failed');
     }
   }
-  throw new Error('Replicate 视频生成超时');
+  throw new Error('Replicate video generation timed out');
 }
 
 // Save video to local and return the local URL
@@ -1522,10 +1522,10 @@ export async function callJuxinVideoGenerationApi(
 ): Promise<string> {
   const apiBaseUrl = baseUrl?.replace(/\/+$/, '');
   if (!apiBaseUrl) {
-    throw new Error('请先在设置中配置视频生成服务映射');
+    throw new Error('Please configure the video generation service mapping in Settings');
   }
   if (!model) {
-    throw new Error('请先在设置中配置视频生成模型');
+    throw new Error('Please configure the video generation model in Settings');
   }
   console.log('[VideoGen] Using JuxinAPI (Grok) for video generation');
   
@@ -1578,7 +1578,7 @@ export async function callJuxinVideoGenerationApi(
       }
 
       if (submitResponse.status === 401 || submitResponse.status === 403) {
-        throw new Error('API Key 无效或已过期');
+        throw new Error('API key is invalid or expired');
       }
       const err = new Error(errorMessage) as Error & { status?: number };
       err.status = submitResponse.status;
@@ -1599,7 +1599,7 @@ export async function callJuxinVideoGenerationApi(
   // Extract task ID from response
   const taskId = submitData.id;
   if (!taskId) {
-    throw new Error('Grok API 返回空的任务 ID');
+    throw new Error('Grok API returned empty task ID');
   }
 
   console.log('[VideoGen] Grok task ID:', taskId);
@@ -1628,7 +1628,7 @@ export async function callJuxinVideoGenerationApi(
 
     if (!statusResponse.ok) {
       if (statusResponse.status === 404) {
-        throw new Error('任务不存在');
+        throw new Error('Task not found');
       }
       console.warn('[VideoGen] Grok query failed:', statusResponse.status);
       await sleepOrAbort(pollInterval, signal);
@@ -1645,7 +1645,7 @@ export async function callJuxinVideoGenerationApi(
       const videoUrl = statusData.video_url || statusData.result_url || statusData.url;
       
       if (!videoUrl) {
-        throw new Error('任务完成但没有视频 URL');
+        throw new Error('Task completed but returned no video URL');
       }
       
       console.log('[VideoGen] Grok video completed:', videoUrl);
@@ -1653,7 +1653,7 @@ export async function callJuxinVideoGenerationApi(
     }
 
     if (status === 'failed' || status === 'error') {
-      const errorMsg = statusData.error || statusData.error_message || '视频生成失败';
+      const errorMsg = statusData.error || statusData.error_message || 'Video generation failed';
       throw new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
     }
 
@@ -1661,5 +1661,5 @@ export async function callJuxinVideoGenerationApi(
     await sleepOrAbort(pollInterval, signal);
   }
   
-  throw new Error('视频生成超时');
+  throw new Error('Video generation timed out');
 }

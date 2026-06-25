@@ -147,7 +147,7 @@ export function useSClassGeneration() {
           groupId: group.id,
           success: false,
           videoUrl: null,
-          error: "无活跃项目",
+          error: "No active project",
         };
       }
 
@@ -169,7 +169,7 @@ export function useSClassGeneration() {
           groupId: group.id,
           success: false,
           videoUrl: null,
-          error: "请先在设置中配置视频生成 API Key",
+          error: "Please configure a video generation API key in Settings first",
         };
       }
       const sclassProjectData = getProjectData(projectId);
@@ -190,7 +190,7 @@ export function useSClassGeneration() {
           groupId: group.id,
           success: false,
           videoUrl: null,
-          error: "组内无场景",
+          error: "No scenes in the group",
         };
       }
 
@@ -241,17 +241,17 @@ export function useSClassGeneration() {
             if (canReuseGrid) {
               // 复用步骤③保存的原始九宫格图
               gridDataUrl = cachedGridUrl!;
-              console.log('[SClassGen] 复用缓存九宫格图:', gridDataUrl.substring(0, 60));
+              console.log('[SClassGen] Reusing cached grid image:', gridDataUrl.substring(0, 60));
             } else {
               // 重新合并首帧为格子图
               gridDataUrl = await mergeToGridImage(firstFrameUrls, aspectRatio);
-              console.log('[SClassGen] 已合并', firstFrameUrls.length, '张首帧为格子图');
+              console.log('[SClassGen] Merged', firstFrameUrls.length, 'first frames into a grid image');
             }
 
             gridImageRef = {
               id: 'grid_image',
               type: 'image',
-              tag: '@图片1',
+              tag: '@Image1',
               localUrl: gridDataUrl,
               httpUrl: gridDataUrl.startsWith('http') ? gridDataUrl : null,
               fileName: 'grid_image.png',
@@ -276,7 +276,7 @@ export function useSClassGeneration() {
 
         if (promptResult.refs.overLimit) {
           console.warn(
-            "[SClassGen] 素材超限:",
+            "[SClassGen] Assets over limit:",
             promptResult.refs.limitWarnings
           );
         }
@@ -415,7 +415,7 @@ export function useSClassGeneration() {
         }
 
         if (!videoUrl) {
-          throw lastVideoError || new Error("视频生成失败：没有可用 API Key");
+          throw lastVideoError || new Error("Video generation failed: no available API key");
         }
 
         // 7. 保存视频到本地
@@ -461,7 +461,7 @@ export function useSClassGeneration() {
         };
       } catch (error) {
         const err = error as Error;
-        const errorMsg = err.message || "视频生成失败";
+        const errorMsg = err.message || "Video generation failed";
         const isModeration = isContentModerationError(err);
 
         console.error("[SClassGen] Group generation failed:", err);
@@ -469,7 +469,7 @@ export function useSClassGeneration() {
         updateGroupVideoStatus(group.id, {
           videoStatus: "failed",
           videoProgress: 0,
-          videoError: isModeration ? `内容审核未通过: ${errorMsg}` : errorMsg,
+          videoError: isModeration ? `Content moderation failed: ${errorMsg}` : errorMsg,
         });
 
         return {
@@ -502,7 +502,7 @@ export function useSClassGeneration() {
     ): Promise<GroupGenerationResult[]> => {
       const projectId = activeProjectId;
       if (!projectId) {
-        toast.error("无活跃项目");
+        toast.error("No active project");
         return [];
       }
 
@@ -510,7 +510,7 @@ export function useSClassGeneration() {
       const groups = projectData.shotGroups;
 
       if (groups.length === 0) {
-        toast.error("没有镜头组");
+        toast.error("No shot groups");
         return [];
       }
 
@@ -520,7 +520,7 @@ export function useSClassGeneration() {
       );
 
       if (groupsToGenerate.length === 0) {
-        toast.info("所有镜头组已生成或正在生成中");
+        toast.info("All shot groups are already generated or in progress");
         return [];
       }
 
@@ -528,12 +528,12 @@ export function useSClassGeneration() {
       const results: GroupGenerationResult[] = [];
 
       toast.info(
-        `开始逐组生成 ${groupsToGenerate.length} 个镜头组视频...`
+        `Starting sequential generation for ${groupsToGenerate.length} group videos...`
       );
 
       for (let i = 0; i < groupsToGenerate.length; i++) {
         if (abortRef.current) {
-          toast.warning("已中止批量生成");
+          toast.warning("Batch generation aborted");
           break;
         }
 
@@ -561,11 +561,11 @@ export function useSClassGeneration() {
 
         if (result.success) {
           toast.success(
-            `组 ${i + 1}/${groupsToGenerate.length} 「${group.name}」生成完成`
+            `Group ${i + 1}/${groupsToGenerate.length} "${group.name}" completed`
           );
         } else {
           toast.error(
-            `组 ${i + 1}/${groupsToGenerate.length} 「${group.name}」失败: ${result.error}`
+            `Group ${i + 1}/${groupsToGenerate.length} "${group.name}" failed: ${result.error}`
           );
         }
       }
@@ -580,10 +580,10 @@ export function useSClassGeneration() {
       const successCount = results.filter((r) => r.success).length;
       const failCount = results.filter((r) => !r.success).length;
       if (failCount === 0) {
-        toast.success(`全部 ${successCount} 个镜头组生成完成 🎬`);
+        toast.success(`All ${successCount} shot groups completed 🎬`);
       } else {
         toast.warning(
-          `生成完毕：${successCount} 成功，${failCount} 失败`
+          `Finished: ${successCount} succeeded, ${failCount} failed`
         );
       }
 
@@ -598,7 +598,7 @@ export function useSClassGeneration() {
     async (sceneId: number): Promise<boolean> => {
       const scene = splitScenes.find((s: SplitScene) => s.id === sceneId);
       if (!scene) {
-        toast.error("未找到分镜");
+        toast.error("Scene not found");
         return false;
       }
 
@@ -610,7 +610,7 @@ export function useSClassGeneration() {
 
       const keyManager = featureConfig.keyManager;
       if (!keyManager.getCurrentKey()) {
-        toast.error("请先在设置中配置视频生成 API Key");
+        toast.error("Please configure a video generation API key in Settings first");
         return false;
       }
       const projectId = activeProjectId;
@@ -640,7 +640,7 @@ export function useSClassGeneration() {
         const prompt =
           scene.videoPrompt ||
           scene.videoPromptZh ||
-          `分镜 ${scene.id + 1} 视频`;
+          `Scene ${scene.id + 1} video`;
         const duration = Math.max(4, Math.min(15, scene.duration || 5));
 
         const maxVideoAttempts = Math.max(1, Math.min(keyManager.getTotalKeyCount(), 6));
@@ -701,7 +701,7 @@ export function useSClassGeneration() {
         }
 
         if (!videoUrl) {
-          throw lastVideoError || new Error("视频生成失败：没有可用 API Key");
+          throw lastVideoError || new Error("Video generation failed: no available API key");
         }
 
         const localUrl = await saveVideoLocally(videoUrl, sceneId);
@@ -713,7 +713,7 @@ export function useSClassGeneration() {
           videoError: null,
         });
 
-        toast.success(`分镜 ${sceneId + 1} 生成完成`);
+        toast.success(`Scene ${sceneId + 1} completed`);
         return true;
       } catch (error) {
         const err = error as Error;
@@ -722,7 +722,7 @@ export function useSClassGeneration() {
           videoProgress: 0,
           videoError: err.message,
         });
-        toast.error(`分镜 ${sceneId + 1} 生成失败: ${err.message}`);
+        toast.error(`Scene ${sceneId + 1} failed: ${err.message}`);
         return false;
       }
     },
@@ -738,7 +738,7 @@ export function useSClassGeneration() {
 
   const abortGeneration = useCallback(() => {
     abortRef.current = true;
-    toast.info("正在中止生成...");
+    toast.info("Aborting generation...");
   }, []);
 
   // ========== 重试单组 ==========
@@ -791,22 +791,22 @@ export function useSClassGeneration() {
     ): Promise<GroupGenerationResult | null> => {
       const projectId = activeProjectId;
       if (!projectId) {
-        toast.error('无活跃项目');
+        toast.error('No active project');
         return null;
       }
 
       const pd = getProjectData(projectId);
       const sourceGroup = pd.shotGroups.find(g => g.id === sourceGroupId);
       if (!sourceGroup || !sourceGroup.videoUrl) {
-        toast.error('源组无已完成视频，无法延长');
+        toast.error('The source group has no completed video to extend');
         return null;
       }
 
-      // 创建延长子组
+      // Create extend child group
       const childId = `extend_${Date.now()}_${sourceGroupId.substring(0, 8)}`;
       const childGroup: ShotGroup = {
         id: childId,
-        name: `${sourceGroup.name} - 延长`,
+        name: `${sourceGroup.name} - Extend`,
         sceneIds: [...sourceGroup.sceneIds],
         sortIndex: sourceGroup.sortIndex + 0.5,
         totalDuration: Math.max(4, Math.min(15, extendDuration)) as ShotGroup["totalDuration"],
@@ -829,7 +829,7 @@ export function useSClassGeneration() {
       };
 
       addShotGroup(childGroup);
-      toast.info(`已创建延长子组「${childGroup.name}」`);
+      toast.info(`Created extend child group "${childGroup.name}"`);
 
       return generateGroupVideo(childGroup);
     },

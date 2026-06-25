@@ -24,9 +24,9 @@ interface ModelSelectorProps {
 }
 
 interface SelectorModel {
-  id: string;       // 供应商原始模型 ID（直接用于 API 调用）
-  name: string;     // 显示名
-  brandId: string;  // 品牌 ID
+  id: string;       // Vendor model ID (used directly in API calls)
+  name: string;     // Display name
+  brandId: string;  // Brand ID
 }
 
 const KLING_VIDEO_VARIANTS = [
@@ -38,7 +38,7 @@ const KLING_VIDEO_VARIANTS = [
   'kling-avatar-image2video',
   'kling-advanced-lip-sync',
   'kling-effects',
-  // kling-video 模型版本 (MemeFast model_version)
+  // kling-video model versions (MemeFast model_version)
   'kling-v1',
   'kling-v1-5',
   'kling-v1-6',
@@ -178,7 +178,7 @@ const SEEDREAM_IMAGE_VARIANTS = [
 const KLING_IMAGE_VARIANTS = [
   'kling-image',
   'kling-omni-image',
-  // kling-image 模型版本 (MemeFast model_version)
+  // kling-image model versions (MemeFast model_version)
   'kling-image-v1',
   'kling-image-v1-5',
   'kling-image-v2',
@@ -217,7 +217,7 @@ const VIDEO_FAMILY_VARIANTS: Record<string, string[]> = {
   'kling-advanced-lip-sync': KLING_VIDEO_VARIANTS,
   'kling-effects': KLING_VIDEO_VARIANTS,
   'aigc-video-kling': KLING_VIDEO_VARIANTS,
-  // kling-video 模型版本 (MemeFast model_version)
+  // kling-video model versions (MemeFast model_version)
   'kling-v1': KLING_VIDEO_VARIANTS,
   'kling-v1-5': KLING_VIDEO_VARIANTS,
   'kling-v1-6': KLING_VIDEO_VARIANTS,
@@ -324,7 +324,7 @@ const IMAGE_FAMILY_VARIANTS: Record<string, string[]> = {
   // Kling image
   'kling-image': KLING_IMAGE_VARIANTS,
   'kling-omni-image': KLING_IMAGE_VARIANTS,
-  // kling-image 模型版本 (MemeFast model_version)
+  // kling-image model versions (MemeFast model_version)
   'kling-image-v1': KLING_IMAGE_VARIANTS,
   'kling-image-v1-5': KLING_IMAGE_VARIANTS,
   'kling-image-v2': KLING_IMAGE_VARIANTS,
@@ -356,14 +356,14 @@ function expandBoundModel(type: 'image' | 'video', model: string): string[] {
 
 function shouldHideModel(type: 'image' | 'video', model: string): boolean {
   if (type === 'video') {
-    // 类目入口不展示
+    // Do not show category entry points.
     if (model === 'kling-video') return true;
     if (model === 'sora-2-characters') return true;
 
     return false;
   }
 
-  // 图片面板：隐藏当前 UI 不支持的任务型模型（编辑/重绘/识图/放大等）
+  // Image panel: hide task-oriented models that the current UI does not support (edit/reframe/recognize/upscale, etc.)
   if (/^mj_/i.test(model) && model !== 'mj_imagine') return true;
   if (/^ideogram_(edit|reframe|remix|replace_background|upscale|describe)/i.test(model)) return true;
   if (/^(kling-image-recognize|deepseek-ocr)$/i.test(model)) return true;
@@ -383,20 +383,20 @@ function isModelAllowedByPanelType(
   const endpointTypes = modelEndpointTypes[modelId] || [];
   const modelType = modelTypes[modelId];
   if (type === 'image') {
-    // 未同步到 model_type 时先放行，避免误伤可用模型
+    // If model_type is not synced yet, allow it to avoid hiding valid models.
     if (!modelType) return true;
     return modelType === '图像';
   }
 
-  // 视频面板：先按 model_type 粗过滤
+  // Video panel: first filter coarsely by model_type.
   if (modelType && modelType !== '音视频') return false;
 
-  // 再按 endpoint type 细过滤，排除纯音频类模型
+  // Then filter by endpoint type to exclude pure audio models.
   if (endpointTypes.length > 0) {
     return endpointTypes.some((t) => /视频|video|文生视频|图生视频|首尾帧|参考生视频|延长|动作控制|数字人|omni-video/i.test(t));
   }
 
-  // endpoint 缺失时用模型名兜底判定（避免自定义展开型号被误过滤）
+  // Fall back to the model name when endpoint metadata is missing.
   return /kling|veo|sora|runway|vidu|hailuo|minimax\/video|wan|luma|grok-video|seedance|aigc-video/i.test(modelId);
 }
 
@@ -408,8 +408,8 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
   const modelTypes = useAPIConfigStore((s) => s.modelTypes);
   const modelEndpointTypes = useAPIConfigStore((s) => s.modelEndpointTypes);
 
-  // 直接从 featureBindings 读取已绑定的模型列表
-  // 格式: ["memefast:gemini-3-pro-image-preview", "memefast:flux-dev", ...]
+  // Read the bound model list directly from featureBindings.
+  // Format: ["memefast:gemini-3-pro-image-preview", "memefast:flux-dev", ...]
   const models = useMemo((): SelectorModel[] => {
     const feature = type === 'image' ? 'freedom_image' : 'freedom_video';
     const bindings = getFeatureBindings(feature);
@@ -457,7 +457,7 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
     return counts;
   }, [models]);
 
-  // 按品牌分组
+  // Group by brand.
   const grouped = useMemo(() => {
     const groups: Record<string, { brand: ReturnType<typeof getBrandInfo>; models: SelectorModel[] }> = {};
     for (const model of filteredModels) {
@@ -486,7 +486,7 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
             className={cn('w-full justify-between h-10', className)}
           >
             <span className="truncate">
-              {selectedModel ? selectedModel.name : value ? getModelDisplayName(value) : '选择模型...'}
+              {selectedModel ? selectedModel.name : value ? getModelDisplayName(value) : 'Select a model...'}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -495,7 +495,7 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
           <div className="flex items-center border-b px-3 py-2">
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
             <Input
-              placeholder="搜索模型..."
+              placeholder="Search models..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="border-0 focus-visible:ring-0 h-8 px-0"
@@ -514,7 +514,7 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
                       {brand.displayName}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      可用 {brandAvailableCounts[brandId] ?? brandModels.length}
+                      Available {brandAvailableCounts[brandId] ?? brandModels.length}
                     </span>
                   </div>
                   {brandModels.map((model) => (
@@ -544,9 +544,9 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
               {Object.keys(grouped).length === 0 && (
                 <div className="p-4 text-center text-sm text-muted-foreground space-y-2">
                   <Settings className="h-5 w-5 mx-auto mb-1 opacity-50" />
-                  <p>暂无可用模型</p>
+                  <p>No models available</p>
                   <p className="text-xs">
-                    请先在设置 → 服务映射 → {type === 'image' ? '自由板块-图片' : '自由板块-视频'} 中勾选模型
+                    First enable models in Settings → Service Mapping → {type === 'image' ? 'Freedom - Image' : 'Freedom - Video'}
                   </p>
                 </div>
               )}
@@ -558,7 +558,7 @@ export function ModelSelector({ type, value, onChange, className }: ModelSelecto
         <div className="flex items-start gap-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-700 dark:text-amber-300">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span>
-            当前已选模型不可用（可能已下线或被当前面板过滤），请重新选择可用模型。
+            The selected model is unavailable (it may be offline or filtered out by this panel). Please choose another available model.
           </span>
         </div>
       )}

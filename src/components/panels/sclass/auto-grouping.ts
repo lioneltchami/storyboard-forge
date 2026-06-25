@@ -87,7 +87,7 @@ export function autoGroupScenes(
     const dur = Math.round(Math.min(Math.max(currentDuration, 4), 15)) as SClassDuration;
     groups.push({
       id: genId(),
-      name: `第${groups.length + 1}组`,
+      name: `Group ${groups.length + 1}`,
       sceneIds: [...currentSceneIds],
       totalDuration: dur,
       imageRefs: [],
@@ -175,7 +175,7 @@ export function generateGroupName(
   scenes: SplitScene[],
   groupIndex: number,
 ): string {
-  if (group.sceneIds.length === 0) return `第${groupIndex + 1}组`;
+  if (group.sceneIds.length === 0) return `Group ${groupIndex + 1}`;
 
   // 尝试使用场景名
   const sceneMap = new Map(scenes.map((s) => [s.id, s]));
@@ -189,8 +189,8 @@ export function generateGroupName(
   const lastNum = lastIdx >= 0 ? lastIdx + 1 : firstNum + group.sceneIds.length - 1;
 
   if (firstScene?.sceneName) {
-    return `${firstScene.sceneName} (镜头${firstNum}-${lastNum})`;
+    return `${firstScene.sceneName} (Shots ${firstNum}-${lastNum})`;
   }
 
-  return `第${groupIndex + 1}组: 镜头${firstNum}-${lastNum}`;
+  return `Group ${groupIndex + 1}: Shots ${firstNum}-${lastNum}`;
 }

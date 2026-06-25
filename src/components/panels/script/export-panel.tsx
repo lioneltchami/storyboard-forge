@@ -45,12 +45,12 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
 
   const handleExportToFolder = async () => {
     if (!stats.canExport) {
-      toast.error('没有可导出的素材');
+      toast.error('No exportable assets');
       return;
     }
 
     setIsExporting(true);
-    setProgress({ current: 0, total: 0, message: '准备导出...' });
+    setProgress({ current: 0, total: 0, message: 'Preparing export...' });
 
     try {
       const success = await exportProjectToFolder(
@@ -67,11 +67,11 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
       );
 
       if (success) {
-        toast.success('导出完成！');
+        toast.success('Export complete!');
       }
     } catch (error) {
       const err = error as Error;
-      toast.error(`导出失败: ${err.message}`);
+      toast.error(`Export failed: ${err.message}`);
     } finally {
       setIsExporting(false);
       setProgress(null);
@@ -80,12 +80,12 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
 
   const handleDownloadFiles = async () => {
     if (!stats.canExport) {
-      toast.error('没有可导出的素材');
+      toast.error('No exportable assets');
       return;
     }
 
     setIsExporting(true);
-    setProgress({ current: 0, total: 0, message: '准备下载...' });
+    setProgress({ current: 0, total: 0, message: 'Preparing download...' });
 
     try {
       await exportProjectFiles(
@@ -101,10 +101,10 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
         (p) => setProgress(p)
       );
 
-      toast.success('下载完成！');
+      toast.success('Download complete!');
     } catch (error) {
       const err = error as Error;
-      toast.error(`下载失败: ${err.message}`);
+      toast.error(`Download failed: ${err.message}`);
     } finally {
       setIsExporting(false);
       setProgress(null);
@@ -114,9 +114,9 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
   return (
     <div className="space-y-4 p-4 rounded-lg border bg-card">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-sm">导出素材包</h3>
+        <h3 className="font-medium text-sm">Export package</h3>
         <span className="text-xs text-muted-foreground">
-          可用于剪映、PR等视频编辑软件
+          Ready for CapCut, Premiere Pro, and similar editors
         </span>
       </div>
 
@@ -124,15 +124,15 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="p-2 rounded bg-muted/50">
           <div className="text-lg font-semibold">{stats.totalShots}</div>
-          <div className="text-xs text-muted-foreground">总镜头</div>
+          <div className="text-xs text-muted-foreground">Total shots</div>
         </div>
         <div className="p-2 rounded bg-muted/50">
           <div className="text-lg font-semibold text-green-500">{stats.imagesReady}</div>
-          <div className="text-xs text-muted-foreground">图片就绪</div>
+          <div className="text-xs text-muted-foreground">Images ready</div>
         </div>
         <div className="p-2 rounded bg-muted/50">
           <div className="text-lg font-semibold text-blue-500">{stats.videosReady}</div>
-          <div className="text-xs text-muted-foreground">视频就绪</div>
+          <div className="text-xs text-muted-foreground">Videos ready</div>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
         <div className="flex items-center justify-between">
           <Label htmlFor="include-images" className="flex items-center gap-2 text-sm">
             <ImageIcon className="h-4 w-4" />
-            导出图片
+            Include images
             <span className="text-xs text-muted-foreground">({stats.imagesReady})</span>
           </Label>
           <Switch
@@ -155,7 +155,7 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
         <div className="flex items-center justify-between">
           <Label htmlFor="include-videos" className="flex items-center gap-2 text-sm">
             <Video className="h-4 w-4" />
-            导出视频
+            Include videos
             <span className="text-xs text-muted-foreground">({stats.videosReady})</span>
           </Label>
           <Switch
@@ -182,9 +182,9 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
       <div className="text-xs text-muted-foreground space-y-1">
         <div className="flex items-center gap-1">
           <FileJson className="h-3 w-3" />
-          包含 manifest.json 元数据文件
+          Includes the `manifest.json` metadata file
         </div>
-        <div>文件夹结构: images/, videos/, manifest.json</div>
+        <div>Folder structure: images/, videos/, manifest.json</div>
       </div>
 
       {/* Export buttons */}
@@ -197,12 +197,12 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
           {isExporting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              导出中...
+              Exporting...
             </>
           ) : (
             <>
               <FolderOpen className="h-4 w-4 mr-2" />
-              选择文件夹导出
+              Export to folder
             </>
           )}
         </Button>
@@ -219,7 +219,7 @@ export function ExportPanel({ projectName, scriptData, shots, targetDuration }: 
       {!stats.canExport && (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <AlertCircle className="h-3 w-3" />
-          请先生成镜头图片或视频
+          Generate at least one shot image or video first
         </div>
       )}
     </div>

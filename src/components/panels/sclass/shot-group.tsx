@@ -4,13 +4,13 @@
 "use client";
 
 /**
- * ShotGroupCard — S级分组容器组件
+ * ShotGroupCard — S-class group container component
  *
- * 显示一组镜头的聚合信息：
- * - 组头：组名 + 镜头数 + 总时长预算条
- * - 组级操作：生成视频 / 展开折叠
- * - 展开后渲染内部的 SceneCard 列表
- * - 组级视频结果显示
+ * Shows aggregate info for a group of shots:
+ * - Group header: name + shot count + duration budget bar
+ * - Group actions: generate video / expand-collapse
+ * - Expanded view renders the internal SceneCard list
+ * - Group video result display
  */
 
 import React, { useState, useMemo, useCallback } from "react";
@@ -53,29 +53,29 @@ import { GroupRefManager } from "./group-ref-manager";
 
 export interface ShotGroupCardProps {
   group: ShotGroup;
-  /** 组内的 SplitScene 数据 */
+  /** SplitScene data inside the group */
   scenes: SplitScene[];
-  /** 所有 SplitScene (用于时长计算) */
+  /** All SplitScene items (for duration calculation) */
   allScenes: SplitScene[];
-  /** 组索引 (0-based) */
+  /** Group index (0-based) */
   groupIndex: number;
-  /** 是否正在全局生成中 */
+  /** Whether anything is currently generating */
   isGeneratingAny: boolean;
-  /** 渲染单个镜头卡片的回调 */
+  /** Callback that renders a single scene card */
   renderSceneCard: (scene: SplitScene) => React.ReactNode;
-  /** 组级视频生成回调 */
+  /** Group video generation callback */
   onGenerateGroupVideo?: (groupId: string) => void;
-  /** 组级 AI 校准回调 */
+  /** Group AI calibration callback */
   onCalibrateGroup?: (groupId: string) => void;
-  /** 视频延长回调 */
+  /** Video extend callback */
   onExtendGroup?: (groupId: string) => void;
-  /** 视频编辑回调 */
+  /** Video edit callback */
   onEditGroup?: (groupId: string) => void;
-  /** 默认展开 */
+  /** Default expanded state */
   defaultExpanded?: boolean;
-  /** 角色库数据（用于 @引用管理） */
+  /** Character library data (for @ ref management) */
   characters?: Character[];
-  /** 场景库数据（用于 @引用管理） */
+  /** Scene library data (for @ ref management) */
   sceneLibrary?: Scene[];
 }
 
@@ -100,7 +100,7 @@ export function ShotGroupCard({
   const [showRefManager, setShowRefManager] = useState(false);
   const [gridPreviewOpen, setGridPreviewOpen] = useState(false);
 
-  /** 下载格子图 */
+  /** Download grid image */
   const handleDownloadGrid = useCallback(() => {
     if (!group.gridImageUrl) return;
     const a = document.createElement('a');
@@ -109,17 +109,17 @@ export function ShotGroupCard({
     a.click();
   }, [group.gridImageUrl, group.name]);
 
-  /** 复制 prompt */
+  /** Copy prompt */
   const handleCopyPrompt = useCallback(() => {
     if (!group.lastPrompt) return;
     navigator.clipboard.writeText(group.lastPrompt).then(() => {
-      toast.success('提示词已复制到剪贴板');
+      toast.success('Prompt copied to clipboard');
     }).catch(() => {
-      toast.error('复制失败');
+      toast.error('Copy failed');
     });
   }, [group.lastPrompt]);
 
-  // 重新计算实际时长
+  // Recalculate actual duration
   const actualDuration = useMemo(
     () => recalcGroupDuration(group, allScenes),
     [group, allScenes],
@@ -138,12 +138,12 @@ export function ShotGroupCard({
   const isEditChild = group.generationType === 'edit';
   const isChildGroup = isExtendChild || isEditChild;
 
-  // 组内各镜头的时长段
+  // Duration segments for each scene in the group
   const durationSegments = useMemo(() => {
     return scenes.map((s, idx) => ({
       id: s.id,
       duration: s.duration > 0 ? s.duration : 5,
-      label: `镜头${idx + 1}`,
+      label: `Shot ${idx + 1}`,
     }));
   }, [scenes]);
 
@@ -158,7 +158,7 @@ export function ShotGroupCard({
         isEditChild && "border-l-4 border-l-orange-500",
       )}
     >
-      {/* ========== 组头 ========== */}
+      {/* ========== Group header ========== */}
       <div
         className={cn(
           "flex items-center gap-2 px-3 py-2 cursor-pointer select-none",
@@ -166,31 +166,31 @@ export function ShotGroupCard({
         )}
         onClick={() => setExpanded(!expanded)}
       >
-        {/* 折叠图标 */}
+        {/* Collapse icon */}
         {expanded ? (
           <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
         ) : (
           <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
         )}
 
-        {/* 组名 */}
+        {/* Group name */}
         <div className="flex items-center gap-1.5 min-w-0">
           <Layers className="h-3.5 w-3.5 text-primary shrink-0" />
           <span className="text-sm font-medium truncate">{group.name}</span>
           {isExtendChild && (
-            <span className="text-[10px] px-1.5 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-full shrink-0">延长</span>
+            <span className="text-[10px] px-1.5 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-full shrink-0">Extend</span>
           )}
           {isEditChild && (
-            <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full shrink-0">编辑</span>
+            <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full shrink-0">Edit</span>
           )}
         </div>
 
-        {/* 镜头数 */}
+        {/* Shot count */}
         <span className="text-xs text-muted-foreground shrink-0">
-          {group.sceneIds.length} 镜头
+          {group.sceneIds.length} shots
         </span>
 
-        {/* 时长标签 */}
+        {/* Duration label */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -210,10 +210,10 @@ export function ShotGroupCard({
             </TooltipTrigger>
             <TooltipContent>
               {isOverBudget ? (
-                <p>总时长超出 15s 限制！请减少镜头或缩短单镜时长。</p>
+                <p>Total duration exceeds the 15s limit. Reduce the shot count or shorten individual shots.</p>
               ) : (
                 <p>
-                  组内 {group.sceneIds.length} 个镜头，总时长 {actualDuration}
+                  {group.sceneIds.length} shots in the group, total duration {actualDuration}
                   s
                 </p>
               )}
@@ -221,7 +221,7 @@ export function ShotGroupCard({
           </Tooltip>
         </TooltipProvider>
 
-        {/* 状态标记 */}
+        {/* Status badges */}
         {isCompleted && (
           <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
         )}
@@ -229,7 +229,7 @@ export function ShotGroupCard({
           <AlertCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
         )}
 
-        {/* @引用数量标记 */}
+        {/* @ ref count badge */}
         {((group.videoRefs?.length || 0) + (group.audioRefs?.length || 0)) > 0 && (
           <div className="flex items-center gap-0.5 text-xs text-muted-foreground shrink-0">
             <Paperclip className="h-3 w-3" />
@@ -237,9 +237,9 @@ export function ShotGroupCard({
           </div>
         )}
 
-        {/* 右侧操作区 */}
+        {/* Right-side actions */}
         <div className="ml-auto flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-          {/* @引用管理按钮 */}
+          {/* @ ref manager button */}
           <Button
             variant="ghost"
             size="sm"
@@ -247,9 +247,9 @@ export function ShotGroupCard({
             onClick={() => setShowRefManager(!showRefManager)}
           >
             <Paperclip className="h-3 w-3 mr-1" />
-            @引用
+            @ refs
           </Button>
-          {/* AI 校准按钮 */}
+          {/* AI calibration button */}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -268,18 +268,18 @@ export function ShotGroupCard({
                   ) : (
                     <Sparkles className="h-3 w-3 mr-1" />
                   )}
-                  {isCalibrating ? '校准中' : isCalibrated ? '已校准' : 'AI校准'}
+                  {isCalibrating ? 'Calibrating' : isCalibrated ? 'Calibrated' : 'AI Calibrate'}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 {isCalibrated
-                  ? <p>已完成 AI 校准，点击重新校准</p>
-                  : <p>AI 分析组内镜头，生成叙事弧线、过渡设计、优化 prompt</p>
+                  ? <p>AI calibration is complete. Click to recalibrate.</p>
+                  : <p>AI will analyze the group shots to generate narrative arcs, transitions, and prompt refinements.</p>
                 }
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {/* 生成按钮 */}
+          {/* Generate button */}
           <Button
             variant={isCompleted ? "outline" : "default"}
             size="sm"
@@ -290,21 +290,21 @@ export function ShotGroupCard({
             {isGenerating ? (
               <>
                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                生成中
+                Generating
               </>
             ) : isCompleted ? (
               <>
                 <Film className="h-3 w-3 mr-1" />
-                重新生成
+                Regenerate
               </>
             ) : (
               <>
                 <Play className="h-3 w-3 mr-1" />
-                生成视频
+                Generate video
               </>
             )}
           </Button>
-          {/* 延长/编辑按钮（仅已完成的普通组显示） */}
+          {/* Extend/edit buttons (only for completed non-child groups) */}
           {isCompleted && !isChildGroup && (
             <>
               <TooltipProvider>
@@ -318,10 +318,10 @@ export function ShotGroupCard({
                       onClick={() => onExtendGroup?.(group.id)}
                     >
                       <Timer className="h-3 w-3 mr-1" />
-                      延长
+                      Extend
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>基于当前视频继续延长，可向后或向前拓展</TooltipContent>
+                  <TooltipContent>Continue the current video with a backward or forward extension</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
@@ -335,10 +335,10 @@ export function ShotGroupCard({
                       onClick={() => onEditGroup?.(group.id)}
                     >
                       <Scissors className="h-3 w-3 mr-1" />
-                      编辑
+                      Edit
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>对当前视频进行剧情编辑、角色替换、属性修改等</TooltipContent>
+                  <TooltipContent>Edit the current video with plot changes, character swaps, attribute edits, and more</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </>
@@ -346,7 +346,7 @@ export function ShotGroupCard({
         </div>
       </div>
 
-      {/* ========== 时长预算条 ========== */}
+      {/* ========== Duration budget bar ========== */}
       <div className="px-3 py-1 bg-muted/10">
         <div className="w-full h-2 bg-muted rounded-full overflow-hidden flex">
           {durationSegments.map((seg, idx) => {
@@ -396,20 +396,20 @@ export function ShotGroupCard({
           </span>
           {isOverBudget && (
             <span className="text-[10px] text-red-500 font-medium">
-              超出 {actualDuration - 15}s
+              Over by {actualDuration - 15}s
             </span>
           )}
         </div>
       </div>
 
-      {/* ========== AI 校准结果预览 ========== */}
+      {/* ========== AI calibration result preview ========== */}
       {(isCalibrated || isCalibrationFailed) && (
         <div className="px-3 py-2 border-t bg-purple-500/5 space-y-1.5">
           {isCalibrated && group.narrativeArc && (
             <div className="flex items-start gap-1.5">
               <Sparkles className="h-3 w-3 text-purple-500 mt-0.5 shrink-0" />
               <div>
-                <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">叙事弧线</span>
+                <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">Narrative arc</span>
                 <p className="text-xs text-muted-foreground mt-0.5">{group.narrativeArc}</p>
               </div>
             </div>
@@ -418,7 +418,7 @@ export function ShotGroupCard({
             <div className="flex items-start gap-1.5">
               <ChevronRight className="h-3 w-3 text-purple-400 mt-0.5 shrink-0" />
               <div>
-                <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">过渡设计</span>
+                <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">Transitions</span>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {group.transitions.map((t, i) => `${i + 1}→${i + 2}: ${t}`).join('；')}
                 </p>
@@ -428,21 +428,21 @@ export function ShotGroupCard({
           {isCalibrationFailed && group.calibrationError && (
             <div className="flex items-start gap-1.5">
               <AlertCircle className="h-3 w-3 text-red-500 mt-0.5 shrink-0" />
-              <span className="text-xs text-red-500">校准失败：{group.calibrationError}</span>
+              <span className="text-xs text-red-500">Calibration failed: {group.calibrationError}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* ========== 生成结果区（格子图 + Prompt + 视频） ========== */}
+      {/* ========== Generation results (grid + prompt + video) ========== */}
       {(group.gridImageUrl || group.lastPrompt || group.videoUrl) && (
         <div className="px-3 py-2 border-t bg-muted/5 space-y-2">
-          {/* 格子图预览 + 下载 */}
+          {/* Grid preview + download */}
           {group.gridImageUrl && (
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <ImageIcon className="h-3.5 w-3.5 text-blue-500" />
-                <span className="text-xs text-blue-600 dark:text-blue-400">格子图</span>
+                <span className="text-xs text-blue-600 dark:text-blue-400">Grid image</span>
                 <div className="ml-auto flex items-center gap-1">
                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setGridPreviewOpen(!gridPreviewOpen)}>
                     <ZoomIn className="h-3 w-3" />
@@ -465,15 +465,15 @@ export function ShotGroupCard({
             </div>
           )}
 
-          {/* Prompt 复制 */}
+          {/* Prompt copy */}
           {group.lastPrompt && (
             <div>
               <div className="flex items-center gap-2">
                 <Copy className="h-3.5 w-3.5 text-orange-500" />
-                <span className="text-xs text-orange-600 dark:text-orange-400">生成 Prompt</span>
+                <span className="text-xs text-orange-600 dark:text-orange-400">Generated prompt</span>
                 <Button variant="ghost" size="sm" className="h-6 px-2 ml-auto text-xs" onClick={handleCopyPrompt}>
                   <Copy className="h-3 w-3 mr-1" />
-                  复制
+                  Copy
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-1 line-clamp-3 whitespace-pre-wrap break-all">
@@ -482,12 +482,12 @@ export function ShotGroupCard({
             </div>
           )}
 
-          {/* 视频预览 */}
+          {/* Video preview */}
           {group.videoUrl && (
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Film className="h-3.5 w-3.5 text-green-500" />
-                <span className="text-xs text-green-600 dark:text-green-400">视频已生成</span>
+                <span className="text-xs text-green-600 dark:text-green-400">Video generated</span>
               </div>
               <video
                 src={group.videoUrl}
@@ -500,7 +500,7 @@ export function ShotGroupCard({
         </div>
       )}
 
-      {/* 错误信息 */}
+      {/* Error message */}
       {isFailed && group.videoError && (
         <div className="px-3 py-1.5 border-t bg-red-500/5">
           <div className="flex items-start gap-1.5">
@@ -510,7 +510,7 @@ export function ShotGroupCard({
         </div>
       )}
 
-      {/* ========== @引用管理面板 ========== */}
+      {/* ========== @ ref management panel ========== */}
       {showRefManager && (
         <GroupRefManager
           group={group}
@@ -521,7 +521,7 @@ export function ShotGroupCard({
         />
       )}
 
-      {/* ========== 展开的镜头卡片列表 ========== */}
+      {/* ========== Expanded scene card list ========== */}
       {expanded && (
         <div className="border-t">
           <div className="flex flex-col gap-2 p-2">

@@ -1051,8 +1051,8 @@ ${gridItemsZh}
     setCurrentPageIndex(0);
     
     // 设置一个占位提示词，触发进入联合图界面
-    setContactSheetPrompt('[直接上传 - 无提示词]');
-    setContactSheetPromptZh('[直接上传 - 无提示词]');
+    setContactSheetPrompt('[Direct Upload - No Prompt]');
+    setContactSheetPromptZh('[Direct Upload - No Prompt]');
 
     // 读取并显示上传的图片
     const reader = new FileReader();
@@ -1072,7 +1072,7 @@ ${gridItemsZh}
     setContactSheetLayout(newLayout);
     
     // 如果是直接上传模式（没有真正的提示词），需要更新视角数据
-    if (contactSheetPrompt === '[直接上传 - 无提示词]') {
+    if (contactSheetPrompt === '[Direct Upload - No Prompt]') {
       const dims = getLayoutDimensions(newLayout, contactSheetAspectRatio);
       const totalCells = dims.rows * dims.cols;
       

@@ -4,13 +4,13 @@
 "use client";
 
 /**
- * GroupRefManager — S级组级 @引用管理器
+ * GroupRefManager — S-class group @ reference manager
  *
- * 功能：
- * - 自动收集：角色参考图、场景参考图、首帧图片 → 只读展示
- * - 手动上传：视频引用（运镜/动作复刻）、音频引用（节奏/BGM）
- * - 配额条：≤9 图片 + ≤3 视频 + ≤3 音频，总 ≤12
- * - 删除已上传的视频/音频引用
+ * Features:
+ * - Auto-collect: character refs, scene refs, first-frame images -> read-only display
+ * - Manual upload: video refs (camera motion / motion replay), audio refs (rhythm / BGM)
+ * - Quota bars: <=9 images + <=3 videos + <=3 audios, total <=12
+ * - Remove uploaded video/audio refs
  *
  * Seedance 2.0 限制:
  * - images: ≤9, videos: ≤3 (≤15s each), audios: ≤3 (MP3, ≤15s), total: ≤12
@@ -56,13 +56,13 @@ export interface GroupRefManagerProps {
   scenes: SplitScene[];
   characters: Character[];
   sceneLibrary: Scene[];
-  /** 是否只读 */
+  /** Read-only */
   readOnly?: boolean;
 }
 
 // ==================== Sub-components ====================
 
-/** 缩略图：支持 base64/http/local-image:// */
+/** Thumbnail: supports base64/http/local-image:// */
 function RefThumbnail({
   src,
   alt,
@@ -103,7 +103,7 @@ function RefThumbnail({
   );
 }
 
-/** 配额进度条 */
+/** Quota bar */
 function QuotaBar({
   label,
   icon,
@@ -149,7 +149,7 @@ export function GroupRefManager({
   const audioInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState<"video" | "audio" | null>(null);
 
-  // ========== 自动收集的图片引用 ==========
+  // ========== Auto-collected image refs ==========
   const autoImages = useMemo(() => {
     const allCharIds = Array.from(
       new Set(scenes.flatMap((s) => s.characterIds || []))
@@ -172,7 +172,7 @@ export function GroupRefManager({
   const audioRefs = group.audioRefs || [];
   const totalFiles = imageCount + videoRefs.length + audioRefs.length;
 
-  // ========== 文件上传处理 ==========
+  // ========== File upload handling ==========
   const handleFileUpload = useCallback(
     async (files: FileList | null, type: "video" | "audio") => {
       if (!files || files.length === 0) return;
@@ -184,38 +184,38 @@ export function GroupRefManager({
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
-        // 配额检查（单类型）
+        // Quota check (single type)
         if (limits.current + i >= limits.max) {
-          toast.error(`${type === "video" ? "视频" : "音频"}引用已达上限 ${limits.max} 个`);
+          toast.error(`${type === "video" ? "Video" : "Audio"} refs have reached the limit of ${limits.max}`);
           break;
         }
 
-        // 配额检查（总文件数）
+        // Quota check (total files)
         if (totalFiles + i >= SEEDANCE_LIMITS.maxTotalFiles) {
-          toast.error(`总文件数已达上限 ${SEEDANCE_LIMITS.maxTotalFiles}`);
+          toast.error(`Total file count has reached the limit of ${SEEDANCE_LIMITS.maxTotalFiles}`);
           break;
         }
 
-        // 文件类型检查
+        // File type check
         if (!limits.accept.some((t) => file.type.startsWith(t.split("/")[0]))) {
-          toast.error(`不支持的文件类型: ${file.name}`);
+          toast.error(`Unsupported file type: ${file.name}`);
           continue;
         }
 
-        // 读取为 data URL
+        // Read as data URL
         const dataUrl = await readFileAsDataUrl(file);
 
-        // 检查时长（视频/音频都需 ≤15s）
+        // Duration check (video/audio must both be <=15s)
         const duration = await getMediaDuration(dataUrl, type);
         if (duration > SEEDANCE_LIMITS.maxDuration) {
-          toast.error(`${file.name} 时长 ${Math.round(duration)}s 超出 ${SEEDANCE_LIMITS.maxDuration}s 限制`);
+          toast.error(`${file.name} is ${Math.round(duration)}s long and exceeds the ${SEEDANCE_LIMITS.maxDuration}s limit`);
           continue;
         }
 
         const asset: AssetRef = {
           id: `${type}_upload_${Date.now()}_${i}`,
           type,
-          tag: type === "video" ? `@视频${videoRefs.length + i + 1}` : `@音频${audioRefs.length + i + 1}`,
+          tag: type === "video" ? `@Video${videoRefs.length + i + 1}` : `@Audio${audioRefs.length + i + 1}`,
           localUrl: dataUrl,
           httpUrl: null,
           fileName: file.name,
@@ -225,17 +225,17 @@ export function GroupRefManager({
         };
 
         addAssetRef(group.id, asset);
-        toast.success(`已添加 ${type === "video" ? "视频" : "音频"}引用: ${file.name}`);
+        toast.success(`Added ${type === "video" ? "video" : "audio"} ref: ${file.name}`);
       }
     },
     [group.id, videoRefs.length, audioRefs.length, addAssetRef]
   );
 
-  // 删除引用
+  // Remove ref
   const handleRemoveRef = useCallback(
     (assetId: string, fileName: string) => {
       removeAssetRef(group.id, assetId);
-      toast.info(`已移除: ${fileName}`);
+      toast.info(`Removed: ${fileName}`);
     },
     [group.id, removeAssetRef]
   );
@@ -260,25 +260,25 @@ export function GroupRefManager({
 
   return (
     <div className="px-3 py-2 border-t bg-muted/5 space-y-2">
-      {/* ========== 配额总览 ========== */}
+      {/* ========== Quota overview ========== */}
       <div className="flex items-center gap-4 flex-wrap">
-        <span className="text-xs font-medium text-muted-foreground">@引用素材</span>
+        <span className="text-xs font-medium text-muted-foreground">@ refs</span>
         <QuotaBar
-          label="图片"
+          label="Images"
           icon={<ImageIcon className="h-3 w-3 text-blue-500" />}
           current={imageCount}
           max={SEEDANCE_LIMITS.maxImages}
           color="bg-blue-500"
         />
         <QuotaBar
-          label="视频"
+          label="Videos"
           icon={<Film className="h-3 w-3 text-purple-500" />}
           current={videoRefs.length}
           max={SEEDANCE_LIMITS.maxVideos}
           color="bg-purple-500"
         />
         <QuotaBar
-          label="音频"
+          label="Audios"
           icon={<Music className="h-3 w-3 text-green-500" />}
           current={audioRefs.length}
           max={SEEDANCE_LIMITS.maxAudios}
@@ -290,11 +290,11 @@ export function GroupRefManager({
             ? "bg-red-500/10 text-red-500 font-medium"
             : "bg-muted text-muted-foreground"
         )}>
-          总 {totalFiles}/{SEEDANCE_LIMITS.maxTotalFiles}
+          Total {totalFiles}/{SEEDANCE_LIMITS.maxTotalFiles}
         </div>
       </div>
 
-      {/* ========== 自动收集的图片引用（折叠展示） ========== */}
+      {/* ========== Auto-collected image refs (collapsed) ========== */}
       <AutoImageSection
         charRefs={autoImages.charRefs}
         sceneRefs={autoImages.sceneRefs}
@@ -302,14 +302,14 @@ export function GroupRefManager({
         truncated={autoImages.truncated}
       />
 
-      {/* ========== 视频引用上传区 ========== */}
+      {/* ========== Video ref upload area ========== */}
       <div className="space-y-1">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Film className="h-3 w-3 text-purple-500" />
-          <span>视频引用 — 运镜/动作复刻</span>
+          <span>Video refs - camera motion / motion replay</span>
         </div>
 
-        {/* 已上传的视频 */}
+        {/* Uploaded videos */}
         {videoRefs.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {videoRefs.map((ref) => (
@@ -322,7 +322,7 @@ export function GroupRefManager({
           </div>
         )}
 
-        {/* 上传区 */}
+        {/* Upload area */}
         {!readOnly && videoRefs.length < SEEDANCE_LIMITS.maxVideos && (
           <UploadZone
             type="video"
@@ -346,14 +346,14 @@ export function GroupRefManager({
         />
       </div>
 
-      {/* ========== 音频引用上传区 ========== */}
+      {/* ========== Audio ref upload area ========== */}
       <div className="space-y-1">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Music className="h-3 w-3 text-green-500" />
-          <span>音频引用 — 节奏/BGM</span>
+          <span>Audio refs - rhythm / BGM</span>
         </div>
 
-        {/* 已上传的音频 */}
+        {/* Uploaded audios */}
         {audioRefs.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {audioRefs.map((ref) => (
@@ -366,7 +366,7 @@ export function GroupRefManager({
           </div>
         )}
 
-        {/* 上传区 */}
+        {/* Upload area */}
         {!readOnly && audioRefs.length < SEEDANCE_LIMITS.maxAudios && (
           <UploadZone
             type="audio"
@@ -390,11 +390,11 @@ export function GroupRefManager({
         />
       </div>
 
-      {/* ========== 超限警告 ========== */}
+      {/* ========== Over-limit warning ========== */}
       {totalFiles > SEEDANCE_LIMITS.maxTotalFiles && (
         <div className="flex items-start gap-1.5 text-xs text-red-500 bg-red-500/5 rounded p-1.5">
           <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
-          <span>总文件数 {totalFiles} 超出 Seedance 2.0 限制 ({SEEDANCE_LIMITS.maxTotalFiles})，请移除部分引用</span>
+          <span>Total file count {totalFiles} exceeds the Seedance 2.0 limit ({SEEDANCE_LIMITS.maxTotalFiles}); remove some refs.</span>
         </div>
       )}
     </div>
@@ -420,7 +420,7 @@ function AutoImageSection({
   if (totalCount === 0) {
     return (
       <div className="text-xs text-muted-foreground/60 py-1">
-        暂无自动收集的图片引用（请先生成首帧图片、关联角色或场景）
+        No auto-collected image refs yet (generate first-frame images or attach characters/scenes first)
       </div>
     );
   }
@@ -433,34 +433,34 @@ function AutoImageSection({
       >
         <ImageIcon className="h-3 w-3 text-blue-500" />
         <span>
-          自动收集 {totalCount} 张图片
-          {truncated && <span className="text-amber-500 ml-1">(超出限制已截断至 {SEEDANCE_LIMITS.maxImages})</span>}
+          Auto-collected {totalCount} images
+          {truncated && <span className="text-amber-500 ml-1">(truncated to {SEEDANCE_LIMITS.maxImages})</span>}
         </span>
         <span className="text-[10px]">{expanded ? "▼" : "▶"}</span>
       </button>
 
       {expanded && (
         <div className="space-y-1.5 pl-1">
-          {/* 首帧图 */}
+          {/* First-frame images */}
           {frameRefs.length > 0 && (
             <RefGroup
-              label="首帧"
+              label="First frame"
               icon={<Clapperboard className="h-3 w-3 text-blue-400" />}
               refs={frameRefs}
             />
           )}
-          {/* 角色图 */}
+          {/* Character images */}
           {charRefs.length > 0 && (
             <RefGroup
-              label="角色"
+              label="Characters"
               icon={<User className="h-3 w-3 text-amber-400" />}
               refs={charRefs}
             />
           )}
-          {/* 场景图 */}
+          {/* Scene images */}
           {sceneRefs.length > 0 && (
             <RefGroup
-              label="场景"
+              label="Scenes"
               icon={<MapPin className="h-3 w-3 text-teal-400" />}
               refs={sceneRefs}
             />
@@ -541,8 +541,8 @@ function UploadZone({
       <Plus className={cn("h-3 w-3", isVideo ? "text-purple-400" : "text-green-400")} />
       <span className="text-xs text-muted-foreground">
         {isVideo
-          ? "拖放或点击上传视频 (MP4/WebM, ≤15s)"
-          : "拖放或点击上传音频 (MP3/WAV, ≤15s)"}
+          ? "Drag and drop or click to upload video (MP4/WebM, <=15s)"
+          : "Drag and drop or click to upload audio (MP3/WAV, <=15s)"}
       </span>
     </div>
   );

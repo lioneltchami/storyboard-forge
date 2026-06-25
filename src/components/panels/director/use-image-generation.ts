@@ -143,7 +143,7 @@ export async function callImageGenerationApi(
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       // 检查外部中止信号
-      if (signal?.aborted) throw new Error('用户已取消');
+      if (signal?.aborted) throw new Error('User cancelled');
 
       const progress = Math.min(Math.floor((attempt / maxAttempts) * 100), 99);
       onProgress?.(progress);
@@ -196,7 +196,7 @@ export async function callImageGenerationApi(
 
       await new Promise<void>((resolve, reject) => {
         const tid = setTimeout(resolve, pollInterval);
-        signal?.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('用户已取消')); }, { once: true });
+        signal?.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('User cancelled')); }, { once: true });
       });
     }
     throw new Error('Image generation timed out');
