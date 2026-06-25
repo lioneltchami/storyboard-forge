@@ -435,7 +435,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   // 切换摄影风格档案
   const handleCinProfileChange = useCallback((profileId: string) => {
     setCinematographyProfileId(profileId || undefined);
-    toast.success('摄影风格已更新');
+    toast.success('Cinematography style updated');
   }, [setCinematographyProfileId]);
 
   // Update style
@@ -444,14 +444,14 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     if (style) {
       // 直接存储风格 ID，同时保留 styleTokens（完整 prompt）兼容旧逻辑
       setStoryboardConfig({ visualStyleId: styleId, styleTokens: [style.prompt] });
-      toast.success(`已切换为 ${style.name} 风格`);
+      toast.success(`Switched to ${style.name} style`);
     }
   }, [setStoryboardConfig]);
 
   // Update aspect ratio
   const handleAspectRatioChange = useCallback((ratio: '16:9' | '9:16') => {
     setStoryboardConfig({ aspectRatio: ratio });
-    toast.success(`已切换为 ${ratio === '16:9' ? '横屏' : '竖屏'} 模式`);
+    toast.success(`Switched to ${ratio === '16:9' ? 'landscape' : 'portrait'} mode`);
   }, [setStoryboardConfig]);
 
   const { getApiKey, getProviderByPlatform, concurrency } = useAPIConfigStore();
@@ -557,7 +557,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   // Handle delete scene
   const handleDeleteScene = useCallback((sceneId: number) => {
     deleteSplitScene(sceneId);
-    toast.success(`分镜 ${sceneId + 1} 已删除`);
+    toast.success(`Scene ${sceneId + 1} deleted`);
   }, [deleteSplitScene]);
 
   // Handle remove first frame image
@@ -3364,7 +3364,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
           <ImageIcon className="h-8 w-8 text-muted-foreground" />
         </div>
-        <p className="text-sm text-muted-foreground">暂无切割的分镜</p>
+        <p className="text-sm text-muted-foreground">No split scenes yet</p>
       </div>
     );
   }
@@ -3380,14 +3380,14 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-9 px-4"
             >
               <Film className="h-3 w-3 mr-1" />
-              分镜编辑
+              Scene Editor
             </TabsTrigger>
             <TabsTrigger 
               value="trailer" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-9 px-4"
             >
               <Clapperboard className="h-3 w-3 mr-1" />
-              预告片 {trailerScenes.length > 0 ? `(${trailerScenes.length})` : ''}
+              Trailer {trailerScenes.length > 0 ? `(${trailerScenes.length})` : ''}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -3399,21 +3399,21 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           {trailerScenes.length === 0 ? (
             <div className="text-center text-muted-foreground text-sm py-8">
               <Clapperboard className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>预告片功能</p>
-              <p className="text-xs mt-1">请在左侧「剧本」面板中的「预告片」标签页生成预告片</p>
-              <p className="text-xs mt-1">挑选的分镜将在此显示并可进行图片/视频生成</p>
+              <p>Trailer tools</p>
+              <p className="text-xs mt-1">Generate a trailer from the "Trailer" tab in the Script panel on the left.</p>
+              <p className="text-xs mt-1">Selected scenes will appear here for image and video generation.</p>
             </div>
           ) : (
             <>
               {/* Header - 与分镜编辑一致 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">预告片分镜</span>
+                  <span className="text-sm font-medium">Trailer Scenes</span>
                   <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {trailerScenes.length} 个分镜
+                    {trailerScenes.length} scenes
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    预计 {trailerScenes.reduce((sum, s) => sum + (s.duration || 5), 0)} 秒
+                    Est. {trailerScenes.reduce((sum, s) => sum + (s.duration || 5), 0)}s
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -3429,7 +3429,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                     ) : (
                       <Sparkles className="h-3 w-3 mr-1 text-yellow-500" />
                     )}
-                    AI 自动填写提示词
+                    Auto-fill prompts with AI
                   </Button>
                   {/* 一键清空预告片分镜 */}
                   <AlertDialog>
@@ -3441,18 +3441,18 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                         disabled={isGenerating}
                       >
                         <Trash2 className="h-3 w-3 mr-1" />
-                        清空分镜
+                        Clear scenes
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>确认清空预告片分镜</AlertDialogTitle>
+                        <AlertDialogTitle>Clear trailer scenes?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          这将删除所有 {trailerScenes.length} 个预告片分镜（包括已生成的图片和视频）。此操作不可撤销。
+                          This will delete all {trailerScenes.length} trailer scenes, including generated images and videos. This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
                             // 删除所有预告片分镜
@@ -3461,11 +3461,11 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                             });
                             // 清空预告片配置
                             clearTrailer();
-                            toast.success(`已清空 ${trailerScenes.length} 个预告片分镜`);
+                            toast.success(`Cleared ${trailerScenes.length} trailer scenes`);
                           }}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          确认清空
+                          Clear trailer scenes
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -3476,7 +3476,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               {/* Global style and aspect ratio config - 与分镜编辑一致 */}
               <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-muted/30 border">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">视觉风格:</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">Visual style:</span>
                   <StylePicker
                     value={currentStyleId || ''}
                     onChange={handleStyleChange}
@@ -3484,7 +3484,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">画面比例:</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">Aspect ratio:</span>
                   <div className="flex rounded-md border overflow-hidden">
                     <button
                       onClick={() => handleAspectRatioChange('16:9')}
@@ -3496,7 +3496,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                       )}
                     >
                       <Monitor className="h-3.5 w-3.5" />
-                      横屏
+                      Landscape
                     </button>
                     <button
                       onClick={() => handleAspectRatioChange('9:16')}
@@ -3508,7 +3508,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                       )}
                     >
                       <Smartphone className="h-3.5 w-3.5" />
-                      竖屏
+                      Portrait
                     </button>
                   </div>
                 </div>
@@ -3517,16 +3517,16 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                   value={storyboardConfig.resolution || '2K'}
                   onValueChange={(v: '1K' | '2K' | '4K') => {
                     setStoryboardConfig({ resolution: v });
-                    toast.success(`图片分辨率已切换为 ${v}`);
+                    toast.success(`Image resolution set to ${v}`);
                   }}
                 >
                   <SelectTrigger className="w-[130px] h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1K" className="text-xs">标准 (1K)</SelectItem>
-                    <SelectItem value="2K" className="text-xs">高清 (2K)</SelectItem>
-                    <SelectItem value="4K" className="text-xs">超清 (4K)</SelectItem>
+                    <SelectItem value="1K" className="text-xs">Standard (1K)</SelectItem>
+                    <SelectItem value="2K" className="text-xs">HD (2K)</SelectItem>
+                    <SelectItem value="4K" className="text-xs">Ultra HD (4K)</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -3535,16 +3535,16 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                   value={storyboardConfig.videoResolution || '480p'}
                   onValueChange={(v: '480p' | '720p' | '1080p') => {
                     setStoryboardConfig({ videoResolution: v });
-                    toast.success(`视频分辨率已切换为 ${v}`);
+                    toast.success(`Video resolution set to ${v}`);
                   }}
                 >
                   <SelectTrigger className="w-[140px] h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="480p" className="text-xs">标准 (480P)</SelectItem>
-                    <SelectItem value="720p" className="text-xs">高清 (720P)</SelectItem>
-                    <SelectItem value="1080p" className="text-xs">高品质 (1080P)</SelectItem>
+                    <SelectItem value="480p" className="text-xs">Standard (480p)</SelectItem>
+                    <SelectItem value="720p" className="text-xs">HD (720p)</SelectItem>
+                    <SelectItem value="1080p" className="text-xs">High Quality (1080p)</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -3604,7 +3604,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                       <Button
                         onClick={() => {
                           // 仅为预告片分镜生成视频
-                          toast.info(`开始生成 ${trailerScenes.length} 个预告片视频...`);
+                          toast.info(`Starting generation for ${trailerScenes.length} trailer videos...`);
                           // 循环调用单个生成
                           trailerScenes.forEach(scene => {
                             if (scene.imageDataUrl && scene.videoStatus !== 'completed') {
@@ -3619,18 +3619,18 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                         {isGenerating ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            生成中...
+                            Generating...
                           </>
                         ) : (
                           <>
                             <Play className="h-4 w-4 mr-2" />
-                            生成预告片视频 ({trailerScenes.length})
+                            Generate Trailer Videos ({trailerScenes.length})
                           </>
                         )}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>为预告片分镜生成视频</p>
+                      <p>Generate videos for trailer scenes</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -3638,7 +3638,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
               {/* Tips */}
               <div className="text-xs text-muted-foreground bg-muted/50 rounded-md p-2">
-                <p>💡 预告片分镜与主分镜共享数据，修改会同步。点击每个分镜下方的文字区域可编辑提示词。</p>
+                <p>Trailer scenes share data with the main scene list, so edits stay in sync. Click the text area below a scene to edit its prompts.</p>
               </div>
             </>
           )}
@@ -3651,9 +3651,9 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">分镜编辑</span>
+          <span className="text-sm font-medium">Scene Editor</span>
           <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-            {splitScenes.length} 个分镜
+            {splitScenes.length} scenes
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -3669,7 +3669,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             ) : (
               <Sparkles className="h-3 w-3 mr-1 text-yellow-500" />
             )}
-            AI 自动填写提示词
+            Auto-fill prompts with AI
           </Button>
           <Button
             variant="text"
@@ -3678,7 +3678,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
             className="hidden h-7 px-2 text-xs"
           >
             <ArrowLeft className="h-3 w-3 mr-1" />
-            重新生成
+            Regenerate
           </Button>
         </div>
       </div>
@@ -3687,7 +3687,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
       <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-muted/30 border">
         {/* Visual Style Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground whitespace-nowrap">视觉风格:</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Visual style:</span>
           <StylePicker
             value={currentStyleId || ''}
             onChange={handleStyleChange}
@@ -3697,7 +3697,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
         {/* Cinematography Profile Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground whitespace-nowrap">摄影风格:</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Cinematography:</span>
           <CinematographyProfilePicker
             value={currentCinProfileId}
             onChange={handleCinProfileChange}
@@ -3708,7 +3708,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
         {/* Aspect Ratio Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground whitespace-nowrap">画面比例:</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Aspect ratio:</span>
           <div className="flex rounded-md border overflow-hidden">
             <button
               onClick={() => handleAspectRatioChange('16:9')}
@@ -3720,7 +3720,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               )}
             >
               <Monitor className="h-3.5 w-3.5" />
-              横屏
+              Landscape
             </button>
             <button
               onClick={() => handleAspectRatioChange('9:16')}
@@ -3732,7 +3732,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
               )}
             >
               <Smartphone className="h-3.5 w-3.5" />
-              竖屏
+              Portrait
             </button>
           </div>
         </div>
@@ -3742,16 +3742,16 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           value={storyboardConfig.resolution || '2K'}
           onValueChange={(v: '1K' | '2K' | '4K') => {
             setStoryboardConfig({ resolution: v });
-            toast.success(`图片分辨率已切换为 ${v}`);
+            toast.success(`Image resolution set to ${v}`);
           }}
         >
           <SelectTrigger className="w-[130px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="1K" className="text-xs">标准 (1K)</SelectItem>
-            <SelectItem value="2K" className="text-xs">高清 (2K)</SelectItem>
-            <SelectItem value="4K" className="text-xs">超清 (4K)</SelectItem>
+            <SelectItem value="1K" className="text-xs">Standard (1K)</SelectItem>
+            <SelectItem value="2K" className="text-xs">HD (2K)</SelectItem>
+            <SelectItem value="4K" className="text-xs">Ultra HD (4K)</SelectItem>
           </SelectContent>
         </Select>
 
@@ -3760,22 +3760,22 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           value={storyboardConfig.videoResolution || '480p'}
           onValueChange={(v: '480p' | '720p' | '1080p') => {
             setStoryboardConfig({ videoResolution: v });
-            toast.success(`视频分辨率已切换为 ${v}`);
+            toast.success(`Video resolution set to ${v}`);
           }}
         >
           <SelectTrigger className="w-[140px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="480p" className="text-xs">标准 (480P)</SelectItem>
-            <SelectItem value="720p" className="text-xs">高清 (720P)</SelectItem>
-            <SelectItem value="1080p" className="text-xs">高品质 (1080P)</SelectItem>
+            <SelectItem value="480p" className="text-xs">Standard (480p)</SelectItem>
+            <SelectItem value="720p" className="text-xs">HD (720p)</SelectItem>
+            <SelectItem value="1080p" className="text-xs">High Quality (1080p)</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Image generation mode toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground whitespace-nowrap">图片生成方式:</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Image generation:</span>
           <div className="flex rounded-md border overflow-hidden">
             <button
               onClick={() => setImageGenMode('single')}
@@ -3783,14 +3783,14 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                 "px-3 py-1.5 text-xs",
                 imageGenMode === 'single' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
               )}
-            >单图生成</button>
+            >Single image</button>
             <button
               onClick={() => setImageGenMode('merged')}
               className={cn(
                 "px-3 py-1.5 text-xs border-l",
                 imageGenMode === 'merged' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
               )}
-            >合并生成</button>
+            >Merged generation</button>
           </div>
         </div>
 
@@ -3805,7 +3805,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
           {/* 首/尾帧模式 */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">首/尾帧:</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">Frame target:</span>
             <div className="flex rounded-md border overflow-hidden">
               <button
                 onClick={() => setFrameMode('first')}
@@ -3813,42 +3813,42 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                   "px-3 py-1.5 text-xs",
                   frameMode === 'first' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
                 )}
-              >仅首帧</button>
+              >Start only</button>
               <button
                 onClick={() => setFrameMode('last')}
                 className={cn(
                   "px-3 py-1.5 text-xs border-l",
                   frameMode === 'last' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
                 )}
-              >仅尾帧</button>
+              >End only</button>
               <button
                 onClick={() => setFrameMode('both')}
                 className={cn(
                   "px-3 py-1.5 text-xs border-l",
                   frameMode === 'both' ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
                 )}
-              >首+尾</button>
+              >Start + End</button>
             </div>
           </div>
 
           {/* 参考图策略 */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">参考图策略:</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">Reference strategy:</span>
             <Select value={refStrategy} onValueChange={v => setRefStrategy(v as any)}>
               <SelectTrigger className="w-[120px] h-8 text-xs">
-                <SelectValue placeholder="选择策略" />
+                <SelectValue placeholder="Select strategy" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cluster" className="text-xs">Cluster（聚类去重）</SelectItem>
-                <SelectItem value="minimal" className="text-xs">Minimal（单参考）</SelectItem>
-                <SelectItem value="none" className="text-xs">None（无参考）</SelectItem>
+                <SelectItem value="cluster" className="text-xs">Cluster (deduplicated)</SelectItem>
+                <SelectItem value="minimal" className="text-xs">Minimal (single reference)</SelectItem>
+                <SelectItem value="none" className="text-xs">None (no references)</SelectItem>
               </SelectContent>
             </Select>
             <button
               onClick={() => setUseExemplar(!useExemplar)}
               className={cn("px-2 py-1 text-xs rounded border", useExemplar ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted')}
-              title="同组格引用已生成的范例成片作为锚点"
-            >范例锚图 {useExemplar ? '开' : '关'}</button>
+              title="Use generated example shots from the same batch as anchors"
+            >Example anchors {useExemplar ? 'On' : 'Off'}</button>
           </div>
 
           {/* 执行合并生成 - 突出显示 */}
@@ -3861,7 +3861,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                 handleMergedGenerate(frameMode, refStrategy, useExemplar);
               }}
             >
-              {isMergedRunning ? (<><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />合并生成中...</>) : (<><Sparkles className="h-3.5 w-3.5 mr-1.5" />执行合并生成</>)}
+              {isMergedRunning ? (<><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Generating merged images...</>) : (<><Sparkles className="h-3.5 w-3.5 mr-1.5" />Run merged generation</>)}
             </Button>
             {isMergedRunning && (
               <Button
@@ -3869,7 +3869,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                 className="h-8 px-3 text-xs"
                 onClick={handleStopMergedGeneration}
               >
-                <Square className="h-3.5 w-3.5 mr-1" />停止
+                <Square className="h-3.5 w-3.5 mr-1" />Stop
               </Button>
             )}
           </div>
@@ -3881,7 +3881,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         <div className="flex items-start gap-2 p-2 rounded-md bg-yellow-500/10 border border-yellow-500/20">
           <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
           <div className="text-xs text-yellow-600 dark:text-yellow-400">
-            <p>部分分镜缺少提示词，点击分镜下方的文字区域可编辑。</p>
+            <p>Some scenes are missing prompts. Click the text area below a scene to edit them.</p>
           </div>
         </div>
       )}
@@ -3942,7 +3942,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
           )}
         >
           <Plus className="h-5 w-5" />
-          <span>添加空白分镜</span>
+          <span>Add blank scene</span>
         </button>
       </div>
 
@@ -3965,21 +3965,21 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
                     {isGenerating ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        生成中...
+                        Generating...
                       </>
                     ) : (
                       <>
                         <Play className="h-4 w-4 mr-2" />
-                        生成视频 ({scenesNeedVideo}/{splitScenes.length})
+                        Generate Videos ({scenesNeedVideo}/{splitScenes.length})
                       </>
                     )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   {noImages ? (
-                    <p>请先为分镜生成图片，再生成视频</p>
+                    <p>Generate images for your scenes before creating videos.</p>
                   ) : (
-                    <p>{scenesWithImages} 个分镜已有图片，{scenesNeedVideo} 个待生成视频</p>
+                    <p>{scenesWithImages} scenes already have images, and {scenesNeedVideo} videos are ready to generate.</p>
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -3990,7 +3990,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
       {/* Tips */}
       <div className="text-xs text-muted-foreground bg-muted/50 rounded-md p-2">
-        <p>💡 点击每个分镜下方的文字区域可编辑视频生成提示词。悬停在分镜上可以删除不需要的分镜。</p>
+        <p>Click the text area below each scene to edit video prompts. Hover over a scene to remove any you do not need.</p>
       </div>
       </>
       )}
@@ -4056,7 +4056,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         result={quadGridResult}
         frameType={quadGridTarget?.type || "start"}
         currentSceneId={quadGridTarget?.sceneId ?? 0}
-        availableScenes={splitScenes.map(s => ({ id: s.id, label: `分镜 ${s.id + 1}` }))}
+        availableScenes={splitScenes.map(s => ({ id: s.id, label: `Scene ${s.id + 1}` }))}
         onApply={handleApplyQuadGrid}
         onCopyToScene={handleCopyQuadGridToScene}
       />

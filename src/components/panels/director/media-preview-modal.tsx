@@ -59,7 +59,7 @@ export function ImagePreviewModal({
           <X className="h-5 w-5" />
         </button>
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white/60 text-xs bg-black/40 px-3 py-1 rounded-full pointer-events-none">
-          点击空白处或按 Esc 关闭
+          Click outside or press Esc to close
         </div>
       </div>
     </div>
