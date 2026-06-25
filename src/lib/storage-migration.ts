@@ -95,7 +95,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
     });
 
   if (!hasLegacyChinese) {
-    await writeProjectJson(DEMO_ENGGLISH_MIGRATION_FLAG_KEY, {
+    await writeProjectJson(DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
       migratedAt: new Date().toISOString(),
       demoProjectId: DEMO_PROJECT_ID,
       skipped: true,
@@ -172,7 +172,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
     }
   }
 
-  await writeProjectJson(DEMO_ENGGLISH_MIGRATION_FLAG_KEY, {
+  await writeProjectJson(DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
     migratedAt: new Date().toISOString(),
     demoProjectId: DEMO_PROJECT_ID,
     source: 'bundled-demo-data',
