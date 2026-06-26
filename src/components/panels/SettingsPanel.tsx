@@ -61,9 +61,7 @@ import {
   Check,
   X,
   Loader2,
-  MessageSquare,
   Zap,
-  ScanEye,
   Info,
   Image,
   RotateCcw,
@@ -86,8 +84,8 @@ import { UpdateDialog } from "@/components/UpdateDialog";
 import type { AvailableUpdateInfo } from "@/types/update";
 import packageJson from "../../../package.json";
 
-const APP_NAME = "Moyin Creator";
-const APP_TAGLINE = "AI-powered anime video creation";
+const APP_NAME = "Storyboard Forge";
+const APP_TAGLINE = "AI-powered storyboard and video creation";
 
 function cleanDisplayText(value: unknown, fallback: string): string {
   if (typeof value !== "string") return fallback;
@@ -194,7 +192,6 @@ export function SettingsPanel() {
     if (!mf || parseApiKeys(mf.apiKey).length === 0) return;
 
     const pid = mf.id;
-    const models = mf.model || [];
     const defaults: Record<string, string> = {
       script_analysis: `${pid}:deepseek-v3.2`,
       character_generation: `${pid}:gemini-3-pro-image-preview`,
@@ -463,7 +460,11 @@ export function SettingsPanel() {
       assignCharactersToProject(activeProjectId);
     }
     // Rehydrate to load/unload other projects' data
-    try { await useCharacterLibraryStore.persist.rehydrate(); } catch {}
+    try {
+      await useCharacterLibraryStore.persist.rehydrate();
+    } catch (error) {
+      console.warn("[SettingsPanel] Failed to rehydrate character library:", error);
+    }
   };
 
   const handleToggleShareScenes = async (checked: boolean) => {
@@ -471,7 +472,11 @@ export function SettingsPanel() {
     if (!checked && activeProjectId) {
       assignScenesToProject(activeProjectId);
     }
-    try { await useSceneStore.persist.rehydrate(); } catch {}
+    try {
+      await useSceneStore.persist.rehydrate();
+    } catch (error) {
+      console.warn("[SettingsPanel] Failed to rehydrate scene store:", error);
+    }
   };
 
   const handleToggleShareMedia = async (checked: boolean) => {
@@ -479,7 +484,11 @@ export function SettingsPanel() {
     if (!checked && activeProjectId) {
       assignMediaToProject(activeProjectId);
     }
-    try { await useMediaStore.persist.rehydrate(); } catch {}
+    try {
+      await useMediaStore.persist.rehydrate();
+    } catch (error) {
+      console.warn("[SettingsPanel] Failed to rehydrate media store:", error);
+    }
   };
 
   // Unified storage handlers

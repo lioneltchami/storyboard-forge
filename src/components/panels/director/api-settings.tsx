@@ -78,7 +78,7 @@ export function APISettings({ collapsed = true, onToggleCollapse }: APISettingsP
   }> = [
     {
       id: "memefast",
-      name: "Moyin API",
+      name: "Storyboard Forge API",
       description: "Full-featured AI relay with chat, image, video, and image understanding support",
       services: ["Chat", "Image", "Video", "Image Understanding"],
     },

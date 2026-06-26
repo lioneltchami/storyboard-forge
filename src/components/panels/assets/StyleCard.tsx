@@ -73,10 +73,12 @@ export function StyleCard({
         ) : category ? (
           /* Built-in style: color block placeholder + category label */
           <div className={cn(
-            "w-full h-full flex flex-col items-center justify-center",
+            "w-full h-full flex flex-col items-center justify-center px-4 text-center",
             CATEGORY_COLORS[category] || 'bg-muted/30'
           )}>
-            <div className="text-lg font-bold">{CATEGORY_LABELS[category] || category}</div>
+            <div className="text-lg font-bold leading-tight">
+              {CATEGORY_LABELS[category] || category}
+            </div>
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
@@ -92,10 +94,12 @@ export function StyleCard({
       </div>
 
       {/* Info area */}
-      <div className="p-2 space-y-0.5">
-        <div className="text-sm font-medium truncate">{name}</div>
+      <div className="p-3 space-y-1 text-center">
+        <div className="text-sm font-medium leading-tight line-clamp-2 break-words">
+          {name}
+        </div>
         {description && (
-          <div className="text-xs text-muted-foreground line-clamp-2">
+          <div className="text-xs text-muted-foreground line-clamp-2 leading-snug">
             {description}
           </div>
         )}

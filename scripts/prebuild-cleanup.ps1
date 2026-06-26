@@ -42,7 +42,7 @@ function Stop-ProcessTree {
 
 $processIds = New-Object "System.Collections.Generic.HashSet[int]"
 
-foreach ($process in Get-Process -Name "moyin-creator", "魔因漫创" -ErrorAction SilentlyContinue) {
+foreach ($process in Get-Process -Name "storyboard-forge" -ErrorAction SilentlyContinue) {
   $null = $processIds.Add([int]$process.Id)
 }
 

@@ -1,5 +1,5 @@
 appId: com.manju2026.moyin-creator
-productName: Moyin Creator
+productName: Storyboard Forge
 directories:
   buildResources: build
   output: release/build
@@ -33,7 +33,7 @@ mac:
     - zip
 
 win:
-  executableName: moyin-creator
+  executableName: storyboard-forge
   icon: build/icon.ico
   forceCodeSigning: false
   target:
@@ -44,7 +44,7 @@ win:
 # NSIS installer configuration
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: Moyin Creator
+  shortcutName: Storyboard Forge
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
   createStartMenuShortcut: true

@@ -1,17 +1,17 @@
 # Full pre-install help is available here
-[Feishu setup guide](https://kvodb27hf3.feishu.cn/wiki/JjSmwf173iN3fqkjXakcGbvTnEf?from=from_copylink)
+[Pre-install setup guide](../PRE_INSTALL_SETUP_GUIDE.md)
 
-# Moyin Creator - Basic workflow guide
+# Storyboard Forge - Basic Workflow Guide
 
-> A complete guide from script to finished video
+> A practical guide from script to finished video
 
-Moyin Creator includes multiple workflows. Each panel can be combined freely or used on its own for different creative scenarios. This guide covers the most common baseline workflow and is the recommended place for new users to start.
+Storyboard Forge includes multiple workflows. Each panel can be used independently or combined with the others for different creative workflows. This guide covers the most common baseline path and is the recommended starting point for new users.
 
-> Language note: the UI can be used in English, but the app is still partially Chinese-first in its prompts, labels, and some reference materials. That split is intentional in the current release: UI language and prompt language are not the same setting.
+> Language note: the UI can now be used in English, but prompt language is still separate from UI language. Some model-facing fields and reference materials may remain Chinese-first in specific workflows.
 
 ---
 
-## Workflow overview
+## Workflow Overview
 
 ```text
 Preparation -> Script -> AI calibration -> Scenes / Characters (optional) -> Director / S-Class -> Generate video
@@ -21,7 +21,7 @@ Preparation -> Script -> AI calibration -> Scenes / Characters (optional) -> Dir
 
 ## Preparation
 
-Before starting, complete the following setup:
+Before you begin, complete these setup steps:
 
 ### 1. Add API providers
 
@@ -49,26 +49,26 @@ Go to `Settings -> Image Host` and configure an image hosting service.
 - Use it to upload reference images, first frames, and other working assets.
 - As with API providers, multiple keys can help with concurrent uploads.
 
-Once the above is configured, you are ready to create.
+Once these are configured, you are ready to create.
 
 ---
 
-## Step 1: Script panel
+## Step 1: Script Panel
 
-Open the `Script` panel. You can begin in two ways:
+Open the `Script` panel. You can begin in one of two ways:
 
 - Import a script: paste or import a complete screenplay into the editor
 - AI creation: use AI assistance to create a script from scratch
 
-For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md). Use the Chinese-first example only if you need a fuller sample of narrative style.
+For formatting guidance, see [SCRIPT_FORMAT_EXAMPLE.md](./SCRIPT_FORMAT_EXAMPLE.md).
 
 The system will automatically analyze the script into structured scenes, storyboard shots, characters, dialogue, and related elements.
 
 ---
 
-## Step 2: AI calibration
+## Step 2: AI Calibration
 
-After the initial analysis completes, run these three calibration steps in order:
+After the initial analysis completes, run these calibration steps in order:
 
 1. AI scene calibration
 2. API storyboard calibration
@@ -78,7 +78,7 @@ These steps deepen the scene, shot, and character descriptions and generate more
 
 ---
 
-## Step 3: Generate assets (optional)
+## Step 3: Generate Assets (Optional)
 
 After calibration, you can optionally generate assets in advance:
 
@@ -102,7 +102,7 @@ Switch to the `Director` panel or the `S-Class` panel.
 
 ---
 
-## Step 5: Generate images and video
+## Step 5: Generate Images and Video
 
 Inside the storyboard editor in the Director or S-Class panel:
 
@@ -119,7 +119,7 @@ Once images are assigned, click `Generate video` to start batch video creation.
 
 ---
 
-## Step 6: S-Class advanced workflow with Seedance 2.0
+## Step 6: S-Class Advanced Workflow with Seedance 2.0
 
 The S-Class panel supports multi-shot narrative generation with Seedance 2.0.
 
@@ -138,16 +138,16 @@ The S-Class workflow also handles first-frame stitching, three-layer prompt fusi
 - Fine-tune parameters freely. Prompts, first frames, and last frames can all be adjusted manually per shot.
 - Use S-Class when you need multi-shot narrative continuity.
 - Use Director when you want finer shot-by-shot control.
-- If you are working in English, keep an eye on prompt language separately from UI language. English UI does not automatically change the underlying script-analysis or prompt-generation contract.
+- Keep prompt language separate from UI language. English UI does not automatically change the underlying script-analysis or prompt-generation contract.
 
-## English reference files
+## English Reference Files
 
-- [README_EN.md](../README_EN.md): product overview and quick start
-- [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md): import structure reference
-- [SCRIPT_FORMAT_EXAMPLE.md](./SCRIPT_FORMAT_EXAMPLE.md): Chinese-first full example, useful when you need a longer narrative sample
+- [README.md](../README.md): product overview and quick start
+- [SCRIPT_FORMAT_EXAMPLE.md](./SCRIPT_FORMAT_EXAMPLE.md): import structure reference
+- [SCRIPT_FORMAT_EXAMPLE_EN.md](./SCRIPT_FORMAT_EXAMPLE_EN.md): English companion example for the same structure
 
 ---
 
 Questions or issues:
 - Email: [memecalculate@gmail.com](mailto:memecalculate@gmail.com)
-- Repo overview: [README_EN](../README_EN.md)
+- Repo overview: [README.md](../README.md)

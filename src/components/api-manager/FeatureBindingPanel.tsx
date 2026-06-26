@@ -119,6 +119,29 @@ function parseOptionKey(key: string): { providerIdOrPlatform: string; model: str
   return { providerIdOrPlatform, model };
 }
 
+function formatMemeFastGroupLabel(group: string): string {
+  const normalized = group.trim();
+  const knownLabels: Record<string, string> = {
+    官转: "Official relay",
+    纯AZ: "Pure AZ",
+    default: "Default",
+  };
+
+  if (normalized in knownLabels) {
+    return knownLabels[normalized];
+  }
+
+  if (!/[\p{Script=Han}]/u.test(normalized)) {
+    return normalized
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  return "Custom group";
+}
+
 const DEFAULT_PLATFORM_CAPABILITIES: Record<string, ModelCapability[]> = {
   memefast: ["text", "vision", "image_generation", "video_generation"],
   // RunningHub is used for specialized tools; do not expose it as a default vision/chat provider.
@@ -296,8 +319,8 @@ export function FeatureBindingPanel() {
 
       // Prefer configured providers first for better UX.
       opts.sort((a, b) => {
-        const aConfigured = isProviderConfigured(a.providerId);
-        const bConfigured = isProviderConfigured(b.providerId);
+        const aConfigured = configuredProviderIds.has(a.providerId);
+        const bConfigured = configuredProviderIds.has(b.providerId);
         if (aConfigured !== bConfigured) return aConfigured ? -1 : 1;
         if (a.name !== b.name) return a.name.localeCompare(b.name);
         return a.model.localeCompare(b.model);
@@ -321,7 +344,7 @@ export function FeatureBindingPanel() {
         const parsed = parseOptionKey(binding);
         if (!parsed) return false;
         const existsInOptions = options.some((o) => getOptionKey(o) === binding || (`${o.platform}:${o.model}` === binding));
-        return existsInOptions && isProviderConfigured(parsed.providerIdOrPlatform);
+        return existsInOptions && configuredProviderIds.has(parsed.providerIdOrPlatform);
       });
     }).length;
   }, [optionsByFeature, configuredProviderIds, getFeatureBindings]);
@@ -553,7 +576,7 @@ export function FeatureBindingPanel() {
                             <div className="flex flex-wrap gap-1.5">
                               {sortedGroups.map(g => (
                                 <span key={g} className="text-xs bg-blue-500/20 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
-                                  {g}
+                                  {formatMemeFastGroupLabel(g)}
                                 </span>
                               ))}
                             </div>

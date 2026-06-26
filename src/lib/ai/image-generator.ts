@@ -361,9 +361,9 @@ async function submitViaChatCompletions(
     );
 
     // 外部 signal 取消时同步取消内部 controller，并传播 reason
-    const onExternalAbort = () => controller.abort(signal?.reason || new Error('用户已取消'));
+    const onExternalAbort = () => controller.abort(signal?.reason || new Error('User cancelled.'));
     if (signal) {
-      if (signal.aborted) throw new Error('用户已取消');
+      if (signal.aborted) throw new Error('User cancelled.');
       signal.addEventListener('abort', onExternalAbort, { once: true });
     }
 
@@ -390,16 +390,16 @@ async function submitViaChatCompletions(
           keyManager.handleError(resp.status, errorText);
         }
 
-        let msg = `图片生成 API 错误: ${resp.status}`;
+        let msg = `Image generation API error (${resp.status}).`;
         try { const j = JSON.parse(errorText); msg = j.error?.message || msg; } catch {}
 
         // 401 专项提示：引导用户检查 API Key
         if (resp.status === 401) {
-          msg = `API Key 无效或已过期，请前往「设置」检查图片生成服务的 API Key 配置（原始信息：${msg}）`;
+          msg = `API key is invalid or expired. Please check the image generation provider key in Settings.`;
         }
         // 502 专项提示：上游服务临时不可用
         if (resp.status === 502) {
-          msg = `API 上游服务暂时不可用（502），将自动重试（原始信息：${msg}）`;
+          msg = `The image generation upstream service is temporarily unavailable (502). Retrying automatically.`;
         }
 
         const err = new Error(msg) as Error & { status?: number };
@@ -598,7 +598,7 @@ async function submitImageTask(
             keyManager.handleError(response.status, errorText);
           }
 
-          let errorMessage = `图片生成 API 错误: ${response.status}`;
+          let errorMessage = `Image generation API error (${response.status}).`;
           try {
             const errorJson = JSON.parse(errorText);
             errorMessage = errorJson.error?.message || errorJson.message || errorJson.msg || errorMessage;
@@ -607,14 +607,14 @@ async function submitImageTask(
           }
 
           if (response.status === 401 || response.status === 403) {
-            throw new Error('API Key 无效或已过期');
+            throw new Error('API key is invalid or expired.');
           } else if (response.status === 529 || response.status === 503) {
             // 上游负载饱和/服务不可用，需要触发重试
-            const err = new Error(errorMessage || `上游服务暂时不可用 (${response.status})`) as Error & { status?: number };
+            const err = new Error(errorMessage || `Upstream service is temporarily unavailable (${response.status}).`) as Error & { status?: number };
             err.status = response.status;
             throw err;
           } else if (response.status >= 500) {
-            const err = new Error(errorMessage || '图片生成服务暂时不可用') as Error & { status?: number };
+            const err = new Error(errorMessage || 'The image generation service is temporarily unavailable.') as Error & { status?: number };
             err.status = response.status;
             throw err;
           }
@@ -830,7 +830,7 @@ export async function submitGridImageRequest(params: {
   const data = await retryOperation(async () => {
     // 每次重试动态取当前 key（利用 keyManager rotate 后的新 key）
     const currentApiKey = keyManager?.getCurrentKey?.() || apiKey;
-    if (signal?.aborted) throw new Error('用户已取消');
+    if (signal?.aborted) throw new Error('User cancelled.');
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {

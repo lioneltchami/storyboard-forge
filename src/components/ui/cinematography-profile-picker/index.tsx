@@ -119,8 +119,7 @@ export function CinematographyProfilePicker({
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{previewProfile.emoji}</span>
           <div>
-            <div className="font-medium text-sm">{previewProfile.name}</div>
-            <div className="text-xs text-muted-foreground">{previewProfile.nameEn}</div>
+            <div className="font-medium text-sm">{previewProfile.nameEn}</div>
           </div>
         </div>
 
@@ -203,7 +202,7 @@ export function CinematographyProfilePicker({
                 {selectedProfile ? (
                   <>
                     <span>{selectedProfile.emoji}</span>
-                    <span>{selectedProfile.name}</span>
+                    <span>{selectedProfile.nameEn}</span>
                   </>
                 ) : (
                   <>

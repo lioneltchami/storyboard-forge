@@ -183,7 +183,7 @@ const defaultProjectData = (): ScriptProjectData => ({
   episodeRawScripts: [],
   metadataMarkdown: '',
   metadataGeneratedAt: undefined,
-  promptLanguage: 'zh',
+  promptLanguage: 'en',
   calibrationStrictness: 'normal',
   lastFilteredCharacters: [],
   calibrationState: defaultCalibrationState(),
@@ -209,7 +209,10 @@ const cloneScriptCharacters = (characters: ScriptCharacter[] | undefined): Scrip
     }));
 };
 
-const normalizeScriptProjectData = (projectId: string, projectData: any): ScriptProjectData => {
+const normalizeScriptProjectData = (
+  projectId: string,
+  projectData: Partial<ScriptProjectData> & Record<string, unknown>,
+): ScriptProjectData => {
   const defaults = defaultProjectData();
   const defaultCalibration = defaultCalibrationState();
   const normalizedProject: ScriptProjectData = {
@@ -1115,7 +1118,10 @@ export const useScriptStore = create<ScriptStore>()(
           projectData: state.projects[pid],
         };
       },
-      merge: (persisted: any, current: any) => {
+      merge: (
+        persisted: Partial<ScriptStoreState & { projectData?: ScriptProjectData }> | undefined,
+        current: ScriptStore,
+      ): ScriptStore => {
         if (!persisted) return current;
         
         // Legacy format: has `projects` as Record (from old monolithic file)

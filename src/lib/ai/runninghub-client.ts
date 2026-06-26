@@ -38,10 +38,10 @@ export async function submitAngleSwitchTask(
 ): Promise<string> {
   const { referenceImage, anglePrompt, apiKey, baseUrl, appId, instanceType = 'default', usePersonalQueue = false } = params;
   if (!baseUrl) {
-    throw new Error('RunningHub Base URL 未配置');
+    throw new Error('RunningHub Base URL is not configured.');
   }
   if (!appId) {
-    throw new Error('RunningHub App ID 未配置');
+    throw new Error('RunningHub App ID is not configured.');
   }
 
   console.log('[RunningHub] Submitting angle switch task:', {
@@ -92,9 +92,9 @@ export async function submitAngleSwitchTask(
 
         const error = new Error(
           response.status === 401 || response.status === 403
-            ? 'API Key 无效或已过期'
+            ? 'API key is invalid or expired.'
             : response.status >= 500
-              ? 'RunningHub 服务暂时不可用'
+              ? 'RunningHub service is temporarily unavailable.'
               : errorMessage
         ) as Error & { status?: number };
         error.status = response.status;
@@ -135,7 +135,7 @@ export async function queryTaskStatus(
 ): Promise<RunningHubTaskResult> {
   try {
     if (!baseUrl) {
-      throw new Error('RunningHub Base URL 未配置');
+      throw new Error('RunningHub Base URL is not configured.');
     }
     const response = await fetch(`${normalizeBaseUrl(baseUrl)}/query`, {
       method: 'POST',

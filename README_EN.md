@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="build/icon.png" width="120" alt="Moyin Creator Logo" />
+  <img src="build/icon.png" width="120" alt="Storyboard Forge Logo" />
 </p>
 
-<h1 align="center">Moyin Creator</h1>
+<h1 align="center">Storyboard Forge</h1>
 
 <p align="center">
   <strong>🎬 AI-Powered Film & Anime Production Tool · Seedance 2.0 · Script-to-Film Batch Pipeline</strong>
@@ -10,15 +10,16 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License" /></a>
-  <a href="https://github.com/MemeCalculate/moyin-creator/releases"><img src="https://img.shields.io/github/v/release/MemeCalculate/moyin-creator" alt="Release" /></a>
-  <a href="https://github.com/MemeCalculate/moyin-creator/stargazers"><img src="https://img.shields.io/github/stars/MemeCalculate/moyin-creator" alt="Stars" /></a>
+  <a href="https://github.com/lioneltchami/storyboard-forge/releases"><img src="https://img.shields.io/github/v/release/lioneltchami/storyboard-forge" alt="Release" /></a>
+  <a href="https://github.com/lioneltchami/storyboard-forge/stargazers"><img src="https://img.shields.io/github/stars/lioneltchami/storyboard-forge" alt="Stars" /></a>
 </p>
 
 <p align="center">
-  <a href="README.md">Chinese</a> | <strong>English</strong>
+  <strong>English</strong> | <a href="README.md">Main README</a>
 </p>
 
 <p align="center">
+  <a href="docs/WORKFLOW_GUIDE.md"><strong>📖 Workflow Guide</strong></a> •
   <a href="#features">Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#architecture">Architecture</a> •
@@ -30,66 +31,47 @@
 
 ## Overview
 
-**Moyin Creator** is a production-grade tool for AI film & anime creators. Five interconnected modules cover the entire pipeline from script to final video:
+**Storyboard Forge** is a production-grade tool for story-driven video creators. Five interconnected modules cover the full pipeline from script to final video:
 
 > **📝 Script → 🎭 Characters → 🌄 Scenes → 🎬 Director → ⭐ S-Class (Seedance 2.0)**
 
-Each stage's output automatically flows into the next — no manual glue required. Supports multiple mainstream AI models, ideal for batch production of short dramas, anime series, trailers, and more.
-
-## Language Notes
-
-- The product can be used with an English-facing UI, but some workflow surfaces are still Chinese-first.
-- Prompt language is intentionally separate from the UI language. Many generation and calibration flows keep Chinese narration / instructions while using English for model-facing visual prompts.
-- For workflow details, use [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md). It is the best English-facing starting point, but some deeper reference material is still Chinese-first.
-- For script import structure, see [docs/SCRIPT_FORMAT_EXAMPLE_EN.md](docs/SCRIPT_FORMAT_EXAMPLE_EN.md). The English companion covers the structure that the importer expects.
+Each stage automatically feeds the next, so you do not need to manually shuttle data around. The app supports multiple mainstream AI models and is well suited to batch production for short dramas, anime series, trailers, and similar projects.
 
 ## Features
 
-### ⭐ S-Class Module — Seedance 2.0 Multimodal Creation
-- **Multi-shot merged narrative video generation**: group storyboard scenes into coherent narrative videos
-- @Image / @Video / @Audio multimodal references (character refs, scene images, first-frame auto-collection)
-- Smart prompt builder: automatic 3-layer fusion (action + cinematography + dialogue lip-sync)
-- First-frame grid stitching (N×N strategy)
-- Seedance 2.0 constraint auto-validation (≤9 images + ≤3 videos + ≤3 audio, prompt ≤5000 chars)
-
-<img width="578" height="801" alt="S-Class Module 1" src="https://github.com/user-attachments/assets/34b623a3-9be9-4eb5-ae52-a6a9553598ea" />
-<img width="584" height="802" alt="S-Class Module 2" src="https://github.com/user-attachments/assets/54c6036b-c545-45c0-a32b-de71b8138484" />
-<img width="1602" height="835" alt="S-Class Module 3" src="https://github.com/user-attachments/assets/2b5af973-98c9-4708-bf53-02d11321d86d" />
+### ⭐ S-Class Module - Seedance 2.0 Multimodal Creation
+- Multi-shot merged narrative video generation
+- @Image / @Video / @Audio multimodal references, including character references, scene images, and auto-collected first frames
+- Smart prompt builder with three-layer fusion: action, cinematography, and dialogue lip sync
+- First-frame grid stitching with an N x N strategy
+- Automatic Seedance 2.0 constraint validation
 
 ### 🎬 Script Parsing Engine
-- Intelligently breaks scripts into scenes, storyboards, and dialogue
+- Breaks scripts into scenes, storyboards, and dialogue
 - Auto-detects characters, locations, emotions, and camera language
-- Supports multi-episode / multi-act script structures
-
-<img width="1384" height="835" alt="Script Parsing" src="https://github.com/user-attachments/assets/e42266c2-aaeb-4cc3-a734-65516774d495" />
+- Supports multi-episode and multi-act script structures
 
 ### 🎭 Character Consistency System
-- **6-layer identity anchoring**: ensures consistent character appearance across different shots
+- Six-layer identity anchoring for consistent appearance across shots
 - Character Bible management
 - Character reference image binding
 
-<img width="1384" height="835" alt="Character System" src="https://github.com/user-attachments/assets/763e6ced-43e2-4c7b-a5ea-b13535af5b2e" />
-
 ### 🖼️ Scene Generation
 - Multi-viewpoint joint image generation
-- Auto-conversion from scene descriptions to visual prompts
-
-<img width="1384" height="835" alt="Scene Generation" src="https://github.com/user-attachments/assets/f301d91e-c826-499f-b3dd-79e69613a5e8" />
+- Automatic conversion from scene descriptions to visual prompts
 
 ### 🎞️ Professional Storyboard System
-- Cinematic camera parameters (shot size, angle, movement)
+- Cinematic camera parameters such as shot size, angle, and movement
 - Auto layout and export
-- One-click visual style switching (2D / 3D / realistic / stop-motion, etc.)
-
-<img width="1602" height="835" alt="Storyboard System" src="https://github.com/user-attachments/assets/94562cee-3827-4645-82fe-2123fdd86897" />
+- One-click visual style switching for 2D, 3D, realistic, stop-motion, and more
 
 ### 🚀 Batch Production Workflow
-- **One-click full pipeline**: script parsing → character/scene generation → storyboard splitting → batch image generation → batch video generation
+- One-click full pipeline: script parsing -> character and scene generation -> storyboard splitting -> batch image generation -> batch video generation
 - Multi-task parallel queue with automatic retry on failure
-- Designed for short drama / anime series batch production
+- Designed for short drama and anime series batch production
 
 ### 🤖 Multi-Provider AI Orchestration
-- Supports multiple AI image/video generation providers
+- Multiple AI image and video generation providers
 - API key rotation with load balancing
 - Task queue management with automatic retry
 
@@ -97,15 +79,15 @@ Each stage's output automatically flows into the next — no manual glue require
 
 ### Requirements
 
-- **Node.js** >= 18
-- **npm** >= 9
+- Node.js >= 18
+- npm >= 9
 
 ### Install & Run
 
 ```bash
 # Clone the repository
-git clone https://github.com/MemeCalculate/moyin-creator.git
-cd moyin-creator
+git clone https://github.com/lioneltchami/storyboard-forge.git
+cd storyboard-forge
 
 # Install dependencies
 npm install
@@ -116,11 +98,11 @@ npm run dev
 
 ### Configure API Key
 
-After launching, go to **Settings → API Configuration** and enter your AI provider API key to start using the tool.
+After launching, go to **Settings -> API Configuration** and enter your AI provider API key to start using the tool.
 
 ### Workflow Reference
 
-If you are new to the app, start with [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md). It covers the baseline script-to-video flow in English and notes where the current experience still remains Chinese-first. For script formatting, use [docs/SCRIPT_FORMAT_EXAMPLE_EN.md](docs/SCRIPT_FORMAT_EXAMPLE_EN.md).
+If you are new to the app, start with [docs/WORKFLOW_GUIDE.md](docs/WORKFLOW_GUIDE.md). It covers the baseline script-to-video flow in English and explains where prompt language stays separate from UI language. For script formatting, use [docs/SCRIPT_FORMAT_EXAMPLE.md](docs/SCRIPT_FORMAT_EXAMPLE.md).
 
 ### Build
 
@@ -146,8 +128,8 @@ npx electron-vite build
 ### Project Structure
 
 ```
-moyin-creator/
-├── electron/              # Electron main process + Preload
+storyboard-forge/
+├── electron/              # Electron main process + preload
 │   ├── main.ts            # Main process (storage, file system, protocol handling)
 │   └── preload.ts         # Security bridge layer
 ├── src/
@@ -165,25 +147,25 @@ moyin-creator/
 
 ## License
 
-This project uses a **dual licensing** model:
+This project uses a dual-licensing model:
 
-### Open Source — AGPL-3.0
+### Open Source - AGPL-3.0
 
-This project is open-sourced under the [GNU AGPL-3.0](LICENSE) license. You are free to use, modify, and distribute it, but any modified code must be open-sourced under the same license.
+This project is open-sourced under the [GNU AGPL-3.0](LICENSE) license. You are free to use, modify, and distribute it, but any modified code must remain open-sourced under the same license.
 
 ### Commercial Use
 
-If you need closed-source usage or integration into commercial products, please contact us for a [Commercial License](COMMERCIAL_LICENSE.md). That document is still Chinese-first at the moment.
+If you need closed-source usage or integration into commercial products, please contact us for a [Commercial License](COMMERCIAL_LICENSE.md).
 
 ## Contributing
 
-Contributions are welcome. The current [Contributing Guide](CONTRIBUTING.md) is still Chinese-first, so English contributor documentation is not yet fully localized.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Contact
 
-- 📧 Email: [memecalculate@gmail.com](mailto:memecalculate@gmail.com)
-- 🐙 GitHub: [https://github.com/MemeCalculate/moyin-creator](https://github.com/MemeCalculate/moyin-creator)
+- Email: [memecalculate@gmail.com](mailto:memecalculate@gmail.com)
+- GitHub: [https://github.com/lioneltchami/storyboard-forge](https://github.com/lioneltchami/storyboard-forge)
 
 ---
 
-<p align="center">Made with ❤️ by <a href="https://github.com/MemeCalculate">MemeCalculate</a></p>
+<p align="center">Made with ❤️ by <a href="https://github.com/lioneltchami">lioneltchami</a></p>

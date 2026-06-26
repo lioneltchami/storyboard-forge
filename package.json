@@ -1,21 +1,21 @@
 {
-  "name": "moyin-creator",
-  "productName": "Moyin Creator",
+  "name": "storyboard-forge",
+  "productName": "Storyboard Forge",
   "version": "0.2.3",
-  "description": "AI-powered anime and short-drama storyboard creation tool",
+  "description": "AI-powered storyboard and video creation tool",
   "author": "MemeCalculate",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MemeCalculate/moyin-creator.git"
+    "url": "https://github.com/lioneltchami/storyboard-forge.git"
   },
-  "homepage": "https://github.com/MemeCalculate/moyin-creator",
+  "homepage": "https://github.com/lioneltchami/storyboard-forge",
   "bugs": {
-    "url": "https://github.com/MemeCalculate/moyin-creator/issues"
+    "url": "https://github.com/lioneltchami/storyboard-forge/issues"
   },
   "updateConfig": {
     "manifestUrl": "http://68.64.176.186/moyin/version.json",
-    "defaultGithubUrl": "https://github.com/MemeCalculate/moyin-creator",
+    "defaultGithubUrl": "https://github.com/lioneltchami/storyboard-forge",
     "defaultBaiduUrl": "https://pan.baidu.com/s/1ImH6tOIiuFxIDXC0fC-6Lg",
     "defaultBaiduCode": "8888"
   },

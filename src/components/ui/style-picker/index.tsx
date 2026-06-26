@@ -156,16 +156,22 @@ export function StylePicker({
       <div className="flex-1 p-4 flex flex-col">
         {/* Color block placeholder + style name */}
         <div className={cn(
-          "flex-1 flex flex-col items-center justify-center rounded-lg mb-3",
+          "flex-1 flex flex-col items-center justify-center rounded-lg mb-3 px-5 text-center",
           CATEGORY_COLORS[previewStyle.category] || 'bg-muted/30'
         )}>
-          <div className="text-2xl font-bold mb-2">{previewStyle.name}</div>
-          <div className="text-xs opacity-70">{previewStyle.category.toUpperCase()} · {previewStyle.mediaType}</div>
+          <div className="text-[1.35rem] font-bold leading-tight max-w-[85%] break-words">
+            {previewStyle.name}
+          </div>
+          <div className="text-xs opacity-70 mt-2">
+            {previewStyle.category.toUpperCase()} · {previewStyle.mediaType}
+          </div>
         </div>
         {/* Style info */}
         <div className="text-center">
-          <div className="font-medium text-sm mb-1">{previewStyle.name}</div>
-          <div className="text-xs text-muted-foreground line-clamp-2">
+          <div className="font-medium text-sm mb-1 leading-tight line-clamp-2 break-words">
+            {previewStyle.name}
+          </div>
+          <div className="text-xs text-muted-foreground line-clamp-2 leading-snug">
             {previewStyle.description}
           </div>
         </div>
@@ -262,7 +268,9 @@ function StyleItem({ style, isSelected, isCustom, onSelect, onHover, onLeave }: 
         {isCustom ? '★' : style.category === '3d' ? '3D' : style.category === '2d' ? '2D' : style.category === 'real' ? 'Real' : 'Fixed'}
       </span>
       {/* Name */}
-      <span className="flex-1 text-left text-sm truncate">{style.name}</span>
+      <span className="flex-1 text-left text-sm leading-tight line-clamp-2 break-words">
+        {style.name}
+      </span>
       {/* Selected marker */}
       {isSelected && (
         <Check className="w-4 h-4 text-primary flex-shrink-0" />

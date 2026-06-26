@@ -1,260 +1,239 @@
-# 📝 剧本导入格式示例
+# Script Import Format Example
 
-> 以下是魔因漫创支持的标准剧本格式，供参考。导入时请按此结构编写剧本。
+> This is the standard screenplay format supported by Storyboard Forge. Use it as a reference when importing scripts.
 
 ---
 
-## 格式说明
+## Format Legend
 
+```text
+Title         ->  "Title of the work"
+Outline       ->  A short paragraph summarizing the core story
+Character Bio ->  Character name (age): identity, personality traits
+Episode Title ->  Episode X: Title
+Scene Header  ->  Index + day/night + interior/exterior + location
+Characters    ->  Characters: Character A, Character B
+Stage Action  ->  Descriptions of action or environment starting with △
+Dialogue      ->  Character name: spoken line
+Performance   ->  Parenthetical notes for tone or movement
+Subtitle/Cut  ->  [Subtitle: time/location information]
 ```
-标题        →  《剧名》
-大纲        →  一段话概括核心故事
-人物小传    →  角色名（年龄）：身份，性格特征
-集标题      →  第X集：标题
-场景头      →  编号 + 日/夜 + 内/外 + 地点
-出场人物    →  人物：角色A、角色B
-舞台指示    →  △ 开头的动作/环境描写
-对白        →  角色名：台词内容
-表演提示    →  （括号内的语气/动作提示）
-字幕/转场   →  【字幕：时间/地点信息】
-```
 
 ---
 
-## 完整示例：《哥哥》第一集
+## Full Example: Episode 1 of "Brother"
 
 ---
 
-**《哥哥》**
+**"Brother"**
 
-**大纲：**
-一个因童年自卑而逃离小镇的青年，在都市创业失败后，意外发现儿时痴迷的火箭模型竟藏有改变电车能源格局的秘密，他必须克服心魔，在资本围剿与技术封锁中，用一场史无前例的「火箭电车」实验，向世界证明「废柴」也能封神。
+**Outline:**
+A young founder who ran away from her hometown because of childhood insecurity fails at a business startup in the city. She then discovers that a childhood obsession with rocket models hides a secret that could change the energy landscape of electric trams. She must confront her inner fears and, under the pressure of capital and technical suppression, prove in a once-in-a-lifetime "rocket tram" experiment that even a washed-up nobody can become a legend.
 
-**人物小传：**
-林星野（28）：创业失败者/火箭电车技术发现者，自卑敏感，执着坚韧
-陆天擎（45）：天擎能源集团CEO，精明冷酷，掌控欲强
-苏晓（27）：顶尖机械工程师，林星野的合伙人，理性务实，外冷内热
-老陈（65）：小镇火箭模型店老板，林星野的启蒙者，豁达睿智，深藏不露
-
----
-
-**第一集：陨落与归途**
+**Character Bios:**
+- Maya (28): failed entrepreneur and discoverer of the rocket-tram technology; insecure but persistent
+- Serena (45): CEO of Tianqing Energy Group; shrewd, cold, and highly controlling
+- Molly (27): top mechanical engineer and Maya's partner; rational, pragmatic, and outwardly cool but inwardly warm
+- Old Chen (65): owner of the rocket-model shop in the town; Maya's mentor, wise and open-minded, with hidden depth
 
 ---
 
-**1-1 日 内 新沪市**
-人物：林星野、苏晓
-
-△林星野把最后一份文件塞进碎纸机。机器发出干涩的咀嚼声。
-
-苏晓：（站在门口）工商的人下午来封门。
-
-林星野没回头。他盯着碎纸机出口吐出的白色条状物，像一地扯烂的绷带。
-
-△他弯腰，从桌底拖出一个空纸箱。把笔筒、几本旧笔记本、一个掉漆的保温杯扔进去。动作很重。
-
-苏晓：陆总那边……
-
-林星野：说。
-
-苏晓：他要见你。今晚八点，凯悦顶层。
-
-林星野手停了。保温杯在纸箱底滚了半圈，哐当一声撞上箱壁。他盯着杯身上"星驰五周年"那几个褪色的烫金字。
-
-林星野：看我笑话？
-
-苏晓：（走进来，把一张报表放在空荡荡的桌面上）数据不会说谎。清算报告出来了，负债比我们预估的还多百分之三十七点六。
-
-△她手指点在某个数字上，指甲修剪得很干净。林星野没看报表，他看着窗外楼下，搬家公司的货车正把"星驰能源"的铜字招牌吊下来。
-
-招牌在半空晃悠，像片落叶。
-
-林星野：这次……
-
-他嗓子发紧，咳了一声。
-
-林星野：我不会再逃了。
-
-△他抱起纸箱。箱子很轻，里面东西哗啦作响。走到门口时，苏晓侧身让开。她的目光落在他磨破的衬衫袖口上。
-
-苏晓：陆天擎不是要羞辱你。（停顿）他有新项目想让你看。但条件……
-
-林星野：（打断）知道了。
-
-△他抱着箱子走进电梯。金属门合拢前，最后一眼看见的是自己办公室——百叶窗歪斜地垂着，地上散落着几页没来得及碎的纸。
-
-电梯下行。
-
-失重感让他胃里一空。
+**Episode 1: Downfall and Return**
 
 ---
 
-**1-2 日 内 新沪市**
-人物：林星野、陆天擎、苏晓（旁观）
+**1-1 Day Interior New Shanghai**
+Characters: Maya, Molly
 
-【字幕：同日 夜】
+△ Maya feeds the last stack of documents into the shredder. The machine makes a dry chewing sound.
 
-△林星野推开会议室玻璃门。
-△陆天擎靠在真皮转椅里，指尖转着万宝龙钢笔。苏晓站在投影仪旁，低头翻文件。
+Molly: The industrial and commercial office will seal the place this afternoon.
 
-陆天擎：账清了？
+Maya does not look back. She stares at the white strips coming out of the shredder, like a pile of torn bandages.
 
-林星野：陆总，再给三个月——
+△ She bends down and drags an empty cardboard box from under the desk. She tosses in a pen holder, a few old notebooks, and a chipped thermos. Her movements are heavy.
 
-陆天擎：（钢笔敲桌）咚、咚、咚。听见没？倒计时。
+Molly: About President Serena...
 
-△林星野指甲掐进掌心。
+Maya: Go on.
 
-陆天擎：你那个破实验室，烧了我八百万。知道八百万什么概念吗？
+Molly: She wants to see you. Eight o'clock tonight, the top floor of Hyatt.
 
-林星野：技术突破就在眼前——
+Maya pauses. The thermos rolls half a circle in the box and hits the side with a dull clang. She stares at the faded gold lettering on the cup: "Xingchi Five Years."
 
-陆天擎：眼前？（笑）你眼前只有讨债的。
+Maya: To laugh at me?
 
-△苏晓把报表推过来。纸张边缘割手。
+Molly: (walking in and placing a report on the empty desk) The numbers do not lie. The liquidation report is out, and the debt ratio is 37.6 percent higher than we expected.
 
-陆天擎：小镇来的吧？读书厉害，做题冠军。（身子前倾）可生意场不考卷面分。
+△ Her finger taps a number on the page. Her nails are trimmed neatly. Maya does not look at the report. Instead, she looks out the window, where a moving company's truck is lowering the copper sign for "Xingchi Energy."
 
-林星野：这次……
+The sign sways in midair like a fallen leaf.
 
-陆天擎：这次什么？不会再逃了？（靠回椅背）你连逃的资格都没有。
+Maya: This time...
 
-△空调冷风灌进衬衫领口。
+Her throat tightens. She coughs once.
 
-陆天擎：你那套储能理论，三流期刊都发不了。知道为什么吗？
+Maya: I won't run again.
 
-△林星野喉结动了动。
+△ She picks up the box. It is very light, and the contents rattle inside. When she reaches the doorway, Molly steps aside. Her gaze falls on the frayed cuff of her shirt.
 
-陆天擎：（对苏晓）告诉他。
+Molly: Serena does not just want to humiliate you. (pause) She wants you to see a new project. But there are conditions...
 
-苏晓：（轻声）同行评审说……理论基础存在根本缺陷。
+Maya: (interrupting) I know.
 
-△会议室死寂。投影仪风扇嗡嗡响。
+△ She carries the box into the elevator. Before the metal doors close, she gets one last look at her office: the blinds hang crookedly, and several sheets of paper that did not make it into the shredder lie scattered on the floor.
 
-陆天擎：规则，由赢家书写。（站起）而你，连参赛证都是借的。
+The elevator descends.
 
-林星野：我会赔——
-
-陆天擎：拿什么赔？你老家那栋瓦房？（抽出担保协议）看清楚。个人连带责任。
-
-△纸页哗啦抖开。签名处红得刺眼。
-
-陆天擎：给你三天搬出公寓。车钥匙放前台。（走向门口）对了——
-
-△他停在门边，没回头。
-
-陆天擎：别再跟我提理想。你那不叫理想。（拉开门）叫妄想。
-
-△玻璃门缓缓合拢。倒影里林星野站着没动。
-
-【字幕：新沪市 · 星驰能源 破产清算日】
+The feeling of weightlessness empties her stomach.
 
 ---
 
-**1-3 夜 外 新沪市**
-人物：林星野
+**1-2 Day Interior New Shanghai**
+Characters: Maya, Serena, Molly (observing)
 
-△林星野把手机揣进兜，走进雨里。雨水顺着他的头发往下滴，在路灯底下拉成细密的银线。
+[Subtitle: Same day, night]
 
-△他踢开脚边的易拉罐。铝罐滚进水坑，转了两圈。
+△ Maya pushes open the glass door of the conference room.
+△ Serena sits in a leather swivel chair, twirling a Montblanc pen between her fingers. Molly stands beside the projector, head down as she flips through documents.
 
-林星野：操。
+Serena: Is the debt settled?
 
-△地铁口的风卷着湿气扑过来。他摸烟盒，掏出来是空的。纸盒被他捏成一团，扔进垃圾桶。
+Maya: President Serena, give me three more months--
 
-△站台灯箱的光打在他脸上。广告里的模特举着新款手机笑，牙白得晃眼。
+Serena: (tapping the desk with the pen) Tap, tap, tap. Hear that? That is the countdown.
 
-林星野：（低声）这次……
+△ Maya digs her nails into her palm.
 
-△话没说完。手机震了。
+Serena: That broken lab of yours burned through 8 million yuan. Do you know what 8 million means?
 
-△他盯着来电显示看了三秒才接。
+Maya: The technical breakthrough is right in front of us--
 
-林星野：喂？
+Serena: In front of you? (laughs) All you have in front of you are creditors.
 
-△听筒里传来堂弟急促的声音。
+△ Molly slides the report over. The paper edge is sharp.
 
-堂弟：（电话音）哥！爷不行了！医院让……让赶紧回来！
+Serena: You came from a small town, didn't you? Good at school, top of the class. (leans forward) But the business world does not grade on exam scores.
 
-△地铁进站的风把他湿透的衣角掀起来。
+Maya: This time...
 
-林星野：我马上回。
+Serena: This time what? You will not run again? (leans back) You do not even have the right to run.
 
-△电话挂了。他把手机攥得太紧，指节都白了。
+△ Cold air from the air conditioner slips into her shirt collar.
 
-△列车门开了又关。他没上去。
+Serena: Your storage theory could not even get published in a third-rate journal. Do you know why?
 
-△雨水顺着站台边往下滴，在铁轨上砸出一个个小坑。远处高楼的光在雨里糊成一片，像化了的糖浆。
+△ Maya's Adam's apple moves.
 
-林星野：（自言自语）不会逃了……
+Serena: (to Molly) Tell her.
 
-△他转身往出口走。鞋底踩过水洼，溅起的水打湿了裤脚。
+Molly: (quietly) Peer review says the theoretical foundation has a fundamental flaw.
 
-△街角便利店还亮着灯。收银员正低头刷手机，屏幕的蓝光映在玻璃上。
+△ The conference room falls silent. The projector fan hums.
 
-△林星野摸了摸口袋里的车票——昨天买的返程票，原本打算下周去邻市找投资人翻盘。
+Serena: Winners write the rules. (stands) And you do not even own your own competition badge.
 
-△他把票撕了。纸屑混着雨水流进下水道缝里。
+Maya: I will pay--
 
-【字幕：三小时后】
+Serena: With what? Your old hometown house? (pulls out a guarantee agreement) Look carefully. Personal joint liability.
 
-△长途汽车站候车厅。塑料椅空了大半。
+△ The page rustles open. The signature line is bright red.
 
-△林星野坐在角落，盯着滚动屏上的班次信息。绿色光标一跳一跳地往前挪。
+Serena: You have three days to move out of the apartment. Leave the car keys at the front desk. (heads for the door) And one more thing--
 
-广播：（电子音）前往青塘镇的旅客请到3号检票口……
+△ She stops at the doorway, not turning around.
 
-△他拎起脚边的背包——里面只有两件换洗衣服和一台旧笔记本。
+Serena: Do not talk to me about ideals anymore. What you call ideals is not idealism. (opens the door) It is fantasy.
 
-林星野：（对着空气）这次不一样。
+△ The glass door slowly closes. In the reflection, Maya does not move.
 
-△检票口的闸机嘀了一声。他把票塞进去的时候手抖了一下。
-
-△夜班车发动时雨还没停。车窗上水痕一道道交错着，把城市的灯火割成破碎的光斑。
-
-△他靠窗坐下，额头抵着冰凉的玻璃。
+[Subtitle: New Shanghai · Xingchi Energy Liquidation Day]
 
 ---
 
-**1-4 夜 内 高速列车车厢**
-人物：林星野
+**1-3 Night Exterior New Shanghai**
+Characters: Maya
 
-△林星野把脸贴在冰凉的车窗上。
-△窗外，新沪市的霓虹像泼翻的颜料桶，把整片天空染成不真实的紫红色。"瞬充联盟"的巨型全息广告牌立在每栋摩天楼顶，蓝色的闪电标志刺得他眼睛发酸。
+△ Maya stuffs her phone into her pocket and walks into the rain. Water slides down her hair and falls in thin silver lines under the streetlight.
 
-林星野：（低声）这次……
+△ She kicks an empty soda can. The can rolls into a puddle and spins twice.
 
-△他喉结动了动，没说完。手指抠进破旧帆布包的带子缝里。
-△车厢广播响起甜腻的女声，报出下一站名——青屿镇。声音在空荡荡的二等座车厢里撞了几下，碎了。
-△前排小孩踢椅背，咚、咚、咚。母亲压着嗓子骂，别闹了。
-△林星野从包里摸出半瓶水，拧开盖时洒了几滴在裤子上。深色水渍在磨白的牛仔裤上慢慢洇开。他盯着那摊污迹看了很久。
+Maya: Damn it.
 
-林星野：不会了。
+△ Wind from the subway entrance pushes damp air toward her. She reaches for a cigarette pack and finds it empty. She crushes the cardboard and throws it into the trash.
 
-△列车钻进隧道。
-△车窗瞬间变成一面模糊的镜子，映出一张胡子拉碴、眼窝深陷的脸。镜子里的人和他对视了三秒，然后被隧道墙壁上飞掠而过的蓝色流光广告撕碎——"瞬充联盟，为您的未来充满可能"。光带快得像抽过来的鞭子。
-△他猛地闭眼。
-△再睁开时，窗外已是沉甸甸的、墨汁般的田野。远处零星灯火像被随手掐灭的烟头。城市的喧嚣和光污染被甩在了身后那片逐渐收缩的光晕里。
-△手机屏幕亮了一下，是银行催缴短信的数字余额：-187,430.59。
-△他把手机反扣在小桌板上，声音有点响。邻座打盹的男人惊醒了片刻，嘟囔着换了个姿势。
+△ The glow from a platform billboard washes over her face. A model in the ad smiles while holding a new phone; the teeth are white enough to sting.
 
-林星野：（对着黑掉的屏幕）这次……我不会再逃了。
+Maya: (quietly) This time...
 
-△列车减速进站的摩擦声尖利地刮着耳膜。
-△他抓起包起身，帆布包带子"刺啦"一声裂开更长的口子。
+△ She does not finish the sentence. Her phone vibrates.
 
-【字幕：青屿镇 · 300公里外】
+△ She stares at the caller ID for three seconds before answering.
+
+Maya: Hello?
+
+△ Her cousin's frantic voice comes through the receiver.
+
+Cousin: Maya! Grandpa is not doing well! The hospital says... says you need to come back right away!
+
+△ The wind from the incoming train lifts her soaked coat hem.
+
+Maya: I am coming back now.
+
+△ The call ends. She grips the phone so tightly that her knuckles turn white.
+
+△ The train doors open and close. She does not get on.
+
+△ Rainwater drips from the platform edge and hits the tracks in little pits. The lights of distant skyscrapers blur in the rain like melted syrup.
+
+Maya: (to herself) I won't run...
+
+△ She turns and walks toward the exit. Her shoes splash through puddles, and water soaks the cuffs of her pants.
+
+△ The convenience store on the corner is still lit. The cashier is looking down at a phone, the blue screen reflected in the glass.
+
+△ Maya touches the train ticket in her pocket. It was a return ticket bought yesterday. She had originally planned to use it next week to go to the neighboring city and fight for investment.
+
+△ She tears the ticket in half. The scraps of paper disappear into the crack of a storm drain with the rainwater.
+
+[Subtitle: Three Hours Later]
+
+△ Long-distance bus station waiting hall. Most of the plastic chairs are empty.
+
+△ Maya sits in the corner, staring at the scrolling departure board. The green cursor keeps jumping forward.
+
+Broadcast: (electronic voice) Passengers heading to Qingtang Town, please go to Gate 3...
+
+△ She picks up the backpack by her feet. It contains only two sets of clothes and an old laptop.
+
+Maya: This time is different.
+
+△ The gate beeps. Her hand shakes when she inserts the ticket.
+
+△ The overnight bus starts moving while the rain still falls. Water trails crisscross the windows, slicing the city lights into broken fragments.
+
+△ She sits by the window and rests her forehead against the cold glass.
 
 ---
 
-## 格式要点总结
+**1-4 Night Interior High-Speed Train Car**
+Characters: Maya
 
-| 元素 | 格式 | 示例 |
-|------|------|------|
-| 场景编号 | `集-场 日/夜 内/外 地点` | `1-3 夜 外 新沪市` |
-| 出场人物 | `人物：角色A、角色B` | `人物：林星野、苏晓` |
-| 舞台指示 | 以 `△` 开头 | `△林星野推开玻璃门。` |
-| 对白 | `角色名：台词` | `林星野：我不会再逃了。` |
-| 表演提示 | `（括号说明）` | `苏晓：（轻声）理论基础存在缺陷。` |
-| 字幕/转场 | `【字幕：内容】` | `【字幕：三小时后】` |
-| 人物小传 | `角色名（年龄）：身份，性格` | `林星野（28）：创业失败者，自卑敏感` |
+△ Maya presses her face against the cold train window.
+△ Outside, the neon lights of New Shanghai look like a spilled bucket of paint, dyeing the sky an unreal purple-red. Giant holographic signs for "Instant Charge Alliance" stand on top of every skyscraper, and the blue lightning logo stings her eyes.
+
+Maya: (quietly) This time...
+
+△ She swallows and still does not finish the sentence. Her fingers dig into the seam of her worn canvas bag.
+△ The carriage announcement plays in a sweet female voice, calling out the next stop: Qingyu Town. The sound bounces once or twice inside the empty second-class cabin and breaks apart.
+△ A child in front of her kicks the seatback. Thump, thump, thump. The mother hisses, "Stop it."
+△ Maya takes out a half-bottle of water, and when she twists the cap, a few drops spill onto her pants. The dark stain slowly spreads across her faded jeans. She stares at it for a long time.
+
+Maya: I will not run.
+
+△ The train enters a tunnel.
+△ The window instantly becomes a blurred mirror, reflecting a scruffy face with deep eye sockets. The person in the mirror stares back for three seconds, then gets torn apart by the blue streaks of tunnel-side ad ads -- "Instant Charge Alliance, charging your future with possibility." The streaks whip past like lashes.
+△ She shuts her eyes hard.
+△ When she opens them again, the world outside is now a heavy, ink-black field. Scattered lights in the distance look like cigarette butts just snuffed out. The noise and light pollution of the city have been left behind in a shrinking halo of light.
+△ Her phone screen lights up. The bank balance notification reads: -187,430.59.
+△ She flips the phone face down on the tray table, making a sharp sound. The man dozing in the neighboring seat stirs and changes position.

@@ -85,7 +85,6 @@ export function ShotGroupCard({
   group,
   scenes,
   allScenes,
-  groupIndex,
   isGeneratingAny,
   renderSceneCard,
   onGenerateGroupVideo,

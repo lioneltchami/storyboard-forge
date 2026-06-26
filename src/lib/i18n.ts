@@ -185,8 +185,8 @@ export const messages: Record<Locale, MessageTree> = {
       untitledProject: "Untitled project",
     },
     shell: {
-      appName: "Moyin Creator",
-      appSubtitle: "Moyin Creator Studio",
+      appName: "Storyboard Forge",
+      appSubtitle: "Storyboard Forge Studio",
       themeLight: "Light",
       themeDark: "Dark",
       switchToLight: "Switch to light mode",
@@ -199,8 +199,8 @@ export const messages: Record<Locale, MessageTree> = {
       episodeLabel: ({ episode }) => `Episode ${episode}`,
     },
     dashboard: {
-      title: "Moyin Creator",
-      subtitle: "Moyin Creator Studio",
+      title: "Storyboard Forge",
+      subtitle: "Storyboard Forge Studio",
       newProject: "New project",
       projectNamePlaceholder: "Enter project name...",
       createNewProject: "Create",
@@ -336,8 +336,8 @@ export const messages: Record<Locale, MessageTree> = {
       untitledProject: "未命名项目",
     },
     shell: {
-      appName: "魔因漫创",
-      appSubtitle: "Moyin Creator Studio",
+      appName: "Storyboard Forge",
+      appSubtitle: "Storyboard Forge Studio",
       themeLight: "浅色",
       themeDark: "深色",
       switchToLight: "切换到浅色模式",
@@ -350,8 +350,8 @@ export const messages: Record<Locale, MessageTree> = {
       episodeLabel: ({ episode }) => `第${episode}集`,
     },
     dashboard: {
-      title: "魔因漫创",
-      subtitle: "Moyin Creator Studio",
+      title: "Storyboard Forge",
+      subtitle: "Storyboard Forge Studio",
       newProject: "新建项目",
       projectNamePlaceholder: "输入项目名称...",
       createNewProject: "创建",

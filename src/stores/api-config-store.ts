@@ -485,7 +485,7 @@ export interface APIConfigStatus {
  * 2. runninghub - RunningHub，视角切换/多角度生成
  */
 const PROVIDER_INFO: Record<ProviderId, { name: string; services: ServiceType[] }> = {
-  memefast: { name: 'Moyin API', services: ['chat', 'image', 'video', 'vision'] },
+  memefast: { name: 'Storyboard Forge API', services: ['chat', 'image', 'video', 'vision'] },
   runninghub: { name: 'RunningHub', services: ['image', 'vision'] },
   openai: { name: 'OpenAI', services: [] },
   custom: { name: 'Custom', services: [] },

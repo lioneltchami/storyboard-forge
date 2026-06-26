@@ -1,6 +1,6 @@
 # Script Import Format Example
 
-> Use this as the English reference format when preparing scripts for Moyin Creator.
+> Use this as the English reference format when preparing scripts for Storyboard Forge.
 
 > This is a structure reference, not a localization guarantee. The app may still keep some prompts, labels, and deeper references Chinese-first while accepting the same import structure.
 

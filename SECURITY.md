@@ -24,4 +24,4 @@ If you discover a security vulnerability, please report it responsibly:
 - We will release a fix as soon as possible
 - We will credit you in the release notes (unless you prefer anonymity)
 
-Thank you for helping keep Moyin Creator and its users safe.
+Thank you for helping keep Storyboard Forge and its users safe.

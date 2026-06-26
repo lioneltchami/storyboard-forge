@@ -60,48 +60,6 @@ const FEATURE_DEFAULT_MODEL: Partial<Record<AIFeature, Record<string, string>>> 
 
 
 /**
- * 解析 platform:model 格式
- */
-function parseBindingValue(binding: string): { platform: string; model?: string } | null {
-  if (binding.includes(':')) {
-    const [platform, model] = binding.split(':');
-    return { platform, model };
-  }
-  return null;
-}
-
-/**
- * Get the platform and model from featureBindings (first binding)
- * featureBindings now stores: string[] (array of platform:model)
- * 这个函数仅用于兼容旧代码，新代码应使用 getProvidersForFeature
- */
-function getBoundPlatformAndModel(store: ReturnType<typeof useAPIConfigStore.getState>, feature: AIFeature): { platform: string; model?: string } | null {
-  const bindings = store.getFeatureBindings(feature);
-  if (!bindings || bindings.length === 0) return null;
-  
-  // 取第一个绑定
-  const binding = bindings[0];
-  if (!binding) return null;
-  
-  // 新格式: platform:model
-  const parsed = parseBindingValue(binding);
-  if (parsed) {
-    return parsed;
-  }
-  
-  // 兼容旧格式: provider ID
-  const provider = store.providers.find(p => p.id === binding);
-  if (provider) return { platform: provider.platform };
-  
-  // 兼容旧格式: platform name
-  const providerByPlatform = store.providers.find(p => p.platform === binding);
-  if (providerByPlatform) return { platform: providerByPlatform.platform };
-  
-  // It might be a platform name that's not yet added
-  return { platform: binding };
-}
-
-/**
  * 获取功能的所有可用配置（多模型）
  */
 export function getAllFeatureConfigs(feature: AIFeature): FeatureConfig[] {
@@ -220,7 +178,7 @@ export function isFeatureReady(feature: AIFeature): boolean {
 export function getFeatureNotConfiguredMessage(feature: AIFeature): string {
   const featureInfo = AI_FEATURES.find(f => f.key === feature);
   const featureName = featureInfo?.name || feature;
-  return `请先在设置中为「${featureName}」功能绑定 API 供应商`;
+  return `Please configure the API provider for "${featureName}" in Settings.`;
 }
 
 // ==================== 统一 API 调用入口 ====================
@@ -267,7 +225,7 @@ export async function callFeatureAPI(
   const model = options?.modelOverride || config.model || config.models?.[0];
   const baseUrl = config.baseUrl?.replace(/\/+$/, '');
   if (!baseUrl) {
-    throw new Error('请先在设置中配置 Base URL');
+    throw new Error('Please configure a Base URL in Settings.');
   }
   if (!model) {
     throw new Error('请先在设置中配置模型');

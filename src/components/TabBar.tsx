@@ -25,7 +25,7 @@ export function TabBar() {
       <div className="flex flex-col w-14 bg-panel border-r border-border py-2">
         <div className="p-2">
           <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center mx-auto rounded">
-            <span className="text-sm font-bold">M</span>
+            <span className="text-sm font-bold">SF</span>
           </div>
         </div>
         {/* Dashboard nav */}
@@ -56,7 +56,7 @@ export function TabBar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href="https://github.com/MemeCalculate/moyin-creator/blob/main/docs/WORKFLOW_GUIDE.md"
+                  href="https://github.com/lioneltchami/storyboard-forge/blob/main/docs/WORKFLOW_GUIDE.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -113,7 +113,7 @@ export function TabBar() {
       {/* Logo + Back */}
       <div className="p-2 border-b border-border">
         <div className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center mx-auto rounded mb-1">
-          <span className="text-sm font-bold">M</span>
+          <span className="text-sm font-bold">SF</span>
         </div>
         <TooltipProvider delayDuration={300}>
           <Tooltip>
@@ -168,7 +168,7 @@ export function TabBar() {
           <Tooltip>
             <TooltipTrigger asChild>
               <a
-                href="https://github.com/MemeCalculate/moyin-creator/blob/main/docs/WORKFLOW_GUIDE.md"
+                href="https://github.com/lioneltchami/storyboard-forge/blob/main/docs/WORKFLOW_GUIDE.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex flex-col items-center py-2 text-muted-foreground hover:text-foreground transition-colors"

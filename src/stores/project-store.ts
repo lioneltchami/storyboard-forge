@@ -34,7 +34,7 @@ type PersistedProjectStore = {
 // Default project for desktop app
 const DEFAULT_PROJECT: Project = {
   id: "default-project",
-  name: "Moyin Creator Project",
+  name: "Storyboard Forge Project",
   createdAt: Date.now(),
   updatedAt: Date.now(),
 };

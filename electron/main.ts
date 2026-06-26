@@ -159,7 +159,7 @@ async function resolveAvailableUpdate(currentVersion: string): Promise<Available
 
 function createWindow() {
   win = new BrowserWindow({
-    title: 'Moyin Creator',
+    title: 'Storyboard Forge',
     width: 1400,
     height: 900,
     minWidth: 1200,

@@ -37,13 +37,12 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { StylePicker } from "@/components/ui/style-picker";
-import type { VisualStyleId } from "@/lib/constants/visual-styles";
 import type { PromptLanguage } from "@/types/script";
 import { useScriptStore } from "@/stores/script-store";
 
 const PROMPT_LANGUAGE_OPTIONS = [
-  { value: "zh", label: "Chinese only" },
   { value: "en", label: "English only" },
+  { value: "zh", label: "Chinese only" },
   { value: "zh+en", label: "Chinese + English" },
 ];
 
@@ -523,7 +522,7 @@ export function ScriptInput({
             <div className="space-y-1">
               <Label className="text-xs">Prompt language</Label>
               <Select
-                value={promptLanguage || "zh"}
+                value={promptLanguage || "en"}
                 onValueChange={(v) => onPromptLanguageChange?.(v as PromptLanguage)}
                 disabled={parseStatus === "parsing"}
               >
@@ -539,7 +538,7 @@ export function ScriptInput({
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                Controls whether AI calibration generates Chinese, English, or both; Chinese only is the default to reduce generation load
+                Controls whether AI calibration generates Chinese, English, or both; English only is the default
               </p>
             </div>
 
@@ -654,7 +653,7 @@ export function ScriptInput({
             <div className="space-y-1">
               <Label className="text-xs">Prompt language</Label>
               <Select
-                value={promptLanguage || "zh"}
+                value={promptLanguage || "en"}
                 onValueChange={(v) => onPromptLanguageChange?.(v as PromptLanguage)}
                 disabled={parseStatus === "parsing"}
               >
@@ -670,7 +669,7 @@ export function ScriptInput({
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                Controls whether AI generation uses Chinese, English, or both; Chinese only is the default to reduce generation load
+                Controls whether AI generation uses Chinese, English, or both; English only is the default
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">

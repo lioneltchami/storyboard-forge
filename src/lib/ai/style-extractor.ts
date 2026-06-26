@@ -71,31 +71,47 @@ async function resolveImageUrl(src: string): Promise<string> {
   return dataUrl || src;
 }
 
+function containsHan(text: string): boolean {
+  return /[\p{Script=Han}]/u.test(text);
+}
+
 function extractErrorMessage(status: number, errorText: string): string {
-  let message = `API 请求失败: ${status}`;
+  let message = `API request failed (${status}).`;
 
   try {
-    const errorJson = JSON.parse(errorText);
-    message = errorJson.error?.message || errorJson.message || message;
+    const errorJson = JSON.parse(errorText) as {
+      error?: { message?: unknown };
+      message?: unknown;
+    };
+    const parsedMessage = errorJson.error?.message || errorJson.message;
+    if (typeof parsedMessage === 'string' && !containsHan(parsedMessage)) {
+      message = parsedMessage;
+    }
   } catch {
-    if (errorText && errorText.length < 200) {
+    if (errorText && errorText.length < 200 && !containsHan(errorText)) {
       message = errorText;
     }
   }
 
   if (status === 401 || status === 403) {
-    return 'API Key 无效或已过期，请检查“图片理解”服务的 Key 配置';
+    return 'API key is invalid or expired. Please check the Image Understanding provider key in Settings.';
   }
 
   if (status >= 500) {
-    return message || `上游服务暂时不可用 (${status})`;
+    return message || `Upstream service is temporarily unavailable (${status}).`;
   }
 
   return message;
 }
 
-function getMessageContent(data: any): string {
-  const rawContent = data?.choices?.[0]?.message?.content;
+function getMessageContent(data: unknown): string {
+  const rawContent = (data as {
+    choices?: Array<{
+      message?: {
+        content?: unknown;
+      };
+    }>;
+  })?.choices?.[0]?.message?.content;
   if (typeof rawContent === 'string') {
     return rawContent;
   }
@@ -117,13 +133,13 @@ export async function extractStyleTokens(
 ): Promise<StyleExtractionResult> {
   const config = getFeatureConfig('image_understanding');
   if (!config) {
-    throw new Error('请先在设置中为“图片理解”功能绑定 API 提供商');
+    throw new Error('Please configure the API provider for "Image Understanding" in Settings.');
   }
 
   const baseUrl = config.baseUrl?.replace(/\/+$/, '');
   const model = config.model || config.models?.[0];
   if (!baseUrl || !model) {
-    throw new Error('图片理解服务缺少 Base URL 或模型配置');
+    throw new Error('Image Understanding is missing a Base URL or model configuration.');
   }
 
   const contentParts: Array<{ type: string; text?: string; image_url?: { url: string } }> = [];
@@ -198,12 +214,12 @@ export async function extractStyleTokens(
   const content = getMessageContent(data);
   const cleanContent = content.replace(/```json\s*|\s*```/g, '').trim();
 
-  let parsed: any;
+  let parsed: Partial<StyleExtractionResult> & { summary_zh?: string };
   try {
     parsed = JSON.parse(cleanContent);
   } catch {
     console.error('[StyleExtractor] Failed to parse JSON:', content);
-    throw new Error('AI 返回的格式无法解析');
+    throw new Error('The AI response could not be parsed.');
   }
 
   const result: StyleExtractionResult = {
