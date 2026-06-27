@@ -127,7 +127,8 @@ export const useProjectStore = create<ProjectStore>()(
         projects: state.projects,
         activeProjectId: state.activeProjectId,
       }),
-      migrate: (persisted: PersistedProjectStore | undefined) => {
+      migrate: (persistedState: unknown, _version: number) => {
+        const persisted = persistedState as PersistedProjectStore | undefined;
         if (persisted?.projects && persisted.projects.length > 0) {
           return persisted;
         }
