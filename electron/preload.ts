@@ -2,6 +2,17 @@
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 import { ipcRenderer, contextBridge } from 'electron'
+import packageMetadata from '../package.json'
+
+type PackageUpdateConfig = {
+  enabled?: boolean
+}
+
+type PackageMetadata = {
+  updateConfig?: PackageUpdateConfig
+}
+
+const updatesEnabled = (packageMetadata as PackageMetadata).updateConfig?.enabled !== false
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -80,6 +91,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 })
 
 contextBridge.exposeInMainWorld('appUpdater', {
+  enabled: updatesEnabled,
   getCurrentVersion: () => ipcRenderer.invoke('app-updater-get-current-version'),
   checkForUpdates: () => ipcRenderer.invoke('app-updater-check'),
   openExternalLink: (url: string) => ipcRenderer.invoke('app-updater-open-link', url),

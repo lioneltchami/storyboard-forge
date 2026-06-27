@@ -93,7 +93,7 @@ export function StoryboardPreview({ onBack, onSplitComplete }: StoryboardPreview
           imagePrompt: '',
           imagePromptZh: '',
           videoPrompt: '',
-          videoPromptZh: '场景 1',
+          videoPromptZh: 'Scene 1',
           needsEndFrame: false,
           endFramePrompt: '',
           endFramePromptZh: '',
@@ -167,7 +167,7 @@ export function StoryboardPreview({ onBack, onSplitComplete }: StoryboardPreview
           imagePrompt: '',
           imagePromptZh: '',
           videoPrompt: '', // 英文提示词，等待 AI 生成
-          videoPromptZh: `场景 ${index + 1}`, // 中文提示词默认值
+          videoPromptZh: `Scene ${index + 1}`, // Default fallback prompt text
           needsEndFrame: false,
           endFramePrompt: '',
           endFramePromptZh: '',

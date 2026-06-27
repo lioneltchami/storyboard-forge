@@ -117,7 +117,7 @@ ${shotSummaries.map(s =>
    动作：${s.actionSummary.slice(0, 100)}
    描述：${s.visualDescription.slice(0, 100)}
    角色：${s.characterNames.join('、') || '无'}
-   叙事功能：${s.narrativeFunction || '未知'}
+   Narrative function: ${s.narrativeFunction || 'Unknown'}
    情绪：${Array.isArray(s.emotionTags) ? s.emotionTags.join(', ') : '无'}`
 ).join('\n\n')}
 

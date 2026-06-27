@@ -58,7 +58,7 @@ function buildGlobalContext(scriptProjectId?: string): GlobalContext {
   if (!project) {
     // 兜底：返回最小化的 context
     return {
-      title: '未命名项目',
+      title: 'Untitled project',
       outline: '',
       characterBios: '',
       episodeTitle: '',
@@ -71,7 +71,7 @@ function buildGlobalContext(scriptProjectId?: string): GlobalContext {
   const episode = scriptData?.episodes?.[0];
 
   return {
-    title: background?.title || scriptData?.title || '未命名剧本',
+    title: background?.title || scriptData?.title || 'Untitled script',
     genre: background?.genre || '',
     era: background?.era || '',
     outline: background?.outline || '',
@@ -167,7 +167,7 @@ export async function recalibrateSplitScenes(
     return { scenes: [], calibratedCount: 0, totalScenes: 0 };
   }
 
-  onProgress?.(0, totalScenes, '准备重新校准...');
+  onProgress?.(0, totalScenes, 'Preparing recalibration...');
 
   // 1. SplitScene → ShotInputData
   const shotInputs = toShotInputData(splitScenes);
@@ -180,7 +180,7 @@ export async function recalibrateSplitScenes(
     styleId: newStyleId,
   };
 
-  onProgress?.(0, totalScenes, '正在用新风格校准分镜...');
+  onProgress?.(0, totalScenes, 'Calibrating shots with the new style...');
 
   const calibrations = await calibrateShotsMultiStage(
     shotInputs,
@@ -202,7 +202,7 @@ export async function recalibrateSplitScenes(
     return scene;
   });
 
-  onProgress?.(calibratedCount, totalScenes, `已校准 ${calibratedCount}/${totalScenes} 个分镜`);
+  onProgress?.(calibratedCount, totalScenes, `Calibrated ${calibratedCount}/${totalScenes} shots`);
 
   return {
     scenes: updatedScenes,

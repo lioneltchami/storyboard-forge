@@ -223,7 +223,7 @@ export async function importSingleEpisodeContent(
       const timeOfDay = headerParts[1] || '日';
       const hasInterior = headerParts[2] && /^(内|外|内\/外)$/.test(headerParts[2]);
       const locStart = hasInterior ? 3 : 2;
-      let loc = headerParts.slice(locStart).join(' ') || headerParts[headerParts.length - 1] || '未知';
+      let loc = headerParts.slice(locStart).join(' ') || headerParts[headerParts.length - 1] || 'Unknown';
       loc = loc.replace(/\s*(?:人物|角色)[：:].*/g, '').trim();
 
       let atmosphere = '平静';
@@ -400,7 +400,7 @@ export async function generateEpisodeShots(
   });
   
   try {
-    onProgress?.(`正在为第 ${episodeIndex} 集生成分镜...`);
+    onProgress?.(`Generating shots for episode ${episodeIndex}...`);
     
     // 获取该集对应的场景
     const scriptData = project.scriptData;
@@ -471,7 +471,7 @@ export async function generateEpisodeShots(
     }
     
     if (options.apiKey && episodeScenes.length > 0) {
-      onProgress?.(`正在 AI 分析场景视角（共 ${episodeScenes.length} 个场景）...`);
+      onProgress?.(`Analyzing scene viewpoints for ${episodeScenes.length} scenes...`);
       
       try {
         // 获取本集大纲和关键事件
@@ -652,7 +652,7 @@ export async function generateEpisodeShots(
           viewpointSkippedReason = '无分镜';
         }
         
-        onProgress?.(`AI 视角分析完成（${viewpointCount} 个视角）`);
+        onProgress?.(`AI viewpoint analysis complete (${viewpointCount} viewpoints)`);
       } catch (e) {
         const err = e as Error;
         console.error('\n============================================');
@@ -671,7 +671,7 @@ export async function generateEpisodeShots(
       lastGeneratedAt: Date.now(),
     });
     
-    onProgress?.(`第 ${episodeIndex} 集分镜生成完成！共 ${newShots.length} 个分镜`);
+    onProgress?.(`Episode ${episodeIndex} shot generation complete: ${newShots.length} shots`);
     
     return { shots: newShots, viewpointAnalyzed, viewpointSkippedReason };
   } catch (error) {
@@ -991,7 +991,7 @@ export async function regenerateAllEpisodeShots(
   
   for (let i = 0; i < totalEpisodes; i++) {
     const ep = project.episodeRawScripts[i];
-    onProgress?.(i + 1, totalEpisodes, `正在生成第 ${ep.episodeIndex} 集...`);
+    onProgress?.(i + 1, totalEpisodes, `Generating episode ${ep.episodeIndex}...`);
     
     await generateEpisodeShots(
       ep.episodeIndex,
@@ -1080,12 +1080,12 @@ function extractEpisodeSummary(episode: EpisodeRawScript): string {
   for (const scene of scenesToUse) {
     // 场景信息（使用 sceneHeader 代替 location）
     if (scene.sceneHeader) {
-      parts.push(`场景：${scene.sceneHeader}`);
+      parts.push(`Scene: ${scene.sceneHeader}`);
     }
     
     // 取前几条对白
-    const dialogueSample = scene.dialogues.slice(0, 3).map(d => 
-      `${d.character}：${d.line.slice(0, 30)}`
+    const dialogueSample = scene.dialogues.slice(0, 3).map(d =>
+      `${d.character}: ${d.line.slice(0, 30)}`
     ).join('\n');
     if (dialogueSample) {
       parts.push(dialogueSample);
@@ -1134,7 +1134,7 @@ export async function calibrateEpisodeTitles(
   // 获取全局背景信息
   const background = project.projectBackground;
   const globalContext = {
-    title: background?.title || project.scriptData?.title || '未命名剧本',
+    title: background?.title || project.scriptData?.title || 'Untitled script',
     outline: background?.outline || project.scriptData?.logline || '',
     characterBios: background?.characterBios || '',
     totalEpisodes: project.episodeRawScripts.length,
@@ -1237,7 +1237,7 @@ ${characterBios.slice(0, 1000)}
       console.warn(`[集标题校准] ${failedBatches}/${totalBatches} 批次失败`);
     }
     
-    onProgress?.(calibratedCount, totalMissing, `已校准 ${calibratedCount}/${totalMissing} 集`);
+    onProgress?.(calibratedCount, totalMissing, `Calibrated ${calibratedCount}/${totalMissing} episodes`);
     
     return {
       success: true,
@@ -1250,7 +1250,7 @@ ${characterBios.slice(0, 1000)}
       success: false,
       calibratedCount: 0,
       totalMissing,
-      error: error instanceof Error ? error.message : '校准失败',
+      error: error instanceof Error ? error.message : 'Calibration failed',
     };
   }
 }
@@ -1377,7 +1377,7 @@ export async function calibrateEpisodeShots(
   const seriesContextSummary = buildSeriesContextSummary(project.seriesMeta || null);
   
   const globalContext = {
-    title: background?.title || project.scriptData?.title || '未命名剧本',
+    title: background?.title || project.scriptData?.title || 'Untitled script',
     genre: background?.genre || '',
     era: background?.era || '',
     outline: background?.outline || '',
@@ -1565,7 +1565,7 @@ export async function calibrateEpisodeShots(
       }
     }
     
-    onProgress?.(calibratedCount, totalShots, `已校准 ${calibratedCount}/${totalShots} 个分镜`);
+    onProgress?.(calibratedCount, totalShots, `Calibrated ${calibratedCount}/${totalShots} shots`);
     
     // 保存更新后的分镜
     store.setShots(projectId, updatedShots);
@@ -1581,7 +1581,7 @@ export async function calibrateEpisodeShots(
       success: false,
       calibratedCount: 0,
       totalShots,
-      error: error instanceof Error ? error.message : '分镜校准失败',
+      error: error instanceof Error ? error.message : 'Shot calibration failed',
     };
   }
 }
@@ -1613,7 +1613,7 @@ export async function calibrateSingleShot(
     return { success: false, calibratedCount: 0, totalShots: 1, error: `找不到分镜 ${shotId}` };
   }
   
-  onProgress?.(`正在校准分镜...`);
+  onProgress?.(`Calibrating shot...`);
   
   // 获取分镜所属的场景和集信息
   const scene = scriptData.scenes.find(s => s.id === shot.sceneRefId);
@@ -1626,7 +1626,7 @@ export async function calibrateSingleShot(
   const episodeRawContent = episodeScript?.rawContent || '';
   
   const globalContext = {
-    title: background?.title || scriptData?.title || '未命名剧本',
+    title: background?.title || scriptData?.title || 'Untitled script',
     genre: background?.genre || '',
     era: background?.era || '',
     outline: background?.outline || '',
@@ -1738,7 +1738,7 @@ export async function calibrateSingleShot(
     });
     
     store.setShots(projectId, updatedShots);
-    onProgress?.(`分镜校准完成`);
+    onProgress?.(`Shot calibration complete`);
     
     return {
       success: true,
@@ -1751,7 +1751,7 @@ export async function calibrateSingleShot(
       success: false,
       calibratedCount: 0,
       totalShots: 1,
-      error: error instanceof Error ? error.message : '单个分镜校准失败',
+      error: error instanceof Error ? error.message : 'Single-shot calibration failed',
     };
   }
 }
@@ -2280,7 +2280,7 @@ export async function generateEpisodeSynopses(
   // 获取全局背景
   const background = project.projectBackground;
   const globalContext = {
-    title: background?.title || project.scriptData?.title || '未命名剧本',
+    title: background?.title || project.scriptData?.title || 'Untitled script',
     genre: background?.genre || '',
     era: background?.era || '',
     worldSetting: background?.worldSetting || '',
@@ -2440,115 +2440,115 @@ export function exportProjectMetadata(projectId: string): string {
   const meta = project.seriesMeta;
   
   const sections: string[] = [];
-  
+
   // 标题
-  const title = meta?.title || background?.title || scriptData?.title || '未命名剧本';
-  sections.push(`# 《${title}》`);
+  const title = meta?.title || background?.title || scriptData?.title || 'Untitled script';
+  sections.push(`# ${title}`);
   sections.push('');
-  
+
   // 基本信息
-  sections.push('## 基本信息');
+  sections.push('## Basic Info');
   const genre = meta?.genre || background?.genre;
   const era = meta?.era || background?.era;
-  if (genre) sections.push(`- **类型**：${genre}`);
-  if (era) sections.push(`- **时代**：${era}`);
-  sections.push(`- **总集数**：${episodes.length}集`);
-  if (meta?.language || scriptData?.language) sections.push(`- **语言**：${meta?.language || scriptData?.language}`);
-  if (meta?.logline) sections.push(`- **Logline**：${meta.logline}`);
-  if (meta?.centralConflict) sections.push(`- **核心冲突**：${meta.centralConflict}`);
-  if (meta?.themes?.length) sections.push(`- **主题**：${meta.themes.join('、')}`);
+  if (genre) sections.push(`- **Genre**: ${genre}`);
+  if (era) sections.push(`- **Era**: ${era}`);
+  sections.push(`- **Total Episodes**: ${episodes.length}`);
+  if (meta?.language || scriptData?.language) sections.push(`- **Language**: ${meta?.language || scriptData?.language}`);
+  if (meta?.logline) sections.push(`- **Logline**: ${meta.logline}`);
+  if (meta?.centralConflict) sections.push(`- **Central Conflict**: ${meta.centralConflict}`);
+  if (meta?.themes?.length) sections.push(`- **Themes**: ${meta.themes.join(', ')}`);
   sections.push('');
-  
+
   // 故事大纲
   const outline = meta?.outline || background?.outline;
   if (outline) {
-    sections.push('## 故事大纲');
+    sections.push('## Story Outline');
     sections.push(outline);
     sections.push('');
   }
-  
+
   // 世界观设定
   const worldNotes = meta?.worldNotes || background?.worldSetting;
   if (worldNotes || meta?.powerSystem || meta?.socialSystem) {
-    sections.push('## 世界观设定');
+    sections.push('## Worldbuilding');
     if (worldNotes) sections.push(worldNotes);
-    if (meta?.socialSystem) sections.push(`- **社会体系**：${meta.socialSystem}`);
-    if (meta?.powerSystem) sections.push(`- **力量体系**：${meta.powerSystem}`);
+    if (meta?.socialSystem) sections.push(`- **Social System**: ${meta.socialSystem}`);
+    if (meta?.powerSystem) sections.push(`- **Power System**: ${meta.powerSystem}`);
     sections.push('');
   }
-  
+
   // 地理设定
   if (meta?.geography?.length) {
-    sections.push('## 地理设定');
+    sections.push('## Geography');
     for (const g of meta.geography) {
-      sections.push(`- **${g.name}**：${g.desc}`);
+      sections.push(`- **${g.name}**: ${g.desc}`);
     }
     sections.push('');
   }
-  
+
   // 关键物品
   if (meta?.keyItems?.length) {
-    sections.push('## 关键物品');
+    sections.push('## Key Items');
     for (const item of meta.keyItems) {
-      sections.push(`- **${item.name}**：${item.desc}`);
+      sections.push(`- **${item.name}**: ${item.desc}`);
     }
     sections.push('');
   }
-  
+
   // 主要人物（原始小传）
   if (background?.characterBios) {
-    sections.push('## 主要人物');
+    sections.push('## Main Characters');
     sections.push(background.characterBios);
     sections.push('');
   }
-  
+
   // 角色列表（结构化）— 优先从 seriesMeta 读取
   const characters = meta?.characters || scriptData?.characters;
   if (characters && characters.length > 0) {
-    sections.push('## 角色列表');
+    sections.push('## Character List');
     for (const char of characters) {
       sections.push(`### ${char.name}`);
-      if (char.gender) sections.push(`- 性别：${char.gender}`);
-      if (char.age) sections.push(`- 年龄：${char.age}`);
-      if (char.role) sections.push(`- 身份：${char.role}`);
-      if (char.personality) sections.push(`- 性格：${char.personality}`);
-      if (char.traits) sections.push(`- 特质：${char.traits}`);
-      if (char.relationships) sections.push(`- 关系：${char.relationships}`);
-      if (char.skills) sections.push(`- 技能：${char.skills}`);
+      if (char.gender) sections.push(`- Gender: ${char.gender}`);
+      if (char.age) sections.push(`- Age: ${char.age}`);
+      if (char.role) sections.push(`- Role: ${char.role}`);
+      if (char.personality) sections.push(`- Personality: ${char.personality}`);
+      if (char.traits) sections.push(`- Traits: ${char.traits}`);
+      if (char.relationships) sections.push(`- Relationships: ${char.relationships}`);
+      if (char.skills) sections.push(`- Skills: ${char.skills}`);
       sections.push('');
     }
   }
-  
+
   // 阵营/势力
   if (meta?.factions?.length) {
-    sections.push('## 阵营/势力');
+    sections.push('## Factions');
     for (const f of meta.factions) {
-      sections.push(`- **${f.name}**：${f.members.join('、')}`);
+      sections.push(`- **${f.name}**: ${f.members.join(', ')}`);
     }
     sections.push('');
   }
-  
+
   // 剧集大纲
-  sections.push('## 剧集大纲');
+  sections.push('## Episode Outline');
   for (const ep of episodes) {
-    sections.push(`### 第${ep.episodeIndex}集：${ep.title.replace(/^第\d+集[：:]？/, '')}`);
+    sections.push(`### Episode ${ep.episodeIndex}: ${ep.title.replace(/^第\d+集[：:]？/, '')}`);
     if (ep.synopsis) {
       sections.push(ep.synopsis);
     }
     if (ep.keyEvents && ep.keyEvents.length > 0) {
-      sections.push('**关键事件：**');
+      sections.push('**Key Events:**');
       for (const event of ep.keyEvents) {
         sections.push(`- ${event}`);
       }
     }
     // 显示场景数量
-    sections.push(`> 本集包含 ${ep.scenes.length} 个场景`);
+    sections.push(`> This episode contains ${ep.scenes.length} scenes`);
     sections.push('');
   }
-  
+
   // 生成时间
   sections.push('---');
-  sections.push(`*导出时间：${new Date().toLocaleString('zh-CN')}*`);
+  sections.push(`*Exported at: ${new Date().toLocaleString('en-US')}*`);
   
   return sections.join('\n');
 }

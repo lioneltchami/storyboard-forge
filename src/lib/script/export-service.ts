@@ -249,7 +249,7 @@ export async function exportProjectFiles(
     onProgress?.({
       current: i + 1,
       total: filesToDownload.length,
-      message: `下载 ${file.filename}`,
+      message: `Downloading ${file.filename}`,
     });
 
     try {
@@ -266,7 +266,7 @@ export async function exportProjectFiles(
   onProgress?.({
     current: filesToDownload.length,
     total: filesToDownload.length,
-    message: '导出完成',
+    message: 'Export complete',
   });
 }
 
@@ -314,7 +314,7 @@ export async function exportProjectToFolder(
     await manifestWritable.write(JSON.stringify(manifest, null, 2));
     await manifestWritable.close();
     currentFile++;
-    onProgress?.({ current: currentFile, total: totalFiles, message: '已写入 manifest.json' });
+    onProgress?.({ current: currentFile, total: totalFiles, message: 'Wrote manifest.json' });
 
     // Download and write images
     if (includeImages && imagesDir) {
@@ -322,7 +322,7 @@ export async function exportProjectToFolder(
         if (!shot.imageUrl) continue;
         
         const filename = `shot_${shot.index.toString().padStart(3, '0')}.png`;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `下载 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Downloading ${filename}` });
 
         try {
           const blob = await downloadFile(shot.imageUrl);
@@ -335,7 +335,7 @@ export async function exportProjectToFolder(
         }
         
         currentFile++;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `已保存 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Saved ${filename}` });
       }
     }
 
@@ -345,7 +345,7 @@ export async function exportProjectToFolder(
         if (!shot.videoUrl) continue;
         
         const filename = `shot_${shot.index.toString().padStart(3, '0')}.mp4`;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `下载 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Downloading ${filename}` });
 
         try {
           const blob = await downloadFile(shot.videoUrl);
@@ -358,11 +358,11 @@ export async function exportProjectToFolder(
         }
         
         currentFile++;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `已保存 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Saved ${filename}` });
       }
     }
 
-    onProgress?.({ current: totalFiles, total: totalFiles, message: '导出完成' });
+    onProgress?.({ current: totalFiles, total: totalFiles, message: 'Export complete' });
     return true;
   } catch (error) {
     // User cancelled or API error
@@ -516,16 +516,16 @@ export async function exportDirectorToFolder(
     await manifestWritable.write(JSON.stringify(manifest, null, 2));
     await manifestWritable.close();
     currentFile++;
-    onProgress?.({ current: currentFile, total: totalFiles, message: '已写入 manifest.json' });
+    onProgress?.({ current: currentFile, total: totalFiles, message: 'Wrote manifest.json' });
 
-    // Export images (首帧)
+    // Export images
     if (includeImages && imagesDir) {
       for (const scene of scenes) {
         const imageUrl = scene.imageHttpUrl || scene.imageDataUrl;
         if (!imageUrl) continue;
 
         const filename = `scene_${(scene.id + 1).toString().padStart(3, '0')}.png`;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `导出首帧 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Exporting first frame ${filename}` });
 
         try {
           const blob = await downloadFile(imageUrl);
@@ -546,7 +546,7 @@ export async function exportDirectorToFolder(
         if (!scene.videoUrl) continue;
 
         const filename = `scene_${(scene.id + 1).toString().padStart(3, '0')}.mp4`;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `导出视频 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Exporting video ${filename}` });
 
         try {
           const blob = await downloadFile(scene.videoUrl);
@@ -561,13 +561,13 @@ export async function exportDirectorToFolder(
       }
     }
 
-    // Export end frames (尾帧)
+    // Export end frames
     if (includeEndFrames && endFramesDir) {
       for (const scene of scenes) {
         if (!scene.endFrameImageUrl) continue;
 
         const filename = `scene_${(scene.id + 1).toString().padStart(3, '0')}_endframe.png`;
-        onProgress?.({ current: currentFile, total: totalFiles, message: `导出尾帧 ${filename}` });
+        onProgress?.({ current: currentFile, total: totalFiles, message: `Exporting end frame ${filename}` });
 
         try {
           const blob = await downloadFile(scene.endFrameHttpUrl || scene.endFrameImageUrl);
@@ -582,7 +582,7 @@ export async function exportDirectorToFolder(
       }
     }
 
-    onProgress?.({ current: totalFiles, total: totalFiles, message: '导出完成' });
+    onProgress?.({ current: totalFiles, total: totalFiles, message: 'Export complete' });
     return true;
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
@@ -650,7 +650,7 @@ export async function exportDirectorFiles(
     onProgress?.({
       current: i + 1,
       total: filesToDownload.length,
-      message: `下载 ${file.filename}`,
+      message: `Downloading ${file.filename}`,
     });
 
     try {
@@ -665,6 +665,6 @@ export async function exportDirectorFiles(
   onProgress?.({
     current: filesToDownload.length,
     total: filesToDownload.length,
-    message: '导出完成',
+    message: 'Export complete',
   });
 }

@@ -2,10 +2,11 @@
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
- * Cinematography Profile Presets — 摄影风格档案预设
+ * Cinematography profile presets.
  *
- * 在「画风选择」和「逐镜拍摄控制字段」之间，提供项目级摄影语言基准。
- * AI 校准时以此为默认倾向，prompt builder 在逐镜字段为空时回退到此处。
+ * Provides a project-level cinematography baseline between the visual style picker
+ * and the per-shot shooting control fields. AI calibration uses this as the default
+ * bias, and the prompt builder falls back here when per-shot fields are empty.
  */
 
 import type {
@@ -24,21 +25,21 @@ import type {
   PhotographyTechnique,
 } from '@/types/script';
 
-// ==================== 类型定义 ====================
+// ==================== Types ====================
 
 export type CinematographyCategory =
-  | 'cinematic'     // 电影类
-  | 'documentary'   // 纪实类
-  | 'stylized'      // 风格化
-  | 'genre'         // 类型片
-  | 'era';          // 时代风格
+  | 'cinematic'     // cinematic
+  | 'documentary'   // documentary
+  | 'stylized'      // stylized
+  | 'genre'         // genre
+  | 'era';          // era
 
 export interface CinematographyProfile {
   id: string;
-  name: string;          // 中文名
-  nameEn: string;        // 英文名
+  name: string;          // display name
+  nameEn: string;        // English display name
   category: CinematographyCategory;
-  description: string;   // 中文描述（1-2句）
+  description: string;   // short description
   emoji: string;         // 标识 emoji
 
   // ---- 灯光默认 (Gaffer) ----
@@ -76,14 +77,14 @@ export interface CinematographyProfile {
   defaultFocalLength?: FocalLength;
   defaultTechnique?: PhotographyTechnique;
 
-  // ---- AI 指导 ----
-  /** 给 AI 的中文摄影指导说明（2-3句话，注入 system prompt） */
+  // ---- AI Guidance ----
+  /** Cinematography guidance for the AI (2-3 sentences, injected into the system prompt). */
   promptGuidance: string;
-  /** 参考影片列表（帮助 AI 理解目标风格） */
+  /** Reference films to help the AI understand the target style. */
   referenceFilms: string[];
 }
 
-// ==================== 分类信息 ====================
+// ==================== Category Metadata ====================
 
 export const CINEMATOGRAPHY_CATEGORIES: { id: CinematographyCategory; name: string; emoji: string }[] = [
   { id: 'cinematic', name: 'Cinematic', emoji: '🎬' },
@@ -93,14 +94,14 @@ export const CINEMATOGRAPHY_CATEGORIES: { id: CinematographyCategory; name: stri
   { id: 'era', name: 'Era', emoji: '📅' },
 ];
 
-// ==================== 预设列表 ====================
+// ==================== Preset Lists ====================
 
-// ---------- 电影类 (cinematic) ----------
+// ---------- Cinematic ----------
 
 const CINEMATIC_PROFILES: CinematographyProfile[] = [
   {
     id: 'classic-cinematic',
-    name: '经典电影',
+    name: 'Classic Cinematic',
     nameEn: 'Classic Cinematic',
     category: 'cinematic',
     description: 'Standard theatrical film texture with three-point lighting, natural color temperature, steady dolly movement, and a composed, grand frame',
@@ -117,7 +118,7 @@ const CINEMATIC_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'film-noir',
-    name: '黑色电影',
+    name: 'Film Noir',
     nameEn: 'Film Noir',
     category: 'cinematic',
     description: 'Low-key lighting, strong light-dark contrast, side light, cool tones, heavy atmosphere, and handheld breathing room',
@@ -134,7 +135,7 @@ const CINEMATIC_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'epic-blockbuster',
-    name: '史诗大片',
+    name: 'Epic Blockbuster',
     nameEn: 'Epic Blockbuster',
     category: 'cinematic',
     description: 'Bright high-key lighting, frontal light, deep depth of field, large crane moves, lens flare, and epic scale',
@@ -151,7 +152,7 @@ const CINEMATIC_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'intimate-drama',
-    name: '亲密剧情',
+    name: 'Intimate Drama',
     nameEn: 'Intimate Drama',
     category: 'cinematic',
     description: 'Natural side light, warm color temperature, shallow depth of field, static tripod framing, and quiet focus on character emotion',
@@ -168,7 +169,7 @@ const CINEMATIC_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'romantic-film',
-    name: '浪漫爱情',
+    name: 'Romantic Film',
     nameEn: 'Romantic Film',
     category: 'cinematic',
     description: 'Backlit golden-hour glow, ultra-shallow depth of field, smooth steadicam follow, god rays, and dreamy softness',
@@ -186,12 +187,12 @@ const CINEMATIC_PROFILES: CinematographyProfile[] = [
   },
 ];
 
-// ---------- 纪实类 (documentary) ----------
+// ---------- Documentary ----------
 
 const DOCUMENTARY_PROFILES: CinematographyProfile[] = [
   {
     id: 'documentary-raw',
-    name: '纪实手持',
+    name: 'Raw Documentary',
     nameEn: 'Raw Documentary',
     category: 'documentary',
     description: 'Handheld breathing room, natural light, medium depth of field, frontal light, no embellishment, and raw realism',
@@ -208,7 +209,7 @@ const DOCUMENTARY_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'news-report',
-    name: '新闻纪实',
+    name: 'News Report',
     nameEn: 'News Report',
     category: 'documentary',
     description: 'Shoulder-mounted, high-key lighting, deep depth of field, neutral color temperature, information-first framing, and crisp clarity',
@@ -225,12 +226,12 @@ const DOCUMENTARY_PROFILES: CinematographyProfile[] = [
   },
 ];
 
-// ---------- 风格化 (stylized) ----------
+// ---------- Stylized ----------
 
 const STYLIZED_PROFILES: CinematographyProfile[] = [
   {
     id: 'cyberpunk-neon',
-    name: '赛博朋克',
+    name: 'Cyberpunk Neon',
     nameEn: 'Cyberpunk Neon',
     category: 'stylized',
     description: 'Neon lighting, rim light, mixed color temperature, shallow depth of field, steadicam sliding, and a hazy atmosphere',
@@ -248,7 +249,7 @@ const STYLIZED_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'wuxia-classic',
-    name: '古典武侠',
+    name: 'Classic Wuxia',
     nameEn: 'Classic Wuxia',
     category: 'stylized',
     description: 'Natural side light, warm color temperature, medium depth of field, crane rises and drops, drifting mist, and classical elegance',
@@ -265,7 +266,7 @@ const STYLIZED_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'horror-thriller',
-    name: '恐怖惊悚',
+    name: 'Horror Thriller',
     nameEn: 'Horror Thriller',
     category: 'stylized',
     description: 'Low-key lighting, unsettling underlight, cool tones, shallow depth of field, shaky handheld movement, and dense fog',
@@ -282,7 +283,7 @@ const STYLIZED_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'music-video',
-    name: 'MV风格',
+    name: 'Music Video',
     nameEn: 'Music Video',
     category: 'stylized',
     description: 'Neon backlight, mixed color temperature, ultra-shallow depth of field, circling steadicam, floating light particles, and strong visual impact',
@@ -300,12 +301,12 @@ const STYLIZED_PROFILES: CinematographyProfile[] = [
   },
 ];
 
-// ---------- 类型片 (genre) ----------
+// ---------- Genre ----------
 
 const GENRE_PROFILES: CinematographyProfile[] = [
   {
     id: 'family-warmth',
-    name: '家庭温情',
+    name: 'Family Warmth',
     nameEn: 'Family Warmth',
     category: 'genre',
     description: 'Natural frontal light, 3200K warm tones, medium depth of field, tripod stability, and the warmth of sunlight in a living room',
@@ -322,7 +323,7 @@ const GENRE_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'action-intense',
-    name: '动作激烈',
+    name: 'Intense Action',
     nameEn: 'Intense Action',
     category: 'genre',
     description: 'High-key side light, neutral color temperature, medium depth of field, fast shoulder-mounted tracking, and flying dust',
@@ -340,7 +341,7 @@ const GENRE_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'suspense-mystery',
-    name: '悬疑推理',
+    name: 'Suspense Mystery',
     nameEn: 'Suspense Mystery',
     category: 'genre',
     description: 'Low-key side light, cool tones, shallow depth of field, slow dolly push, misty atmosphere, and controlled reveal',
@@ -357,12 +358,12 @@ const GENRE_PROFILES: CinematographyProfile[] = [
   },
 ];
 
-// ---------- 时代风格 (era) ----------
+// ---------- Era ----------
 
 const ERA_PROFILES: CinematographyProfile[] = [
   {
     id: 'hk-retro-90s',
-    name: '90s港片',
+    name: '90s Hong Kong',
     nameEn: '90s Hong Kong',
     category: 'era',
     description: 'Neon side light, mixed color temperature, medium depth of field, handheld movement, thin haze, and Wong Kar-wai melancholy',
@@ -379,7 +380,7 @@ const ERA_PROFILES: CinematographyProfile[] = [
   },
   {
     id: 'golden-age-hollywood',
-    name: '好莱坞黄金时代',
+    name: 'Golden Age Hollywood',
     nameEn: 'Golden Age Hollywood',
     category: 'era',
     description: 'High-key three-point lighting, warm color temperature, deep depth of field, graceful dolly movement, radiant glow, and elegant grandeur',

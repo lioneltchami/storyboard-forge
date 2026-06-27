@@ -86,7 +86,7 @@ function App() {
       isMigrating ||
       hasTriggeredStartupUpdateCheck ||
       !updateSettings.autoCheckEnabled ||
-      !window.appUpdater
+      !window.appUpdater?.enabled
     ) {
       return;
     }

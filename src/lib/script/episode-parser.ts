@@ -54,7 +54,7 @@ export function parseFullScript(fullText: string): {
   
   // 1. 提取标题
   const titleMatch = fullText.match(/[《「]([^》」]+)[》」]/);
-  const title = titleMatch ? titleMatch[1] : '未命名剧本';
+  const title = titleMatch ? titleMatch[1] : 'Untitled script';
   
   // 2. 提取大纲（从"大纲："到"人物小传："之间的内容）
   // 支持 Markdown 格式：**大纲：** 或 大纲： 或 【大纲】
@@ -397,7 +397,7 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
           // 也处理整个描述就是时间词的情况
           if (rawDesc === tw) {
             timeOfDay = tw;
-            locationDesc = '未知地点';
+            locationDesc = 'Unknown location';
             break;
           }
         }
@@ -411,7 +411,7 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
         }
         
         // 将中文逗号分隔的地点拼接成可读格式
-        const location = locationDesc.replace(/[，,]/g, ' ').replace(/\s+/g, ' ').trim() || '未知地点';
+        const location = locationDesc.replace(/[，,]/g, ' ').replace(/\s+/g, ' ').trim() || 'Unknown location';
         
         // 构建标准格式的场景头，供下游代码使用
         const sceneHeader = interior 
@@ -454,7 +454,7 @@ export function parseScenes(episodeText: string): SceneRawContent[] {
     const sceneNumber = match[1]; // 如 "1-1"
     const timeOfDay = match[2];   // 如 "日"、"夜"
     const interior = match[3];    // 如 "内"、"外"
-    const location = match[4]?.trim() || '未知地点';
+    const location = match[4]?.trim() || 'Unknown location';
     
     // 获取场景内容（从当前场景头到下一个场景头之间）
     const startIndex = match.index! + match[0].length;
@@ -1061,7 +1061,7 @@ export function convertToScriptData(
     title: background.title,
     genre: detectGenre(background.outline, background.characterBios),
     logline: extractLogline(background.outline),
-    language: '中文',
+    language: 'Chinese',
     characters,
     episodes,
     scenes,

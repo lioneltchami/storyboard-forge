@@ -408,6 +408,7 @@ export function SettingsPanel() {
   const [activeTab, setActiveTab] = useState<string>("api");
   const hasStorageManager = typeof window !== "undefined" && !!window.storageManager;
   const hasAppUpdater = typeof window !== "undefined" && !!window.appUpdater;
+  const updatesEnabled = typeof window !== "undefined" && !!window.appUpdater?.enabled;
 
   const formatBytes = useCallback((bytes: number) => {
     if (!bytes) return "0 B";
@@ -644,6 +645,11 @@ export function SettingsPanel() {
   };
 
   const handleCheckForUpdates = async () => {
+    if (!window.appUpdater?.enabled) {
+      toast.info("App updates are temporarily disabled in this build.");
+      return;
+    }
+
     if (!window.appUpdater) {
       toast.error("Use this feature in the desktop app.");
       return;
@@ -1581,7 +1587,7 @@ export function SettingsPanel() {
                     variant="outline"
                     size="sm"
                     onClick={handleCheckForUpdates}
-                    disabled={!hasAppUpdater || isCheckingForUpdates}
+                    disabled={!hasAppUpdater || !updatesEnabled || isCheckingForUpdates}
                   >
                     {isCheckingForUpdates ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-1" />
@@ -1600,11 +1606,17 @@ export function SettingsPanel() {
                     </p>
                   </div>
                   <Switch
-                    checked={updateSettings.autoCheckEnabled}
+                    checked={updateSettings.autoCheckEnabled && updatesEnabled}
                     onCheckedChange={(checked) => setUpdateSettings({ autoCheckEnabled: checked })}
-                    disabled={!hasAppUpdater}
+                    disabled={!hasAppUpdater || !updatesEnabled}
                   />
                 </div>
+
+                {!updatesEnabled && (
+                  <p className="text-xs text-muted-foreground">
+                    Update checks are paused in this build while the release channel is being set up.
+                  </p>
+                )}
 
                 {updateSettings.ignoredVersion && (
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 px-3 py-2">

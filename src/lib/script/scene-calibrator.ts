@@ -291,7 +291,7 @@ export async function calibrateScenes(
       sceneId: scene.id,
       name: scene.name || scene.location,
       location: scene.location,
-      characters: sceneStat?.characters?.slice(0, 5).join(', ') || '未知',
+      characters: sceneStat?.characters?.slice(0, 5).join(', ') || 'Unknown',
       appearCount: sceneStat?.appearanceCount || 1,
       episodes: sceneStat?.episodeNumbers?.join(',') || '1',
       actionSamples: sceneStat?.actionSamples?.slice(0, 3) || [],
@@ -512,7 +512,7 @@ ${sceneList}
     return {
       scenes: fallbackScenes,
       mergeRecords: [],
-      analysisNotes: 'AI校准失败，返回基于统计的结果',
+      analysisNotes: 'AI calibration failed; returning statistics-based results',
     };
   }
 }
@@ -571,8 +571,8 @@ async function enrichScenesWithVisualPrompts(
 
 【剧本信息】
 剧名：《${background.title}》
-类型：${background.genre || '未知类型'}
-时代：${background.era || '未知'}
+类型：${background.genre || 'Unknown type'}
+时代：${background.era || 'Unknown'}
 
 【故事大纲】
 ${background.outline?.slice(0, 1000) || '无'}
@@ -582,11 +582,11 @@ ${background.outline?.slice(0, 1000) || '无'}
 
 ${keyScenes.map((s, i) => `${i+1}. ${s.name}
    - 重要性：${s.importance === 'main' ? '主场景' : '次要场景'}
-   - 建筑风格：${s.architectureStyle || '未知'}
-   - 光影：${s.lightingDesign || '未知'}
-   - 色彩：${s.colorPalette || '未知'}
-   - 道具：${s.keyProps?.join(', ') || '未知'}
-   - 时代：${s.eraDetails || '未知'}`).join('\n\n')}
+   - 建筑风格：${s.architectureStyle || 'Unknown'}
+   - 光影：${s.lightingDesign || 'Unknown'}
+   - 色彩：${s.colorPalette || 'Unknown'}
+   - 道具：${s.keyProps?.join(', ') || 'Unknown'}
+   - 时代：${s.eraDetails || 'Unknown'}`).join('\n\n')}
 
 【输出要求】
 为每个场景生成：

@@ -51,6 +51,7 @@ declare global {
       }) => Promise<{ success: boolean; filePath?: string; canceled?: boolean; error?: string }>;
     };
     appUpdater?: {
+      enabled: boolean;
       getCurrentVersion: () => Promise<string>;
       checkForUpdates: () => Promise<UpdateCheckResult>;
       openExternalLink: (url: string) => Promise<OpenExternalResult>;

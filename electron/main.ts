@@ -21,6 +21,7 @@ import type { AvailableUpdateInfo, OpenExternalResult, UpdateCheckResult, Update
 // │   └── index.html
 //
 process.env.APP_ROOT = path.join(__dirname, '../..')
+const APP_ICON_PATH = path.join(process.env.APP_ROOT, 'build', 'icon.png')
 
 export const VITE_DEV_SERVER_URL = process.env['ELECTRON_RENDERER_URL'] || process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(__dirname)
@@ -31,6 +32,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 type PackageUpdateConfig = {
+  enabled?: boolean
   manifestUrl?: string
   defaultGithubUrl?: string
   defaultBaiduUrl?: string
@@ -103,6 +105,10 @@ function getDefaultBaiduCode() {
     : undefined
 }
 
+function areUpdatesEnabled() {
+  return packageUpdateConfig.enabled !== false && !!getUpdateManifestUrl()
+}
+
 async function fetchUpdateManifest() {
   const manifestUrl = getUpdateManifestUrl()
   if (!manifestUrl) {
@@ -141,6 +147,10 @@ async function fetchUpdateManifest() {
 }
 
 async function resolveAvailableUpdate(currentVersion: string): Promise<AvailableUpdateInfo | null> {
+  if (!areUpdatesEnabled()) {
+    return null
+  }
+
   const manifest = await fetchUpdateManifest()
   if (compareVersions(manifest.version, currentVersion) <= 0) {
     return null
@@ -160,6 +170,7 @@ async function resolveAvailableUpdate(currentVersion: string): Promise<Available
 function createWindow() {
   win = new BrowserWindow({
     title: 'Storyboard Forge',
+    icon: APP_ICON_PATH,
     width: 1400,
     height: 900,
     minWidth: 1200,
@@ -1596,7 +1607,7 @@ ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filt
 
 // ==================== Demo Project Seed ====================
 const DEMO_PROJECT_ID = 'a4bbe260-0127-49c7-9230-e766402663c7'
-const LEGACY_DEMO_PROJECT_TITLE = '灌篮少女（演示）'
+const LEGACY_DEMO_PROJECT_TITLE = 'Basketball Girl (Demo)'
 
 /**
  * Get the path to bundled demo-data.
@@ -1777,6 +1788,10 @@ app.whenReady().then(() => {
   // Seed demo project on first run (before window creation)
   seedDemoProject()
   migratePersistedDemoProject()
+
+  if (process.platform === 'darwin' && fs.existsSync(APP_ICON_PATH)) {
+    app.dock.setIcon(APP_ICON_PATH)
+  }
 
   scheduleAutoClean()
   // Handle local-image:// protocol
