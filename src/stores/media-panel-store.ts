@@ -89,7 +89,7 @@ export interface PendingDirectorData {
   sceneCount?: number; // 1 for single shot, N for scene with N shots
   styleId?: string; // Visual style from script
   sourceType?: 'shot' | 'scene' | 'episode'; // What triggered this jump
-  // 集作用域透传
+  // Episode-scope passthrough
   sourceEpisodeIndex?: number;
   sourceEpisodeId?: string;
 }
@@ -106,24 +106,24 @@ export interface PendingCharacterData {
   keyActions?: string;
   appearance?: string;
   relationships?: string;
-  tags?: string[];    // 角色标签
-  notes?: string;     // 角色备注
+  tags?: string[];    // Character tags
+  notes?: string;     // Character notes
   styleId?: string;
-  // 集作用域透传
+  // Episode-scope passthrough
   sourceEpisodeIndex?: number;
   sourceEpisodeId?: string;
-  // === 年代信息（从剧本元数据传递）===
-  storyYear?: number;  // 故事年份，如 2002
-  era?: string;        // 时代背景描述
-  // === 提示词语言偏好（从剧本面板透传）===
+  // === Era information (passed through from script metadata) ===
+  storyYear?: number;  // Story year, e.g. 2002
+  era?: string;        // Era background description
+  // === Prompt-language preference (passed through from the script panel) ===
   promptLanguage?: import('@/types/script').PromptLanguage;  // 'zh' | 'en' | 'zh+en'
-  // === 专业角色设计字段（世界级大师生成） ===
-  visualPromptEn?: string;  // 英文视觉提示词
-  visualPromptZh?: string;  // 中文视觉提示词
-  // === 6层身份锚点（角色一致性） ===
-  identityAnchors?: CharacterIdentityAnchors;  // 身份锚点 - 6层特征锁定
-  negativePrompt?: CharacterNegativePrompt;    // 负面提示词
-  // === 多阶段角色支持 ===
+  // === Professional character-design fields (world-class generator output) ===
+  visualPromptEn?: string;  // English visual prompt
+  visualPromptZh?: string;  // Chinese visual prompt
+  // === 6-layer identity anchors (character consistency) ===
+  identityAnchors?: CharacterIdentityAnchors;  // Identity anchors - 6-layer feature lock
+  negativePrompt?: CharacterNegativePrompt;    // Negative prompt
+  // === Multi-stage character support ===
   stageInfo?: {
     stageName: string;
     episodeRange: [number, number];
@@ -138,54 +138,54 @@ export interface PendingCharacterData {
 
 // Data passed from script panel to scene library
 export interface PendingSceneData {
-  // === 基础信息 ===
+  // === Basic information ===
   name: string;
   location: string;
   time?: string;
   atmosphere?: string;
   styleId?: string;
-  tags?: string[];        // 场景标签
-  notes?: string;         // 场景备注
-  // 集作用域透传
+  tags?: string[];        // Scene tags
+  notes?: string;         // Scene notes
+  // Episode-scope passthrough
   sourceEpisodeIndex?: number;
   sourceEpisodeId?: string;
-  // 提示词语言偏好
+  // Prompt-language preference
   promptLanguage?: import('@/types/script').PromptLanguage;
   
-  // === 专业场景设计（完整传递）===
-  visualPrompt?: string;       // 中文视觉描述
-  visualPromptEn?: string;     // 英文视觉描述
-  architectureStyle?: string;  // 建筑风格
-  lightingDesign?: string;     // 光影设计
-  colorPalette?: string;       // 色彩基调
-  eraDetails?: string;         // 时代特征
-  keyProps?: string[];         // 关键道具
-  spatialLayout?: string;      // 空间布局
+  // === Professional scene-design fields (full passthrough) ===
+  visualPrompt?: string;       // Chinese visual description
+  visualPromptEn?: string;     // English visual description
+  architectureStyle?: string;  // Architectural style
+  lightingDesign?: string;     // Lighting design
+  colorPalette?: string;       // Color palette
+  eraDetails?: string;         // Era details
+  keyProps?: string[];         // Key props
+  spatialLayout?: string;      // Spatial layout
   
-  // === 多视角联合图数据 ===
-  viewpoints?: PendingViewpointData[];           // 视角列表
-  contactSheetPrompts?: ContactSheetPromptSet[]; // 联合图提示词（可能多张）
+  // === Multi-view contact-sheet data ===
+  viewpoints?: PendingViewpointData[];           // Viewpoint list
+  contactSheetPrompts?: ContactSheetPromptSet[]; // Contact-sheet prompts (may span multiple pages)
 }
 
-// 待生成的视角数据
+// Pending viewpoint data
 export interface PendingViewpointData {
-  id: string;           // 视角ID
-  name: string;         // 中文名：餐桌区、沙发区
-  nameEn: string;       // 英文名
-  shotIds: string[];    // 关联的分镜ID
-  shotIndexes: number[]; // 关联的分镜序号（用于展示）
-  keyProps: string[];   // 道具（中文）
-  keyPropsEn: string[]; // 道具（英文）
-  gridIndex: number;    // 在联合图中的位置
-  pageIndex: number;    // 属于第几张联合图（从0开始）
+  id: string;           // Viewpoint ID
+  name: string;         // Chinese name, e.g. dining area or sofa area
+  nameEn: string;       // English name
+  shotIds: string[];    // Linked shot IDs
+  shotIndexes: number[]; // Linked shot indices (for display)
+  keyProps: string[];   // Props in Chinese
+  keyPropsEn: string[]; // Props in English
+  gridIndex: number;    // Position within the contact sheet
+  pageIndex: number;    // Which contact sheet page this belongs to (0-based)
 }
 
-// 联合图提示词集合（支持多张）
+// Contact-sheet prompt set (supports multiple pages)
 export interface ContactSheetPromptSet {
-  pageIndex: number;          // 第几张联合图（从0开始）
-  prompt: string;             // 英文提示词
-  promptZh: string;           // 中文提示词
-  viewpointIds: string[];     // 包含哪些视角ID
+  pageIndex: number;          // Which contact-sheet page this is (0-based)
+  prompt: string;             // English prompt
+  promptZh: string;           // Chinese prompt
+  viewpointIds: string[];     // Viewpoint IDs included
   gridLayout: { rows: number; cols: number };
 }
 
@@ -196,7 +196,7 @@ interface MediaPanelStore {
   setActiveTab: (tab: Tab) => void;
   setActiveStage: (stage: Stage) => void;
   setInProject: (inProject: boolean) => void;
-  // Episode scope (子项目作用域)
+  // Episode scope (sub-project scope)
   activeEpisodeIndex: number | null;
   activeEpisodeScopeKey: string | null; // `${projectId}::ep-${episodeIndex}`
   enterEpisode: (index: number, projectId?: string) => void;
@@ -230,7 +230,7 @@ export const useMediaPanelStore = create<MediaPanelStore>((set) => ({
     } else if (tab === "dashboard") {
       set({ activeTab: tab, inProject: false, activeEpisodeIndex: null, activeEpisodeScopeKey: null });
     } else if (tab === "overview" || tab === "freedom") {
-      // 项目级 tab（无 stage 但属于项目内）
+      // Project-level tabs (no stage, but still part of the project)
       set({ activeTab: tab, inProject: true });
     } else {
       set({ activeTab: tab });

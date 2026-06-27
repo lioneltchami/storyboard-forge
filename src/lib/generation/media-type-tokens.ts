@@ -2,21 +2,21 @@
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
- * Media-Type Tokens — 摄影参数 × 媒介类型翻译层
+ * Media-Type Tokens - translation layer for cinematography parameters by media type
  *
- * 核心职责：根据视觉风格的 mediaType，将物理摄影 promptToken 翻译为
- * 该媒介能驾驭的等效表达。
+ * Core responsibility: translate physical cinematography prompt tokens into
+ * equivalent expressions that each media type can handle.
  *
- * 翻译策略：
- * - cinematic  → 直通，保留全部物理摄影词汇
- * - animation  → 虚拟摄像机语义适配（轨道→视差平移、景深→层次模糊）
- * - stop-motion → 微缩实拍约束（轨道→微型滑轨、景深→微距镜头）
- * - graphic    → 跳过物理参数，灯光→色彩/情绪/节奏描述
+ * Translation strategy:
+ * - cinematic  -> pass through, keep all physical cinematography terms
+ * - animation  -> adapt to virtual-camera semantics (dolly -> parallax motion, DOF -> layered blur)
+ * - stop-motion -> constrain to miniature live-action semantics (dolly -> miniature track, DOF -> macro lens)
+ * - graphic    -> skip physical parameters and express lighting as color / mood / rhythm
  */
 
 import type { MediaType } from '@/lib/constants/visual-styles';
 
-// ==================== 字段类型 ====================
+// ==================== Field types ====================
 
 export type CinematographyField =
   | 'cameraRig'
@@ -34,19 +34,19 @@ export type CinematographyField =
   | 'focalLength'
   | 'photographyTechnique';
 
-// ==================== 翻译表 ====================
+// ==================== Translation tables ====================
 
 /**
- * 每种非-cinematic 媒介的字段级翻译表。
+ * Field-level translation table for each non-cinematic media type.
  * - key = preset id
- * - value = 替换后的 promptToken（空字符串 = 静默跳过）
+ * - value = replacement promptToken (empty string = silent skip)
  *
- * 不在表中的 preset id → 沿用原始 token（兼容未来新增预设）
+ * preset ids not in the table -> keep the original token (compatible with future presets)
  */
 type FieldOverrides = Record<string, string>;
 
 /**
- * 'skip' 表示该字段在该媒介下整体跳过（返回空字符串）
+ * 'skip' means this field should be skipped entirely for the media type (return an empty string).
  */
 type FieldStrategy = FieldOverrides | 'skip';
 
@@ -80,8 +80,8 @@ const ANIMATION_TABLE: MediaTranslationTable = {
     'pull-focus':   'focus tracking subject movement,',
   },
   // lightingStyle / lightingDirection / colorTemperature / movementSpeed / playbackSpeed
-  // → 概念相通，不做翻译，沿用原始 token
-  // cameraAngle / focalLength / photographyTechnique → 虚拟摄像机可直接使用
+  // -> conceptually compatible, so we keep the original token
+  // cameraAngle / focalLength / photographyTechnique -> can be used directly by a virtual camera
 };
 
 // ---------- stop-motion ----------
@@ -123,7 +123,7 @@ const STOP_MOTION_TABLE: MediaTranslationTable = {
 // ---------- graphic ----------
 
 const GRAPHIC_TABLE: MediaTranslationTable = {
-  // 物理摄影参数 → 全部跳过
+  // Physical cinematography parameters -> skip entirely
   cameraRig:       'skip',
   movementSpeed:   'skip',
   depthOfField:    'skip',
@@ -132,7 +132,7 @@ const GRAPHIC_TABLE: MediaTranslationTable = {
   cameraAngle:             'skip',
   focalLength:             'skip',
   photographyTechnique:    'skip',
-  // 灯光风格 → 转译为色彩/情绪
+  // Lighting style -> translate into color / mood
   lightingStyle: {
     'high-key':    'bright palette, open composition,',
     'low-key':     'dark tones, heavy contrast areas,',
@@ -143,7 +143,7 @@ const GRAPHIC_TABLE: MediaTranslationTable = {
     candlelight:   'warm golden amber tint,',
     moonlight:     'cool blue-silver tint,',
   },
-  // 色温 → 色调倾向
+  // Color temperature -> tone bias
   colorTemperature: {
     warm:          'warm orange-amber tones,',
     neutral:       'balanced neutral palette,',
@@ -152,7 +152,7 @@ const GRAPHIC_TABLE: MediaTranslationTable = {
     'blue-hour':   'twilight blue-purple cast,',
     mixed:         'mixed warm and cool accents,',
   },
-  // 播放速度 → 节奏描述
+  // Playback speed -> rhythm description
   playbackSpeed: {
     'slow-motion-4x': 'slow deliberate pacing,',
     'slow-motion-2x': 'slow pacing,',
@@ -162,25 +162,25 @@ const GRAPHIC_TABLE: MediaTranslationTable = {
   },
 };
 
-// ---------- 汇总查找 ----------
+// ---------- Lookup table summary ----------
 
 const TRANSLATION_TABLES: Partial<Record<MediaType, MediaTranslationTable>> = {
-  animation:      ANIMATION_TABLE,
-  'stop-motion':  STOP_MOTION_TABLE,
-  graphic:        GRAPHIC_TABLE,
-  // cinematic 不需要翻译表
+  animation: ANIMATION_TABLE,
+  'stop-motion': STOP_MOTION_TABLE,
+  graphic: GRAPHIC_TABLE,
+  // cinematic does not need a translation table
 };
 
-// ==================== 核心函数 ====================
+// ==================== Core functions ====================
 
 /**
- * 将摄影参数 token 翻译为当前媒介类型的等效表达。
+ * Translate a cinematography token into the equivalent expression for the current media type.
  *
- * @param mediaType   - 当前视觉风格的媒介类型
- * @param field       - 摄影参数维度
- * @param presetId    - 预设 ID（如 'dolly', 'shallow'）
- * @param originalToken - 原始 promptToken（来自预设数据）
- * @returns 翻译后的 token；空字符串表示该参数在此媒介下不适用
+ * @param mediaType   - Current visual style's media type
+ * @param field       - Cinematography field
+ * @param presetId    - Preset ID (for example 'dolly' or 'shallow')
+ * @param originalToken - Original promptToken from preset data
+ * @returns Translated token; an empty string means the parameter does not apply to this media type
  */
 export function translateToken(
   mediaType: MediaType,
@@ -188,7 +188,7 @@ export function translateToken(
   presetId: string,
   originalToken: string,
 ): string {
-  // cinematic → 直通
+  // cinematic -> pass through
   if (mediaType === 'cinematic') return originalToken;
 
   const table = TRANSLATION_TABLES[mediaType];
@@ -196,19 +196,19 @@ export function translateToken(
 
   const strategy = table[field];
 
-  // 该字段无特殊处理 → 沿用原始 token
+  // No special handling for this field -> keep the original token
   if (strategy === undefined) return originalToken;
 
-  // 整体跳过
+  // Skip entirely
   if (strategy === 'skip') return '';
 
-  // 查表替换
+  // Replace via lookup table
   const override = strategy[presetId];
   return override !== undefined ? override : originalToken;
 }
 
 /**
- * 判断某个字段在当前媒介下是否被跳过（UI 可用此决定是否显示灰色）
+ * Check whether a field is skipped for the current media type (UI can use this to gray it out).
  */
 export function isFieldSkipped(mediaType: MediaType, field: CinematographyField): boolean {
   if (mediaType === 'cinematic') return false;
@@ -217,7 +217,7 @@ export function isFieldSkipped(mediaType: MediaType, field: CinematographyField)
 }
 
 /**
- * 获取媒介类型的简要指导说明（用于 AI 校准 system prompt）
+ * Get a short guidance string for the media type (used in the AI calibration system prompt).
  */
 export function getMediaTypeGuidance(mediaType: MediaType): string {
   switch (mediaType) {

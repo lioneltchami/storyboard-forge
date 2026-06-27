@@ -43,7 +43,7 @@ export function Layout() {
   }
 
   // Full-screen views (no resizable panels)
-  // 这些板块有自己的多栏布局，不需要全局的预览和属性面板
+  // These sections have their own multi-column layouts and do not need the global preview or properties panels.
   const fullScreenTabs = ["export", "settings", "overview", "script", "characters", "scenes", "freedom", "assets"];
   if (fullScreenTabs.includes(activeTab)) {
     return (
@@ -73,7 +73,7 @@ export function Layout() {
       case "script":
         return <ScriptView />;
       case "director":
-        // 保持原有 AI 导演功能
+        // Preserve the existing AI Director experience.
         return <DirectorView />;
       case "sclass":
         return <SClassView />;

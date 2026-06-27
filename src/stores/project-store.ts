@@ -31,7 +31,7 @@ type PersistedProjectStore = {
   activeProjectId?: string | null;
 };
 
-// Default project for desktop app
+// Default project for the desktop app
 const DEFAULT_PROJECT: Project = {
   id: "default-project",
   name: "Storyboard Forge Project",
@@ -73,8 +73,8 @@ export const useProjectStore = create<ProjectStore>()(
         };
         set((state) => ({
           projects: [newProject, ...state.projects],
-          // 不在这里设置 activeProjectId —— 由 switchProject() 统一处理
-          // 避免 switchProject 因 ID 已相同而跳过 rehydration
+          // Do not set activeProjectId here; switchProject() handles that centrally.
+          // This avoids skipping rehydration when the ID is already the same.
         }));
         return newProject;
       },
@@ -102,7 +102,7 @@ export const useProjectStore = create<ProjectStore>()(
             activeProject: nextActive,
           };
         });
-        // Clean up per-project storage directory
+        // Clean up the per-project storage directory
         if (window.fileStorage?.removeDir) {
           window.fileStorage.removeDir(`_p/${id}`).catch((err: unknown) =>
             console.warn(`[ProjectStore] Failed to remove project dir _p/${id}:`, err)
@@ -146,8 +146,8 @@ export const useProjectStore = create<ProjectStore>()(
         state.activeProjectId = project?.id || null;
         state.activeProject = project;
 
-        // 异步扫描磁盘上 _p/ 目录，将遗漏的项目恢复到列表中
-        // 解决路径切换/导入/迁移后项目列表为空的问题
+        // Asynchronously scan the _p/ directory and restore any missing projects.
+        // This fixes empty project lists after path changes, imports, or migrations.
         discoverProjectsFromDisk().catch((err) =>
           console.warn('[ProjectStore] Disk discovery failed:', err)
         );
@@ -170,7 +170,7 @@ async function discoverProjectsFromDisk(): Promise<void> {
   if (!window.fileStorage?.listDirs) return;
 
   try {
-    // 列出 _p/ 下所有子目录名（每个子目录名就是一个 projectId）
+    // List every subdirectory under _p/ (each folder name is a projectId)
     const diskProjectIds = await window.fileStorage.listDirs('_p');
     if (!diskProjectIds || diskProjectIds.length === 0) return;
 
@@ -185,13 +185,13 @@ async function discoverProjectsFromDisk(): Promise<void> {
       missingIds.map((id) => id.substring(0, 8))
     );
 
-      // 尝试从每个遗漏项目的 director / script 文件中提取项目名
+      // Try to extract project names from each missing project's director/script files
       const recoveredProjects: Project[] = [];
       for (const pid of missingIds) {
         let name = `Recovered Project (${pid.substring(0, 8)})`;
       const createdAt = Date.now();
 
-      // 尝试从 script 文件获取名称
+      // Try to get the name from the script file
       try {
         const scriptCandidates = [
           `_p/${pid}/script`,
@@ -202,7 +202,7 @@ async function discoverProjectsFromDisk(): Promise<void> {
           if (!scriptRaw) continue;
           const parsed = JSON.parse(scriptRaw);
           const state = parsed?.state ?? parsed;
-          // script-store 的 projects 字段中可能有项目信息
+          // The script store's projects field may contain project info
           if (state?.projects?.[pid]?.title) {
             name = state.projects[pid].title;
             break;
@@ -210,7 +210,7 @@ async function discoverProjectsFromDisk(): Promise<void> {
         }
       } catch { /* ignore */ }
 
-      // 尝试从 director 文件获取创建时间等信息
+      // Try to read creation time and similar metadata from the director file
       try {
         const directorCandidates = [
           `_p/${pid}/director`,
@@ -222,12 +222,12 @@ async function discoverProjectsFromDisk(): Promise<void> {
           const parsed = JSON.parse(directorRaw);
           const state = parsed?.state ?? parsed;
           if (state?.projects?.[pid]?.screenplay) {
-            // 有剧本内容，说明确实是有效项目
+            // Script content means this is a valid project
             const screenplay = state.projects[pid].screenplay;
             if (!name.includes('Recovered Project')) {
-              // 已经有名称了，不覆盖
+              // Already has a name, do not overwrite it
             } else if (screenplay) {
-              // 用剧本前几个字做临时名称
+              // Use the first few words of the script as a temporary name
               const preview = screenplay.substring(0, 20).replace(/\n/g, ' ').trim();
               if (preview) name = preview + '...';
             }
