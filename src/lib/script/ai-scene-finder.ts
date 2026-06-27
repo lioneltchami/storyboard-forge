@@ -272,7 +272,7 @@ ${contexts.slice(0, 3).join('\n\n')}
       notes: ensureString(parsed.notes),
     };
   } catch (error) {
-    console.error('[generateSceneData] AI生成失败:', error);
+    console.error('[generateSceneData] AI generation failed:', error);
     // 返回基础数据
     return {
       id: `scene_${Date.now()}`,
@@ -306,7 +306,7 @@ export async function findSceneByDescription(
       confidence: 0,
       episodeNumbers: [],
       contexts: [],
-      message: '无法识别场景名。请用类似"缺第5集的张家客厅"或"添加医院走廊这个场景"的方式描述。',
+      message: 'Could not identify the scene name. Try something like "missing Zhang family living room from episode 5" or "add this hospital hallway scene".',
     };
   }
   
@@ -328,7 +328,7 @@ export async function findSceneByDescription(
       confidence: 1,
       episodeNumbers: [],
       contexts: [],
-      message: `场景「${existing.name || existing.location}」已存在于场景列表中。`,
+      message: `Scene "${existing.name || existing.location}" already exists in the scene list.`,
       scene: existing,
     };
   }
@@ -345,8 +345,8 @@ export async function findSceneByDescription(
       episodeNumbers: [],
       contexts: [],
       message: episodeNumber 
-        ? `在第 ${episodeNumber} 集中未找到场景「${name}」。是否仍要创建这个场景？`
-        : `在剧本中未找到场景「${name}」。是否仍要创建这个场景？`,
+        ? `Could not find scene "${name}" in episode ${episodeNumber}. Create it anyway?`
+        : `Could not find scene "${name}" in the script. Create it anyway?`,
     };
   }
   
@@ -372,7 +372,7 @@ export async function findSceneByDescription(
     confidence,
     episodeNumbers: searchResult.episodeNumbers,
     contexts: searchResult.contexts,
-    message: `找到场景「${scene.name || scene.location}」，出现在第 ${searchResult.episodeNumbers.join(', ')} 集。`,
+    message: `Found scene "${scene.name || scene.location}" in episode ${searchResult.episodeNumbers.join(', ')}.`,
     scene,
   };
 }
@@ -388,7 +388,7 @@ export function quickSearchScene(
   const { name, episodeNumber } = parseSceneQuery(userQuery);
   
   if (!name) {
-    return { name: null, found: false, message: '请输入场景名' };
+    return { name: null, found: false, message: 'Please enter a scene name.' };
   }
   
   // 检查已存在
@@ -404,7 +404,7 @@ export function quickSearchScene(
     return { 
       name: existing.name || existing.location, 
       found: true, 
-      message: `场景「${existing.name || existing.location}」已存在`,
+      message: `Scene "${existing.name || existing.location}" already exists.`,
       existingScene: existing,
     };
   }
@@ -416,13 +416,13 @@ export function quickSearchScene(
     return {
       name,
       found: true,
-      message: `找到「${name}」，出现在第 ${searchResult.episodeNumbers.join(', ')} 集`,
+      message: `Found "${name}" in episode ${searchResult.episodeNumbers.join(', ')}.`,
     };
   }
   
   return {
     name,
     found: false,
-    message: `未在剧本中找到「${name}」`,
+    message: `Could not find "${name}" in the script.`,
   };
 }

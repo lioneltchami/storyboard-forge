@@ -1817,8 +1817,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     } catch (error) {
       const err = error as Error;
 
-      // 用户主动取消：abort() 触发的 AbortError 或自定义 '用户已取消'
-      if (err.name === 'AbortError' || err.message === '用户已取消') {
+      // User cancelled: AbortError or our custom sentinel
+      if (err.name === 'AbortError' || err.message === 'Cancelled by user') {
         console.log(`[SplitScenes] Scene ${sceneId} video generation cancelled by user`);
         setIsGenerating(false);
         setCurrentGeneratingId(null);
@@ -2142,7 +2142,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
           await new Promise<void>((resolve, reject) => {
             const tid = setTimeout(resolve, pollInterval);
-            imageSignal.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('用户已取消')); }, { once: true });
+            imageSignal.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('Cancelled by user')); }, { once: true });
           });
         }
         throw new Error('Image generation timed out');
@@ -2152,8 +2152,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     } catch (error) {
       const err = error as Error;
 
-      // 用户主动取消：abort() 触发的 AbortError 或自定义 '用户已取消'
-      if (err.name === 'AbortError' || err.message === '用户已取消') {
+      // User cancelled: AbortError or our custom sentinel
+      if (err.name === 'AbortError' || err.message === 'Cancelled by user') {
         console.log(`[SplitScenes] Scene ${sceneId} image generation cancelled by user`);
         setIsGenerating(false);
         return;
@@ -3274,7 +3274,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
           await new Promise<void>((resolve, reject) => {
             const tid = setTimeout(resolve, pollInterval);
-            endFrameSignal.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('用户已取消')); }, { once: true });
+            endFrameSignal.addEventListener('abort', () => { clearTimeout(tid); reject(new Error('Cancelled by user')); }, { once: true });
           });
         }
         throw new Error('End frame generation timed out');
@@ -3284,8 +3284,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     } catch (error) {
       const err = error as Error;
 
-      // 用户主动取消：abort() 触发的 AbortError 或自定义 '用户已取消'
-      if (err.name === 'AbortError' || err.message === '用户已取消') {
+      // User cancelled: AbortError or our custom sentinel
+      if (err.name === 'AbortError' || err.message === 'Cancelled by user') {
         console.log(`[SplitScenes] Scene ${sceneId} end frame generation cancelled by user`);
         setIsGenerating(false);
         return;
