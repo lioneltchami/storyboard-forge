@@ -530,7 +530,7 @@ export async function calibrateEpisodeScenes(
   // 找到该集的剧本
   const episodeScript = episodeScripts.find(ep => ep.episodeIndex === episodeIndex);
   if (!episodeScript) {
-    throw new Error(`找不到第 ${episodeIndex} 集的剧本`);
+    throw new Error(`Could not find the script for episode ${episodeIndex}.`);
   }
   
   // 只校准该集的场景

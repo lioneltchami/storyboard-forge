@@ -165,16 +165,16 @@ export async function processBatched<TItem, TResult>(
 
   // 单批次无需并发调度
   if (batches.length === 1) {
-    onProgress?.(0, 1, `处理中 (1/1)...`);
+    onProgress?.(0, 1, `Processing (1/1)...`);
     try {
       const result = await executeBatchWithRetry(
         batches[0], feature, buildPrompts, parseResult, apiOptions,
       );
-      onProgress?.(1, 1, '完成');
+      onProgress?.(1, 1, 'Complete');
       return { results: result, failedBatches: 0, totalBatches: 1 };
     } catch (err) {
       console.error('[BatchProcessor] 唯一批次失败:', err);
-      onProgress?.(1, 1, '失败');
+      onProgress?.(1, 1, 'Failed');
       return { results: new Map(), failedBatches: 1, totalBatches: 1 };
     }
   }
@@ -185,7 +185,7 @@ export async function processBatched<TItem, TResult>(
 
   const batchTasks = batches.map((batch, idx) => {
     return async () => {
-      onProgress?.(completedCount, batches.length, `处理批次 ${idx + 1}/${batches.length}...`);
+      onProgress?.(completedCount, batches.length, `Processing batch ${idx + 1}/${batches.length}...`);
       const result = await executeBatchWithRetry(
         batch, feature, buildPrompts, parseResult, apiOptions,
       );

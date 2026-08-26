@@ -178,8 +178,8 @@ export async function calibrateShotsMultiStage(
   }
 
   // ===================== Stage 1: 叙事骨架 =====================
-  onStageProgress?.(1, 5, '叙事骨架');
-  console.log('[MultiStage] Stage 1/5: 叙事骨架');
+  onStageProgress?.(1, 5, 'Narrative structure');
+  console.log('[MultiStage] Stage 1/5: Narrative structure');
 
   const s1System = `你是电影叙事分析师，精通镜头语言和叙事结构。分析每个分镜的叙事功能并确定镜头参数。
 
@@ -220,7 +220,7 @@ ${contextLine}${narrativeAnchorBlock}${episodeSynopsis ? `\n\n【本集大纲】
   }
 
   // ===================== Stage 2: 视觉描述 + 音频 =====================
-  onStageProgress?.(2, 5, '视觉描述');
+  onStageProgress?.(2, 5, 'Visual description');
   console.log('[MultiStage] Stage 2/5: 视觉描述');
   const includeEnVisualPrompt = promptLanguage !== 'zh';
   const s2VisualPromptRule = includeEnVisualPrompt
@@ -256,7 +256,7 @@ ${s2VisualPromptRule}
   }
 
   // ===================== Stage 3: 拍摄控制 =====================
-  onStageProgress?.(3, 5, '拍摄控制');
+  onStageProgress?.(3, 5, 'Cinematography controls');
   console.log('[MultiStage] Stage 3/5: 拍摄控制');
 
   const s3System = `你是电影摄影指导(DP)。根据视觉描述确定专业拍摄参数。${cinematographyGuidance ? `\n\n${cinematographyGuidance}` : ''}
@@ -299,7 +299,7 @@ ${s2VisualPromptRule}
   }
 
   // ===================== Stage 4: 首帧提示词 =====================
-  onStageProgress?.(4, 5, '首帧提示词');
+  onStageProgress?.(4, 5, 'First-frame prompt');
   console.log('[MultiStage] Stage 4/5: 首帧提示词');
 
   // Stage 4: 根据 promptLanguage 动态调整输出字段
@@ -354,7 +354,7 @@ needsEndFrame 判断：
   }
 
   // ===================== Stage 5: 动态 + 尾帧提示词 =====================
-  onStageProgress?.(5, 5, '动态+尾帧提示词');
+  onStageProgress?.(5, 5, 'Motion and end-frame prompts');
   console.log('[MultiStage] Stage 5/5: 动态+尾帧提示词');
 
   // Stage 5: 根据 promptLanguage 动态调整输出字段

@@ -58,10 +58,10 @@ async function submitImageGenTask(
   baseUrl?: string
 ): Promise<{ taskId?: string; imageUrl?: string; estimatedTime?: number }> {
   if (!model) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚妯″瀷');
+    throw new Error('Configure an image-generation model in Settings first.');
   }
   if (!baseUrl) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚鏈嶅姟鏄犲皠');
+    throw new Error('Configure an image-generation provider mapping in Settings first.');
   }
   const actualModel = model;
   const actualBaseUrl = baseUrl.replace(/\/+$/, '');
@@ -174,11 +174,11 @@ async function submitImageGenTask(
     clearTimeout(timeoutId);
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        throw new Error('鍥剧墖鐢熸垚 API 璇锋眰瓒呮椂锛岃绋嶅悗鍐嶈瘯');
+        throw new Error('The image-generation API request timed out. Please try again.');
       }
       throw error;
     }
-    throw new Error('调用图片生成 API 时发生未知错误');
+    throw new Error('An unknown error occurred while calling the image-generation API.');
   }
 }
 
@@ -193,10 +193,10 @@ async function submitZhipuImageTask(
   baseUrl?: string
 ): Promise<{ taskId?: string; imageUrl?: string; estimatedTime?: number }> {
   if (!model) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚妯″瀷');
+    throw new Error('Configure an image-generation model in Settings first.');
   }
   if (!baseUrl) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚鏈嶅姟鏄犲皠');
+    throw new Error('Configure an image-generation provider mapping in Settings first.');
   }
   const endpoint = buildEndpoint(baseUrl, 'images/generations');
   const response = await fetch(endpoint, {
@@ -427,7 +427,7 @@ export async function generateStoryboardImage(
 
   // Validate API key
   if (!apiKey) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆 API Key');
+    throw new Error('Configure an API key in Settings first.');
   }
 
   onProgress?.(10);
@@ -437,11 +437,11 @@ export async function generateStoryboardImage(
 
   const baseUrl = config.baseUrl?.replace(/\/+$/, '');
   if (!baseUrl) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚鏈嶅姟鏄犲皠');
+    throw new Error('Configure an image-generation provider mapping in Settings first.');
   }
   const model = config.model;
   if (!model) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆鍥剧墖鐢熸垚妯″瀷');
+    throw new Error('Configure an image-generation model in Settings first.');
   }
 
   // Use submitGridImageRequest for smart routing (auto-detects chat/completions vs images/generations)
@@ -520,10 +520,10 @@ async function submitVideoGenTask(
   videoResolution?: '480p' | '720p' | '1080p'
 ): Promise<{ taskId?: string; videoUrl?: string; estimatedTime?: number }> {
   if (!model) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆瑙嗛鐢熸垚妯″瀷');
+    throw new Error('Configure a video-generation model in Settings first.');
   }
   if (!baseUrl) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆瑙嗛鐢熸垚鏈嶅姟鏄犲皠');
+    throw new Error('Configure a video-generation provider mapping in Settings first.');
   }
   const actualModel = model;
   const actualBaseUrl = baseUrl.replace(/\/+$/, '');
@@ -591,7 +591,7 @@ async function submitVideoGenTask(
       }
 
       if (response.status === 401 || response.status === 403) {
-        throw new Error('API Key 无效或已过期，请检查配置');
+        throw new Error('The API key is invalid or expired. Please check your configuration.');
       }
 
       const error = new Error(errorMessage) as Error & { status?: number };
@@ -681,7 +681,7 @@ export async function generateSceneVideos(
 
   // Validate API key
   if (!apiKey && !mockMode) {
-    throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆 API Key');
+    throw new Error('Configure an API key in Settings first.');
   }
 
   // Process scenes sequentially with rate limiting
@@ -713,7 +713,7 @@ export async function generateSceneVideos(
       if (provider !== 'zhipu') {
         const resolvedBaseUrl = baseUrl?.replace(/\/+$/, '');
         if (!resolvedBaseUrl) {
-          throw new Error('璇峰厛鍦ㄨ缃腑閰嶇疆瑙嗛鐢熸垚鏈嶅姟鏄犲皠');
+          throw new Error('Configure a video-generation provider mapping in Settings first.');
         }
         const result = await submitVideoGenTask(
           scene.imageDataUrl,

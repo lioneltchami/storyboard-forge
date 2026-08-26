@@ -718,7 +718,7 @@ ${gridItemsZh}
       const aiFolderId = getOrCreateCategoryFolder('ai-image');
       addMediaFromUrl({
         url: localPath,
-        name: `场景-${name || selectedScene?.name || '未命名'}`,
+        name: `Scene - ${name || selectedScene?.name || 'Untitled'}`,
         type: 'image',
         source: 'ai-image',
         folderId: aiFolderId,
@@ -1372,7 +1372,7 @@ ${gridItemsZh}
       const aiFolder = getOrCreateCategoryFolder('ai-image');
       addMediaFromUrl({
         url: localPath,
-        name: `场景-${variantName}`,
+        name: `Scene - ${variantName}`,
         type: 'image',
         source: 'ai-image',
         folderId: aiFolder,
@@ -1820,7 +1820,7 @@ ${gridItemsZh}
           const aiFolder = getOrCreateCategoryFolder('ai-image');
           addMediaFromUrl({
             url: localPath,
-            name: `场景-${variantName}`,
+            name: `Scene - ${variantName}`,
             type: 'image',
             source: 'ai-image',
             folderId: aiFolder,
@@ -2019,10 +2019,10 @@ No characters, empty environment.`;
 
         // 保存 4 个视角子场景
         const viewLabels = [
-          { key: 'front', name: '正面', row: 0, col: 0 },
-          { key: 'back', name: '背面', row: 0, col: 1 },
-          { key: 'left', name: '左侧', row: 1, col: 0 },
-          { key: 'right', name: '右侧', row: 1, col: 1 },
+          { key: 'front', name: 'Front View', row: 0, col: 0 },
+          { key: 'back', name: 'Back View', row: 0, col: 1 },
+          { key: 'left', name: 'Left View', row: 1, col: 0 },
+          { key: 'right', name: 'Right View', row: 1, col: 1 },
         ];
 
         for (const view of viewLabels) {
@@ -2053,7 +2053,7 @@ No characters, empty environment.`;
             const batchAiFolder = getOrCreateCategoryFolder('ai-image');
             addMediaFromUrl({
               url: localPath,
-              name: `场景-${childScene.name}-${view.name}`,
+              name: `Scene - ${childScene.name}-${view.name}`,
               type: 'image',
               source: 'ai-image',
               folderId: batchAiFolder,
@@ -2363,10 +2363,10 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
     const parentSceneName = selectedScene.name || selectedScene.location;
     const createdIds: string[] = [];
     const viewLabels = [
-      { key: 'front', name: '正面', nameEn: 'Front View', image: front },
-      { key: 'back', name: '背面', nameEn: 'Back View', image: back },
-      { key: 'left', name: '左侧', nameEn: 'Left View', image: left },
-      { key: 'right', name: '右侧', nameEn: 'Right View', image: right },
+      { key: 'front', name: 'Front View', nameEn: 'Front View', image: front },
+      { key: 'back', name: 'Back View', nameEn: 'Back View', image: back },
+      { key: 'left', name: 'Left View', nameEn: 'Left View', image: left },
+      { key: 'right', name: 'Right View', nameEn: 'Right View', image: right },
     ];
 
     for (const view of viewLabels) {
@@ -2400,7 +2400,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
       const orthoAiFolder = getOrCreateCategoryFolder('ai-image');
       addMediaFromUrl({
         url: localPath,
-        name: `场景-${variantName}`,
+        name: `Scene - ${variantName}`,
         type: 'image',
         source: 'ai-image',
         folderId: orthoAiFolder,

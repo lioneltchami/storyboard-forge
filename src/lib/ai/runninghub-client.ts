@@ -121,7 +121,7 @@ export async function submitAngleSwitchTask(
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('提交 RunningHub 任务失败');
+    throw new Error('Failed to submit the RunningHub task.');
   }
 }
 
@@ -221,7 +221,7 @@ export async function pollTaskUntilComplete(
     }
   }
 
-  throw new Error('视角切换超时，请重试');
+  throw new Error('The viewpoint switch timed out. Please try again.');
 }
 
 /**

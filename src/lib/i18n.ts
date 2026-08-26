@@ -81,6 +81,7 @@ type MessageTree = {
     desktopOnly: string;
     openDownloadFailed: string;
     noReleaseNotes: string;
+    releaseNotesUnavailable: string;
   };
   projectHeader: {
     returnToSeries: string;
@@ -234,6 +235,7 @@ export const messages: Record<Locale, MessageTree> = {
       desktopOnly: "Use this feature in the desktop app.",
       openDownloadFailed: "Failed to open download link",
       noReleaseNotes: "No release notes were provided for this release.",
+      releaseNotesUnavailable: "Release notes are available from the download page.",
     },
     projectHeader: {
       returnToSeries: "Back to series view",
@@ -385,6 +387,7 @@ export const messages: Record<Locale, MessageTree> = {
       desktopOnly: "请在桌面版中使用此功能",
       openDownloadFailed: "打开下载链接失败",
       noReleaseNotes: "本次发布未填写更新说明。",
+      releaseNotesUnavailable: "更新说明请查看下载页面。",
     },
     projectHeader: {
       returnToSeries: "返回全剧视图",

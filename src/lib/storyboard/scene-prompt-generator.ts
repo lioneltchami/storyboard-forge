@@ -468,7 +468,7 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
       }
       
       if (response.status === 401 || response.status === 403) {
-        throw new Error('API Key 无效或已过期');
+        throw new Error('The API key is invalid or expired.');
       }
       throw new Error(errorMessage);
     }
@@ -487,11 +487,11 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
       parsed = JSON.parse(cleanContent);
     } catch (e) {
       console.error('[ScenePromptGenerator] Failed to parse JSON:', content);
-      throw new Error('AI 响应不是有效的 JSON 格式');
+      throw new Error('The AI response was not valid JSON.');
     }
 
     if (!Array.isArray(parsed)) {
-      throw new Error('AI 响应不是数组格式');
+      throw new Error('The AI response was not an array.');
     }
 
     // Validate and map to three-tier prompt result

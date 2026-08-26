@@ -86,18 +86,18 @@ export async function generateCharacterDesign(
   const project = store.projects[projectId];
   
   if (!project) {
-    throw new Error('项目不存在');
+    throw new Error('The project does not exist.');
   }
   
   const scriptData = project.scriptData;
   if (!scriptData) {
-    throw new Error('剧本数据不存在');
+    throw new Error('Script data is unavailable.');
   }
   
   // 找到目标角色
   const character = scriptData.characters.find(c => c.id === characterId);
   if (!character) {
-    throw new Error('角色不存在');
+    throw new Error('The character does not exist.');
   }
   
   // 收集角色相关的上下文信息
@@ -308,7 +308,7 @@ ${context.characterAppearances.length > 0
     };
   } catch (e) {
     console.error('[CharacterDesign] Failed to parse AI response:', result);
-    throw new Error('解析角色设计失败');
+    throw new Error('Could not parse the character design response.');
   }
 }
 
