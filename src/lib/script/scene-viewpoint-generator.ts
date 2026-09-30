@@ -1332,8 +1332,8 @@ export function buildContactSheetDataFromViewpoints(
       const row = Math.floor(idx / gridLayout.cols) + 1;
       const col = (idx % gridLayout.cols) + 1;
       const vpNameEn = vp.nameEn || vp.name;
-      const content = vp.keyProps.length > 0 
-        ? `showing ${vp.keyProps.join(', ')}` 
+      const content = vp.keyProps.length > 0
+        ? `showing ${vp.keyProps.join(', ')}`
         : (vpNameEn === 'Overview' || vp.name === 'Overview' || vp.name === '全景' ? 'wide shot showing the entire room layout' : `${vpNameEn} angle of the room`);
       
       promptParts.push(`Panel [row ${row}, col ${col}] (no people): ${content} [same style]`);

@@ -285,7 +285,7 @@ export function ScriptView() {
   const parseStatus = scriptProject?.parseStatus || "idle";
   const parseError = scriptProject?.parseError;
   const shots = scriptProject?.shots || [];
-  const promptLanguage = scriptProject?.promptLanguage || 'zh';
+  const promptLanguage = scriptProject?.promptLanguage || 'en';
 
   // 当前集作用域：从 activeEpisodeIndex 映射到 episodeId
   const activeEpisodeId = activeEpisodeIndex != null
@@ -1601,7 +1601,7 @@ export function ScriptView() {
         notes: character.notes,
         styleId,
         // === 提示词语言偏好 ===
-        promptLanguage: scriptProject?.promptLanguage || 'zh',
+        promptLanguage: scriptProject?.promptLanguage || 'en',
         // === 专业角色设计字段（世界级大师生成）===
         visualPromptEn: character.visualPromptEn,
         visualPromptZh: character.visualPromptZh,
@@ -1690,7 +1690,7 @@ export function ScriptView() {
           sourceEpisodeIndex: activeEpisodeIndex ?? undefined,
           sourceEpisodeId: activeEpisodeId,
           // === 提示词语言偏好 ===
-          promptLanguage: scriptProject?.promptLanguage || 'zh',
+          promptLanguage: scriptProject?.promptLanguage || 'en',
         });
 
         const viewpointCount = scene.viewpoints!.length;
@@ -1722,7 +1722,7 @@ export function ScriptView() {
           sourceEpisodeIndex: activeEpisodeIndex ?? undefined,
           sourceEpisodeId: activeEpisodeId,
           // === 提示词语言偏好 ===
-          promptLanguage: scriptProject?.promptLanguage || 'zh',
+          promptLanguage: scriptProject?.promptLanguage || 'en',
         });
 
         toast.success(
@@ -1747,18 +1747,18 @@ export function ScriptView() {
       // 查找场景信息
       const scene = scriptData?.scenes.find((s) => s.id === shot.sceneRefId);
 
-      // 组合故事prompt: 场景 + 动作 + 对白
+      // Build story prompt: scene + action + dialogue
       const promptParts: string[] = [];
       if (scene) {
-        promptParts.push(`场景：${scene.location || scene.name}`);
-        if (scene.time) promptParts.push(`时间：${scene.time}`);
-        if (scene.atmosphere) promptParts.push(`氛围：${scene.atmosphere}`);
+        promptParts.push(`Scene: ${scene.location || scene.name}`);
+        if (scene.time) promptParts.push(`Time: ${scene.time}`);
+        if (scene.atmosphere) promptParts.push(`Mood: ${scene.atmosphere}`);
       }
       if (shot.actionSummary) {
-        promptParts.push(`\n动作：${shot.actionSummary}`);
+        promptParts.push(`\nAction: ${shot.actionSummary}`);
       }
       if (shot.dialogue) {
-        promptParts.push(`对白：「${shot.dialogue}」`);
+        promptParts.push(`Dialogue: "${shot.dialogue}"`);
       }
 
       const storyPrompt = promptParts.join("\n");
@@ -1798,19 +1798,19 @@ export function ScriptView() {
       const sceneShots = shots.filter((s) => s.sceneRefId === sceneId);
       const shotCount = sceneShots.length || 1;
 
-      // 组合故事prompt: 场景信息 + 所有分镜内容
+      // Build story prompt: scene details + all shots
       const promptParts: string[] = [];
-      promptParts.push(`场景：${scene.location || scene.name}`);
-      if (scene.time) promptParts.push(`时间：${scene.time}`);
-      if (scene.atmosphere) promptParts.push(`氛围：${scene.atmosphere}`);
+      promptParts.push(`Scene: ${scene.location || scene.name}`);
+      if (scene.time) promptParts.push(`Time: ${scene.time}`);
+      if (scene.atmosphere) promptParts.push(`Mood: ${scene.atmosphere}`);
 
       if (sceneShots.length > 0) {
-        promptParts.push(`\n--- 分镜列表 (${sceneShots.length}个) ---`);
+        promptParts.push(`\n--- Shot list (${sceneShots.length}) ---`);
         sceneShots.forEach((shot, idx) => {
           const shotDesc = [
-            `\n[分镜${idx + 1}]`,
-            shot.actionSummary ? `动作：${shot.actionSummary}` : null,
-            shot.dialogue ? `对白：「${shot.dialogue}」` : null,
+            `\n[Shot ${idx + 1}]`,
+            shot.actionSummary ? `Action: ${shot.actionSummary}` : null,
+            shot.dialogue ? `Dialogue: "${shot.dialogue}"` : null,
           ].filter(Boolean).join(" ");
           promptParts.push(shotDesc);
         });

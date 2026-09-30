@@ -328,7 +328,11 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   const promptLanguage = useScriptStore(state => {
     const pid = state.activeProjectId;
     return pid ? state.projects[pid]?.promptLanguage : undefined;
-  }) || 'zh';
+  }) || 'en';
+  const getPromptInPreferredLanguage = (english?: string, chinese?: string) =>
+    promptLanguage === 'en'
+      ? english?.trim() || chinese?.trim() || ''
+      : chinese?.trim() || english?.trim() || '';
 
   // Read from project data (with defaults)
   const splitScenes = projectData?.splitScenes || [];
@@ -1390,7 +1394,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
 
     try {
       // Get story prompt from storyboard config
-      const storyPrompt = storyboardConfig.storyPrompt || "视频分镜";
+      const storyPrompt = storyboardConfig.storyPrompt || "Video storyboard";
 
       const prompts = await generateScenePrompts({
         storyboardImage,
@@ -1600,6 +1604,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         styleTokens: [getStylePrompt(currentStyleId)],
         aspectRatio: storyboardConfig.aspectRatio,
         mediaType: getMediaType(currentStyleId),
+        promptLanguage,
       });
       
       // 使用用户设置的时长，默认 5 秒
@@ -1952,8 +1957,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     console.log('[SingleImage] Using config:', { platform, model, imageBaseUrl });
 
     // Need a prompt to generate - prefer imagePromptZh (first frame static), fallback to videoPromptZh
-    const promptToUse = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() 
-      || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
+    const promptToUse = getPromptInPreferredLanguage(scene.imagePrompt, scene.imagePromptZh)
+      || getPromptInPreferredLanguage(scene.videoPrompt, scene.videoPromptZh);
     if (!promptToUse) {
       toast.warning("Enter a start frame prompt before generating an image");
       return;
@@ -2253,7 +2258,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   };
 
   const composeTilePrompt = (scene: SplitScene, angle: Angle, aspect: '16:9'|'9:16', styleTokens?: string[]) => {
-    const base = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
+    const base = getPromptInPreferredLanguage(scene.imagePrompt, scene.imagePromptZh)
+      || getPromptInPreferredLanguage(scene.videoPrompt, scene.videoPromptZh);
     const shot = allowedShotFromSize(scene.shotSize);
     const vertical = aspect === '9:16' ? 'vertical composition, tighter framing, avoid letterboxing, ' : '';
     // 禁用相机运动与节奏，仅保留视角/景别/构图
@@ -2581,9 +2587,12 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         const col = (idx % cols) + 1;
         let desc = '';
         if (task.type === 'end') {
-          desc = s.endFramePromptZh?.trim() || s.endFramePrompt?.trim() || (s.imagePromptZh || s.imagePrompt || '') + ' end state';
+          desc = getPromptInPreferredLanguage(s.endFramePrompt, s.endFramePromptZh)
+            || `${getPromptInPreferredLanguage(s.imagePrompt, s.imagePromptZh)} end state`;
         } else {
-          desc = s.imagePromptZh?.trim() || s.imagePrompt?.trim() || s.videoPromptZh?.trim() || s.videoPrompt?.trim() || `scene ${idx + 1}`;
+          desc = getPromptInPreferredLanguage(s.imagePrompt, s.imagePromptZh)
+            || getPromptInPreferredLanguage(s.videoPrompt, s.videoPromptZh)
+            || `scene ${idx + 1}`;
         }
         const sceneCharacterContexts = getSceneCharacterContexts(s.characterIds || [], s.characterVariationMap);
         const identityInline = getSceneIdentityLockLines(
@@ -3051,7 +3060,7 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     if (!scene) return;
 
     // Must have end frame prompt
-    const promptToUse = scene.endFramePromptZh?.trim() || scene.endFramePrompt?.trim() || '';
+    const promptToUse = getPromptInPreferredLanguage(scene.endFramePrompt, scene.endFramePromptZh);
     if (!promptToUse) {
       toast.warning("Fill in the end-frame prompt before generating");
       return;

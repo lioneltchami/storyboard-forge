@@ -106,7 +106,7 @@ export async function importFullScript(
         background: null,
         episodes: [],
         scriptData: null,
-        error: "未能解析出任何集数，请检查剧本格式",
+        error: "No episodes could be parsed. Please check the script format.",
       };
     }
     
@@ -155,7 +155,7 @@ export async function importFullScript(
       background: null,
       episodes: [],
       scriptData: null,
-      error: error instanceof Error ? error.message : "导入失败",
+      error: error instanceof Error ? error.message : "Import failed",
     };
   }
 }
@@ -188,13 +188,13 @@ export async function importSingleEpisodeContent(
     const store = useScriptStore.getState();
     const project = store.projects[projectId];
     if (!project?.scriptData) {
-      return { success: false, sceneCount: 0, error: '项目或剧本数据不存在' };
+      return { success: false, sceneCount: 0, error: 'Project or script data does not exist' };
     }
 
     const scriptData = project.scriptData;
     const episode = scriptData.episodes.find(e => e.index === episodeIndex);
     if (!episode) {
-      return { success: false, sceneCount: 0, error: `找不到第 ${episodeIndex} 集` };
+      return { success: false, sceneCount: 0, error: `Episode ${episodeIndex} was not found` };
     }
 
     // === 1. 预处理 + 场景解析 ===
@@ -281,7 +281,7 @@ export async function importSingleEpisodeContent(
     return {
       success: false,
       sceneCount: 0,
-      error: error instanceof Error ? error.message : '结构补全失败',
+      error: error instanceof Error ? error.message : 'Structure completion failed',
     };
   }
 }
@@ -463,7 +463,7 @@ export async function generateEpisodeShots(
     console.log('============================================\n');
     
     if (!options.apiKey) {
-      viewpointSkippedReason = 'apiKey 未配置';
+        viewpointSkippedReason = 'API key is not configured';
       console.error('[generateEpisodeShots] ❌ 跳过 AI 视角分析: apiKey 未配置');
     } else if (episodeScenes.length === 0) {
       viewpointSkippedReason = '无场景';
@@ -518,7 +518,7 @@ export async function generateEpisodeShots(
           
           console.log(`[generateEpisodeShots] 场景 ${i + 1}/${episodeScenes.length}: "${scene.location}" 有 ${sceneShots.length} 个分镜`);
           analysisExecuted = true;
-          onProgress?.(`AI 分析场景 ${i + 1}/${episodeScenes.length}: ${scene.location}...`);
+          onProgress?.(`AI analyzing scene ${i + 1}/${episodeScenes.length}: ${scene.location}...`);
           
           console.log(`[generateEpisodeShots] 🔄 调用 analyzeSceneViewpoints for "${scene.location}"...`);
           const result = await analyzeSceneViewpoints(scene, sceneShots, viewpointOptions);
@@ -549,7 +549,7 @@ export async function generateEpisodeShots(
             if (sceneIndex !== -1) {
               const viewpointsData = result.viewpoints.map((v: any, idx: number) => ({
                 id: v.id,
-                name: v.name,
+                name: v.nameEn || v.name,
                 nameEn: v.nameEn,
                 shotIds: v.shotIndexes.map((si: number) => sceneShots[si - 1]?.id).filter(Boolean),
                 keyProps: v.keyProps,
@@ -598,7 +598,7 @@ export async function generateEpisodeShots(
                   
                   if (bestScore === 0) {
                     const overviewIdx = viewpointsData.findIndex((v: any) => 
-                      v.name.includes('全景') || v.id === 'overview'
+                      v.name.includes('Overview') || v.name.includes('全景') || v.id === 'overview'
                     );
                     bestViewpointIdx = overviewIdx >= 0 ? overviewIdx : 0;
                   }
@@ -661,7 +661,7 @@ export async function generateEpisodeShots(
         console.error('[generateEpisodeShots] Error message:', err.message);
         console.error('[generateEpisodeShots] Error stack:', err.stack);
         console.error('============================================\n');
-        viewpointSkippedReason = `AI 分析失败: ${err.message}`;
+        viewpointSkippedReason = `AI analysis failed: ${err.message}`;
         // 不影响主流程，但记录详细错误
       }
     }
@@ -707,7 +707,7 @@ async function generateShotsForEpisode(
   
   for (let i = 0; i < scenes.length; i++) {
     const scene = scenes[i];
-    onProgress?.(`处理场景 ${i + 1}/${scenes.length}: ${scene.name || scene.location}`);
+    onProgress?.(`Processing scene ${i + 1}/${scenes.length}: ${scene.name || scene.location}`);
     
     // 基于场景内容生成分镜
     const sceneShots = generateShotsFromSceneContent(
@@ -774,9 +774,9 @@ function generateShotsFromSceneContent(
         index: index++,
         episodeId,
         sceneRefId: scene.id,
-        actionSummary: `${charName}说话`,
-        visualDescription: `${scene.location}，${charName}${parenthetical ? `（${parenthetical}）` : ''}说："${dialogueText.slice(0, 50)}${dialogueText.length > 50 ? '...' : ''}"`,
-        dialogue: `${charName}${parenthetical ? `（${parenthetical}）` : ''}：${dialogueText}`,
+        actionSummary: `${charName} speaks`,
+        visualDescription: `${scene.location}, ${charName}${parenthetical ? ` (${parenthetical})` : ''} says: "${dialogueText.slice(0, 50)}${dialogueText.length > 50 ? '...' : ''}"`,
+        dialogue: `${charName}${parenthetical ? ` (${parenthetical})` : ''}: ${dialogueText}`,
         characterNames: [charName],
         characterIds: charId ? [charId] : [],
         shotSize: dialogueText.length > 30 ? 'MS' : 'CU',
@@ -821,7 +821,7 @@ function generateShotsFromSceneContent(
           episodeId,
           sceneRefId: scene.id,
           actionSummary: subtitleText,
-          visualDescription: `【${subtitleText}】画面渐变过渡`,
+          visualDescription: `[${subtitleText}] gradual visual transition`,
           characterNames: [],
           characterIds: [],
           shotSize: 'WS',
@@ -836,8 +836,8 @@ function generateShotsFromSceneContent(
           index: index++,
           episodeId,
           sceneRefId: scene.id,
-          actionSummary: '字幕显示',
-          visualDescription: `画面叠加字幕：${subtitleText.replace('字幕：', '').replace('字幕:', '')}`,
+          actionSummary: 'Subtitle appears',
+          visualDescription: `Subtitle overlay: ${subtitleText.replace('字幕：', '').replace('字幕:', '')}`,
           characterNames: [],
           characterIds: [],
           shotSize: 'WS',
@@ -853,8 +853,8 @@ function generateShotsFromSceneContent(
       index: index,
       episodeId,
       sceneRefId: scene.id,
-      actionSummary: `${scene.name || scene.location} 建立镜头`,
-      visualDescription: `${scene.location}，${scene.atmosphere}的氛围`,
+      actionSummary: `${scene.name || scene.location} establishing shot`,
+      visualDescription: `${scene.location}, ${scene.atmosphere} atmosphere`,
       characterNames: [],
       characterIds: [],
       shotSize: 'WS',
@@ -1118,7 +1118,7 @@ export async function calibrateEpisodeTitles(
   const project = store.projects[projectId];
   
   if (!project) {
-    return { success: false, calibratedCount: 0, totalMissing: 0, error: '项目不存在' };
+    return { success: false, calibratedCount: 0, totalMissing: 0, error: 'Project does not exist' };
   }
   
   // 找出缺失标题的集数
@@ -1129,7 +1129,7 @@ export async function calibrateEpisodeTitles(
     return { success: true, calibratedCount: 0, totalMissing: 0 };
   }
   
-  onProgress?.(0, totalMissing, `找到 ${totalMissing} 集缺失标题，开始校准...`);
+  onProgress?.(0, totalMissing, `Found ${totalMissing} episode(s) missing titles. Starting calibration...`);
   
   // 获取全局背景信息
   const background = project.projectBackground;
@@ -1217,7 +1217,7 @@ ${characterBios.slice(0, 1000)}
       const newTitle = results.get(String(ep.episodeIndex));
       if (newTitle) {
         store.updateEpisodeRawScript(projectId, ep.episodeIndex, {
-          title: `第${ep.episodeIndex}集：${newTitle}`,
+          title: `Episode ${ep.episodeIndex}: ${newTitle}`,
         });
         
         const scriptData = store.projects[projectId]?.scriptData;
@@ -1339,18 +1339,18 @@ export async function calibrateEpisodeShots(
   const project = store.projects[projectId];
   
   if (!project) {
-    return { success: false, calibratedCount: 0, totalShots: 0, error: '项目不存在' };
+    return { success: false, calibratedCount: 0, totalShots: 0, error: 'Project does not exist' };
   }
   
   // 找到该集的分镜
   const scriptData = project.scriptData;
   if (!scriptData) {
-    return { success: false, calibratedCount: 0, totalShots: 0, error: '剧本数据不存在' };
+    return { success: false, calibratedCount: 0, totalShots: 0, error: 'Script data does not exist' };
   }
   
   const episode = scriptData.episodes.find(ep => ep.index === episodeIndex);
   if (!episode) {
-    return { success: false, calibratedCount: 0, totalShots: 0, error: `找不到第 ${episodeIndex} 集` };
+    return { success: false, calibratedCount: 0, totalShots: 0, error: `Episode ${episodeIndex} was not found` };
   }
   
   // 获取该集的所有分镜（可选：只校准指定场景的分镜）
@@ -1361,10 +1361,10 @@ export async function calibrateEpisodeShots(
   const totalShots = episodeShots.length;
   
   if (totalShots === 0) {
-    return { success: false, calibratedCount: 0, totalShots: 0, error: '该集没有分镜' };
+    return { success: false, calibratedCount: 0, totalShots: 0, error: 'This episode has no shots' };
   }
   
-  onProgress?.(0, totalShots, `开始校准第 ${episodeIndex} 集的 ${totalShots} 个分镜...`);
+  onProgress?.(0, totalShots, `Starting calibration for ${totalShots} shot(s) in Episode ${episodeIndex}...`);
   
   // 获取全局背景信息
   const background = project.projectBackground;
@@ -1464,7 +1464,7 @@ export async function calibrateEpisodeShots(
     const settledBatchResults = await runStaggered(
       allBatches.map(({ batch, batchNum, batchData }) => async () => {
         console.log(`[calibrateShots] 🚀 启动批次 ${batchNum}/${totalBatches}`);
-        onProgress?.(calibratedCount, totalShots, `🚀 处理批次 ${batchNum}/${totalBatches}...`);
+        onProgress?.(calibratedCount, totalShots, `Processing batch ${batchNum}/${totalBatches}...`);
         
         // 带重试机制的 AI 调用
         let calibrations: Record<string, any> = {};
@@ -1479,7 +1479,7 @@ export async function calibrateEpisodeShots(
               globalContext,
               (stage, total, name) => {
                 console.log(`[calibrateShots] 批次 ${batchNum}/${totalBatches} - Stage ${stage}/${total}: ${name}`);
-                onProgress?.(calibratedCount, totalShots, `批次 ${batchNum} Stage ${stage}/${total}: ${name}`);
+                onProgress?.(calibratedCount, totalShots, `Batch ${batchNum} Stage ${stage}/${total}: ${name}`);
               }
             );
             completedBatches++;
@@ -1599,18 +1599,18 @@ export async function calibrateSingleShot(
   const project = store.projects[projectId];
   
   if (!project) {
-    return { success: false, calibratedCount: 0, totalShots: 1, error: '项目不存在' };
+    return { success: false, calibratedCount: 0, totalShots: 1, error: 'Project does not exist' };
   }
   
   const scriptData = project.scriptData;
   if (!scriptData) {
-    return { success: false, calibratedCount: 0, totalShots: 1, error: '剧本数据不存在' };
+    return { success: false, calibratedCount: 0, totalShots: 1, error: 'Script data does not exist' };
   }
   
   // 找到目标分镜
   const shot = project.shots.find(s => s.id === shotId);
   if (!shot) {
-    return { success: false, calibratedCount: 0, totalShots: 1, error: `找不到分镜 ${shotId}` };
+    return { success: false, calibratedCount: 0, totalShots: 1, error: `Shot ${shotId} was not found` };
   }
   
   onProgress?.(`Calibrating shot...`);
@@ -1633,7 +1633,7 @@ export async function calibrateSingleShot(
     characterBios: background?.characterBios || '',
     worldSetting: background?.worldSetting || '',
     themes: background?.themes || [],
-    episodeTitle: episode?.title || `第${episodeIndex}集`,
+    episodeTitle: episode?.title || `Episode ${episodeIndex}`,
     episodeSynopsis: episodeScript?.synopsis || '',
     episodeKeyEvents: episodeScript?.keyEvents || [],
     episodeRawContent,
@@ -1646,7 +1646,7 @@ export async function calibrateSingleShot(
     // 准备分镜数据
     let sourceText = shot.actionSummary || '';
     if (shot.dialogue) {
-      sourceText += `\n对白：「${shot.dialogue}」`;
+      sourceText += `\nDialogue: "${shot.dialogue}"`;
     }
     
     // 查找场景天气
@@ -1685,7 +1685,7 @@ export async function calibrateSingleShot(
     const calibration = calibrations[shot.id];
     
     if (!calibration) {
-      return { success: false, calibratedCount: 0, totalShots: 1, error: 'AI 校准未返回结果' };
+      return { success: false, calibratedCount: 0, totalShots: 1, error: 'AI calibration did not return a result' };
     }
     
     // 更新分镜
@@ -2267,14 +2267,14 @@ export async function generateEpisodeSynopses(
   const project = store.projects[projectId];
   
   if (!project) {
-    return { success: false, generatedCount: 0, totalEpisodes: 0, error: '项目不存在' };
+    return { success: false, generatedCount: 0, totalEpisodes: 0, error: 'Project does not exist' };
   }
   
   const episodes = project.episodeRawScripts;
   const totalEpisodes = episodes.length;
   
   if (totalEpisodes === 0) {
-    return { success: false, generatedCount: 0, totalEpisodes: 0, error: '没有集数据' };
+    return { success: false, generatedCount: 0, totalEpisodes: 0, error: 'No episode data is available' };
   }
   
   // 获取全局背景
@@ -2293,7 +2293,7 @@ export async function generateEpisodeSynopses(
   // 注入概览里的世界观知识（角色、阵营、核心冲突、关键物品等）
   const seriesCtx = buildSeriesContextSummary(project.seriesMeta || null);
   
-  onProgress?.(0, totalEpisodes, `开始为 ${totalEpisodes} 集生成大纲...`);
+  onProgress?.(0, totalEpisodes, `Starting outline generation for ${totalEpisodes} episode(s)...`);
   
   try {
     // 准备 batch items
@@ -2397,7 +2397,7 @@ ${characterBios.slice(0, 800)}
       console.warn(`[集大纲生成] ${failedBatches}/${totalBatches} 批次失败`);
     }
     
-    onProgress?.(generatedCount, totalEpisodes, `已生成 ${generatedCount}/${totalEpisodes} 集大纲`);
+    onProgress?.(generatedCount, totalEpisodes, `Generated outlines for ${generatedCount}/${totalEpisodes} episode(s)`);
     
     // 大纲生成完成后，更新项目元数据 MD
     const updatedMetadata = exportProjectMetadata(projectId);
@@ -2415,7 +2415,7 @@ ${characterBios.slice(0, 800)}
       success: false,
       generatedCount: 0,
       totalEpisodes,
-      error: error instanceof Error ? error.message : '大纲生成失败',
+      error: error instanceof Error ? error.message : 'Outline generation failed',
     };
   }
 }
@@ -2431,7 +2431,7 @@ export function exportProjectMetadata(projectId: string): string {
   const project = store.projects[projectId];
   
   if (!project) {
-    return '# 错误\n\n项目不存在';
+    return '# Error\n\nProject does not exist';
   }
   
   const background = project.projectBackground;

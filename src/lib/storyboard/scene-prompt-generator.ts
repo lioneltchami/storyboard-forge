@@ -130,7 +130,7 @@ function generatePromptFromText(scene: ScenePromptRequest['scenes'][0], storyCon
   const camera = scene.cameraMovement || '';
   const dialogue = scene.dialogue || '';
   const sceneDesc = scene.sceneDescription || '';
-  const sceneName = scene.sceneName || `场景 ${scene.id}`;
+  const sceneName = scene.sceneName || `Scene ${scene.id}`;
   
   // Build image prompt (static first frame description)
   const imagePromptParts: string[] = [];
@@ -222,14 +222,14 @@ export async function generateScenePrompts(
       console.warn('[ScenePromptGenerator] No Vision API configured, using placeholder for scenes without text');
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
         imagePromptZh: `场景 ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} motion shot`,
         videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} motion shot`,
         promptZh: `场景 ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);
@@ -239,14 +239,14 @@ export async function generateScenePrompts(
       console.warn('[ScenePromptGenerator] No Vision model configured, using placeholder for scenes without text');
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
         imagePromptZh: `场景 ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} motion shot`,
         videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} motion shot`,
         promptZh: `场景 ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);
@@ -268,14 +268,14 @@ export async function generateScenePrompts(
       console.error('[ScenePromptGenerator] Vision API failed, using placeholders:', error);
       const placeholderResults = scenesWithoutText.map(s => ({
         id: s.id,
-        imagePrompt: `场景 ${s.id}`,
+        imagePrompt: `Scene ${s.id}`,
         imagePromptZh: `场景 ${s.id}`,
         needsEndFrame: false,
         endFramePrompt: '',
         endFramePromptZh: '',
-        videoPrompt: `场景 ${s.id} 的动态画面`,
+        videoPrompt: `Scene ${s.id} motion shot`,
         videoPromptZh: `场景 ${s.id} 的动态画面`,
-        prompt: `场景 ${s.id} 的动态画面`,
+        prompt: `Scene ${s.id} motion shot`,
         promptZh: `场景 ${s.id} 的动态画面`,
       }));
       return [...textResults, ...placeholderResults].sort((a, b) => a.id - b.id);

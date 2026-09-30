@@ -130,7 +130,7 @@ export interface SplitSceneCardProps {
 
 export function SplitSceneCard({
   scene,
-  promptLanguage = 'zh',
+  promptLanguage = 'en',
   onUpdateImagePrompt,
   onUpdateVideoPrompt,
   onUpdateEndFramePrompt,

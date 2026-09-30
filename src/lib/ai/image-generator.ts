@@ -356,7 +356,7 @@ async function submitViaChatCompletions(
     // 每次重试独立创建 AbortController，避免共享 controller 在重试时已超时
     const controller = new AbortController();
     const timeoutId = setTimeout(
-      () => controller.abort(new DOMException('图片生成请求超时（60秒），请检查网络后重试', 'TimeoutError')),
+      () => controller.abort(new DOMException('Image generation timed out after 60 seconds. Please check your network and try again.', 'TimeoutError')),
       60000
     );
 
@@ -847,7 +847,7 @@ export async function submitGridImageRequest(params: {
       if (keyManager?.handleError) {
         keyManager.handleError(response.status, errorText);
       }
-      let errorMessage = `API 失败: ${response.status}`;
+      let errorMessage = `API failed: ${response.status}`;
       try {
         const errJson = JSON.parse(errorText);
         errorMessage = errJson.error?.message || errJson.message || errorMessage;

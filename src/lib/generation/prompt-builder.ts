@@ -39,6 +39,7 @@ import {
 import type { CinematographyProfile } from '@/lib/constants/cinematography-profiles';
 import type { MediaType } from '@/lib/constants/visual-styles';
 import { translateToken, type CinematographyField } from '@/lib/generation/media-type-tokens';
+import type { PromptLanguage } from '@/types/script';
 
 // ==================== Helper functions ====================
 
@@ -60,12 +61,12 @@ export function buildEmotionDescription(emotionTags: EmotionTag[]): string {
   });
 
   if (labels.length === 1) {
-    return `氛围${labels[0]}，`;
+    return `Mood: ${labels[0]}. `;
   } else if (labels.length === 2) {
-    return `氛围从${labels[0]}转为${labels[1]}，`;
+    return `Mood shifts from ${labels[0]} to ${labels[1]}. `;
   } else {
-    const progression = labels.slice(0, -1).join('、') + '然后' + labels[labels.length - 1];
-    return `氛围依次${progression}，`;
+    const progression = `${labels.slice(0, -1).join(', ')}, then ${labels[labels.length - 1]}`;
+    return `Mood progresses through ${progression}. `;
   }
 }
 
@@ -97,6 +98,8 @@ export interface VideoPromptConfig {
   aspectRatio?: '16:9' | '9:16';
   /** Media type - controls the cinematography translation strategy */
   mediaType?: MediaType;
+  /** Prompt-language preference for the scene's authored prompt. */
+  promptLanguage?: PromptLanguage;
 }
 
 // ==================== Core function ====================
@@ -301,25 +304,25 @@ export function buildVideoPrompt(
   if (scene.audioDialogueEnabled !== false && scene.dialogue?.trim()) {
     promptParts.push(`Dialogue: "${scene.dialogue.trim()}"`);
   } else {
-    promptParts.push('Dialogue: 禁止对白');
+    promptParts.push('Dialogue: no dialogue');
   }
   // Ambient sound: include when there is content and it is enabled; otherwise explicitly forbid it
   if (scene.audioAmbientEnabled !== false && scene.ambientSound?.trim()) {
     promptParts.push(`Ambient: ${scene.ambientSound.trim()}`);
   } else {
-    promptParts.push('Ambient: 禁止环境音');
+    promptParts.push('Ambient: no ambient sound');
   }
   // Sound effects: include when there is content and it is enabled; otherwise explicitly forbid it
   if (scene.audioSfxEnabled !== false && scene.soundEffectText?.trim()) {
     promptParts.push(`SFX: ${scene.soundEffectText.trim()}`);
   } else {
-    promptParts.push('SFX: 禁止音效');
+    promptParts.push('SFX: no sound effects');
   }
   // Background music: include when there is content and it is enabled; otherwise explicitly forbid it
   if (scene.audioBgmEnabled === true && scene.backgroundMusic?.trim()) {
     promptParts.push(`Music: ${scene.backgroundMusic.trim()}`);
   } else {
-    promptParts.push('Music: 禁止背景音乐');
+    promptParts.push('Music: no background music');
   }
 
   // ---------- Layer 5: Visual style ----------
@@ -328,7 +331,10 @@ export function buildVideoPrompt(
   }
 
   // ---------- Base prompt: user video prompt ----------
-  const basePrompt = scene.videoPromptZh || scene.videoPrompt || '';
+  const preferChinese = config.promptLanguage === 'zh' || config.promptLanguage === 'zh+en';
+  const basePrompt = preferChinese
+    ? scene.videoPromptZh || scene.videoPrompt || ''
+    : scene.videoPrompt || scene.videoPromptZh || '';
   if (basePrompt.trim()) {
     promptParts.push(basePrompt.trim());
   }

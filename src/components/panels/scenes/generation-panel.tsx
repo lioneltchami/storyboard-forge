@@ -100,7 +100,11 @@ export function GenerationPanel({ selectedScene, onSceneCreated }: GenerationPan
   const allShots = currentProject?.shots || [];
 
   // 提示词语言偏好（从剧本设置同步）
-  const [promptLanguage, setPromptLanguage] = useState<PromptLanguage>('zh');
+  const [promptLanguage, setPromptLanguage] = useState<PromptLanguage>('en');
+  const getViewpointName = (viewpoint: { name?: string; nameEn?: string }) =>
+    promptLanguage === 'en'
+      ? viewpoint.nameEn || viewpoint.name || ''
+      : viewpoint.name || viewpoint.nameEn || '';
 
   // Form state
   const [name, setName] = useState("");
@@ -339,7 +343,7 @@ export function GenerationPanel({ selectedScene, onSceneCreated }: GenerationPan
           .filter(v => v.pageIndex === 0)
           .map(v => ({
             id: v.id,
-            name: v.name,
+            name: getViewpointName(v),
             nameEn: v.nameEn,
             shotIds: v.shotIds,
             keyProps: v.keyProps,
@@ -506,8 +510,8 @@ export function GenerationPanel({ selectedScene, onSceneCreated }: GenerationPan
       
       // 重新生成中文提示词
       const gridItemsZh = currentPageVps.map((vp, idx) => {
-        const content = vp.keyProps && vp.keyProps.length > 0 
-          ? `展示${vp.keyProps.join('、')}` 
+        const content = vp.keyProps && vp.keyProps.length > 0
+          ? `展示${vp.keyProps.join('、')}`
           : (vp.name === '全景' ? '展示整个房间布局的宽角度全景' : `${vp.name}视角`);
         return `[${idx + 1}] ${vp.name}：${content}`;
       }).join('\n');
@@ -806,7 +810,7 @@ ${gridItemsZh}
     
     // 根据宽高比确定布局描述
     const isLandscape = contactSheetAspectRatio === '16:9';
-      const layoutDesc = `${contactSheetLayout} (${contactSheetLayout === '2x2' ? '4格' : '9格'})`;
+    const layoutDesc = `${contactSheetLayout} (${contactSheetLayout === '2x2' ? '4格' : '9格'})`;
     const layoutDescEn = `${contactSheetLayout === '2x2' ? '2 rows x 2 cols' : '3 rows x 3 cols'} (${contactSheetLayout})`;
     
     // 组合完整提示词
@@ -1205,7 +1209,7 @@ ${gridItemsZh}
       if (currentPageVps.length > 0 && extractedViewpoints.length === 0) {
         setExtractedViewpoints(currentPageVps.map(vp => ({
           id: vp.id,
-          name: vp.name,
+          name: getViewpointName(vp),
           nameEn: vp.nameEn,
           shotIds: vp.shotIds,
           keyProps: vp.keyProps,
@@ -1336,7 +1340,7 @@ ${gridItemsZh}
       const imgData = splitViewpointImages[vp.id];
       if (!imgData) continue;
       
-      const variantName = `${parentSceneName}-${vp.name}`;
+      const variantName = `${parentSceneName}-${getViewpointName(vp)}`;
       // 将 data URL 保存到本地文件
       const safeName = variantName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
       const localPath = await saveImageToLocal(
@@ -1362,7 +1366,7 @@ ${gridItemsZh}
         // 视角变体特有字段
         parentSceneId: parentScene.id,
         viewpointId: vp.id,
-        viewpointName: vp.name,
+        viewpointName: getViewpointName(vp),
         shotIds: vp.shotIds,
         isViewpointVariant: true,
       } as any);
@@ -1383,7 +1387,7 @@ ${gridItemsZh}
     // 更新父场景：仅记录本次联合图（不覆盖其它子场景）
     const viewpointsData = viewpointsToUse.map(vp => ({
       id: vp.id,
-      name: vp.name,
+      name: getViewpointName(vp),
       nameEn: vp.nameEn,
       shotIds: vp.shotIds,
       keyProps: vp.keyProps,
@@ -1403,7 +1407,7 @@ ${gridItemsZh}
         const csAiFolder = getOrCreateCategoryFolder('ai-image');
         addMediaFromUrl({
           url: csPath,
-          name: `联合图-${parentSceneName}`,
+          name: `Contact Sheet - ${parentSceneName}`,
           type: 'image',
           source: 'ai-image',
           folderId: csAiFolder,
@@ -1790,7 +1794,7 @@ ${gridItemsZh}
             continue;
           }
 
-          const variantName = `${parentSceneName}-${vp.name}`;
+            const variantName = `${parentSceneName}-${getViewpointName(vp)}`;
           const safeName = variantName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
           const localPath = await saveImageToLocal(
             imgData.imageUrl,
@@ -1811,7 +1815,7 @@ ${gridItemsZh}
             tags: parentScene.tags,
             parentSceneId: parentScene.id,
             viewpointId: vp.id,
-            viewpointName: vp.name,
+            viewpointName: getViewpointName(vp),
             shotIds: vp.shotIds,
             isViewpointVariant: true,
           } as any);
@@ -1842,7 +1846,7 @@ ${gridItemsZh}
             const csAiFolder = getOrCreateCategoryFolder('ai-image');
             addMediaFromUrl({
               url: csPath,
-              name: `联合图-${parentSceneName}`,
+              name: `Contact Sheet - ${parentSceneName}`,
               type: 'image',
               source: 'ai-image',
               folderId: csAiFolder,
@@ -1853,7 +1857,7 @@ ${gridItemsZh}
 
         const viewpointsData = viewpointsToSave.map(vp => ({
           id: vp.id,
-          name: vp.name,
+          name: getViewpointName(vp),
           nameEn: vp.nameEn,
           shotIds: vp.shotIds,
           keyProps: vp.keyProps,
@@ -1971,7 +1975,7 @@ No characters, empty environment.`;
           if (!overviewImage) {
             const overviewByName = scenes.find(s => 
               s.parentSceneId === childScene.parentSceneId && 
-              (s.name?.includes('全景') || (s as any).viewpointName === '全景')
+              (s.name?.includes('Overview') || s.name?.includes('全景') || ('viewpointName' in s && (s.viewpointName === 'Overview' || s.viewpointName === '全景')))
             );
             if (overviewByName?.referenceImage) {
               overviewImage = overviewByName.referenceImage;
@@ -2102,6 +2106,12 @@ No characters, empty environment.`;
       west: '装饰墙或书架',
       east: '家具或陈设',
     };
+    const wallDescriptionsEn = {
+      north: 'windows and natural light',
+      south: 'entrance door',
+      west: 'decorative wall or bookshelf',
+      east: 'furniture or room dressing',
+    };
 
     // 从视觉描述中尝试提取墙面信息
     const wallKeywords = {
@@ -2114,16 +2124,20 @@ No characters, empty environment.`;
     for (const part of [...locationParts, ...visualParts]) {
       if (wallKeywords.window.some(k => part.includes(k))) {
         wallDescriptions.north = part.trim();
+        wallDescriptionsEn.north = part.trim();
       } else if (wallKeywords.door.some(k => part.includes(k))) {
         wallDescriptions.south = part.trim();
+        wallDescriptionsEn.south = part.trim();
       } else if (wallKeywords.shelf.some(k => part.includes(k))) {
         wallDescriptions.west = part.trim();
+        wallDescriptionsEn.west = part.trim();
       } else if (wallKeywords.decoration.some(k => part.includes(k))) {
         wallDescriptions.east = part.trim();
+        wallDescriptionsEn.east = part.trim();
       }
     }
 
-    return { anchor, walls: wallDescriptions };
+    return { anchor, walls: wallDescriptions, wallsEn: wallDescriptionsEn };
   };
 
   /**
@@ -2135,7 +2149,7 @@ No characters, empty environment.`;
       return;
     }
 
-    const { anchor, walls } = extractSpatialAssets(selectedScene);
+    const { anchor, walls, wallsEn } = extractSpatialAssets(selectedScene);
     const sceneName = selectedScene.name || selectedScene.location || 'the scene';
     
     // 获取风格 tokens
@@ -2146,16 +2160,16 @@ No characters, empty environment.`;
     const promptEn = `A professional orthographic concept sheet arranged in a precise 2x2 grid, depicting ${sceneName} from four cardinal angles with perfect spatial continuity. ${styleTokens}, detailed environment concept art.
 
 **Top-Left (Front View):**
-A direct front-facing shot of ${anchor}. We see the front details clearly. The background is the wall behind it, featuring ${walls.south}.
+A direct front-facing shot of ${anchor}. We see the front details clearly. The background is the wall behind it, featuring ${wallsEn.south}.
 
 **Top-Right (Back View):**
-A direct back-facing shot of ${anchor}. We see the rear structure. The background is the wall the object is facing, featuring ${walls.north}.
+A direct back-facing shot of ${anchor}. We see the rear structure. The background is the wall the object is facing, featuring ${wallsEn.north}.
 
 **Bottom-Left (Left Profile):**
-A side profile shot of ${anchor} from the left. The background is the opposite wall, strictly featuring ${walls.east}.
+A side profile shot of ${anchor} from the left. The background is the opposite wall, strictly featuring ${wallsEn.east}.
 
 **Bottom-Right (Right Profile):**
-A side profile shot of ${anchor} from the right. The background is the opposite wall, strictly featuring ${walls.west}.
+A side profile shot of ${anchor} from the right. The background is the opposite wall, strictly featuring ${wallsEn.west}.
 
 Unified by flat, neutral cinematic lighting to ensure texture visibility. No characters, empty environment.`;
 
@@ -2228,7 +2242,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
         if (!overviewImage) {
           const overviewByName = scenes.find(s => 
             s.parentSceneId === selectedScene.parentSceneId && 
-            (s.name?.includes('全景') || (s as any).viewpointName === '全景')
+            (s.name?.includes('Overview') || s.name?.includes('全景') || ('viewpointName' in s && (s.viewpointName === 'Overview' || s.viewpointName === '全景')))
           );
           if (overviewByName?.referenceImage) {
             overviewImage = overviewByName.referenceImage;
@@ -2538,7 +2552,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                 if (!overviewImage) {
                   const overviewByName = scenes.find(s => 
                     s.parentSceneId === selectedScene.parentSceneId && 
-                    (s.name?.includes('全景') || (s as any).viewpointName === '全景')
+                    (s.name?.includes('Overview') || s.name?.includes('全景') || ('viewpointName' in s && (s.viewpointName === 'Overview' || s.viewpointName === '全景')))
                   );
                   if (overviewByName?.referenceImage) {
                     overviewImage = overviewByName.referenceImage;
@@ -2633,7 +2647,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
               </summary>
               <div className="mt-2 space-y-2">
                 {(() => {
-                  const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'zh';
+                  const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'en';
                   const isZh = effectiveLang === 'zh' || effectiveLang === 'zh+en';
                   const langLabel = isZh ? 'Chinese' : 'English';
                   const currentValue = isZh
@@ -2884,7 +2898,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                         {('gridIndex' in vp ? vp.gridIndex : idx) + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium">{vp.name}</div>
+                        <div className="font-medium">{getViewpointName(vp)}</div>
                         <div className="text-muted-foreground truncate">
                           {vp.keyProps.join(' / ') || 'Default viewpoint'}
                         </div>
@@ -2950,7 +2964,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
               </summary>
               <div className="mt-2 space-y-2">
                 {(() => {
-                  const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'zh';
+                  const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'en';
                   const isZh = effectiveLang === 'zh' || effectiveLang === 'zh+en';
                   const langLabel = isZh ? 'Chinese' : 'English';
                   const currentValue = isZh
@@ -3045,7 +3059,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                             {imgData ? (
                               <img 
                                 src={imgData.imageUrl} 
-                                alt={vp.name}
+                                alt={getViewpointName(vp)}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
@@ -3055,7 +3069,7 @@ ${anchor} 的背面直视镜头。展示后部结构。背景是物体面向的�
                             )}
                           </div>
                           <div className="text-[10px] text-center text-muted-foreground truncate">
-                            {vp.name}
+                            {getViewpointName(vp)}
                           </div>
                         </div>
                       );

@@ -240,7 +240,7 @@ async function uploadWithProvider(
         ? errorMessage
         : typeof messageField === 'string'
           ? messageField
-          : text || `上传失败: ${response.status}`;
+          : text || `Upload failed: ${response.status}`;
       return { success: false, error: `Image host ${provider.name} upload failed: ${message}` };
     }
 
@@ -267,7 +267,7 @@ async function uploadWithProvider(
     });
     return { success: false, error: `Image host ${provider.name} reported success but returned no URL.` };
   } catch (error) {
-    const message = error instanceof Error ? error.message : '上传失败';
+    const message = error instanceof Error ? error.message : 'Upload failed';
     return { success: false, error: `Image host ${provider.name} request failed: ${message}` };
   }
 }
@@ -316,7 +316,7 @@ export async function uploadToImageHost(
   }
 
   const orderedProviders = getRotatedProviders(providers);
-  let lastError = '上传失败';
+  let lastError = 'Upload failed';
 
   for (const provider of orderedProviders) {
     const keys = parseApiKeys(provider.apiKey);
@@ -327,14 +327,14 @@ export async function uploadToImageHost(
           if (result.success) {
             return result;
           }
-          lastError = result.error || '上传失败';
+          lastError = result.error || 'Upload failed';
           if (attempt < 1) {
             await sleep(600);
           }
         }
         continue;
       }
-      lastError = `图床 ${provider.name} 未配置 API Key`;
+      lastError = `Image host ${provider.name} does not have an API key configured.`;
       continue;
     }
 
@@ -344,7 +344,7 @@ export async function uploadToImageHost(
     for (let i = 0; i < maxRetries; i++) {
       const apiKey = keyManager.getCurrentKey();
       if (!apiKey) {
-        lastError = '所有 API Key 暂时不可用';
+        lastError = 'All API keys are temporarily unavailable.';
         break;
       }
 
@@ -353,7 +353,7 @@ export async function uploadToImageHost(
         return result;
       }
 
-      lastError = result.error || '上传失败';
+      lastError = result.error || 'Upload failed';
       keyManager.markCurrentKeyFailed();
     }
 

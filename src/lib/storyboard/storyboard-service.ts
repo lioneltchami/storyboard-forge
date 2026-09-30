@@ -115,7 +115,7 @@ async function submitImageGenTask(
         const errorText = await response.text();
         console.error('[StoryboardService] Image API error:', response.status, errorText);
 
-        let errorMessage = `鍥剧墖鐢熸垚 API 閿欒: ${response.status}`;
+        let errorMessage = `Image generation API error: ${response.status}`;
         try {
           const errorJson = JSON.parse(errorText);
           errorMessage = errorJson.error?.message || errorJson.message || errorJson.msg || errorMessage;
@@ -127,9 +127,9 @@ async function submitImageGenTask(
 
         const error = new Error(
           response.status === 401 || response.status === 403
-            ? 'API Key 无效或已过期，请检查配置'
+            ? 'The API key is invalid or expired. Please check your configuration.'
             : response.status >= 500
-              ? '图片生成服务暂时不可用，请稍后再试'
+              ? 'The image generation service is temporarily unavailable. Please try again later.'
               : errorMessage
         ) as Error & { status?: number };
         error.status = response.status;

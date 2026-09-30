@@ -170,7 +170,7 @@ ${shotSummaries}
     
     const viewpoints = (parsed.viewpoints || []).map((v: any, idx: number) => ({
       id: v.id || `viewpoint_${idx}`,
-      name: v.name || 'Unnamed viewpoint',
+      name: v.nameEn || v.name || 'Unnamed viewpoint',
       nameEn: v.nameEn || 'Unnamed Viewpoint',
       description: v.description || '',
       descriptionEn: v.descriptionEn || '',

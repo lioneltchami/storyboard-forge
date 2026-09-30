@@ -190,7 +190,7 @@ export async function processBatched<TItem, TResult>(
         batch, feature, buildPrompts, parseResult, apiOptions,
       );
       completedCount++;
-      onProgress?.(completedCount, batches.length, `批次 ${idx + 1} 完成`);
+      onProgress?.(completedCount, batches.length, `Batch ${idx + 1} complete`);
       return result;
     };
   });
@@ -227,7 +227,7 @@ export async function processBatched<TItem, TResult>(
     }
   }
 
-  onProgress?.(batches.length, batches.length, `完成 (${failedBatches > 0 ? `${failedBatches} 批失败` : '全部成功'})`);
+  onProgress?.(batches.length, batches.length, `Complete (${failedBatches > 0 ? `${failedBatches} batch(es) failed` : 'all successful'})`);
 
   return { results: finalResults, failedBatches, totalBatches: batches.length };
 }

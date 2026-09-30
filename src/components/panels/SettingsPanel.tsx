@@ -1198,7 +1198,7 @@ export function SettingsPanel() {
                           Automatically skips blocked shots with sensitive content and continues generating the rest.
                         </p>
                         <p className="text-xs text-muted-foreground/70 mt-1">
-                          Recommended on · keeps one failed shot from stopping the whole batch
+                          Recommended: on. Keeps one failed shot from stopping the whole batch.
                         </p>
                       </div>
                     </div>
