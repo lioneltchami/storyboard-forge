@@ -44,22 +44,23 @@ function readState(payload: any): any {
   return payload?.state ?? payload;
 }
 
-async function writeProjectJson(key: string, value: unknown): Promise<void> {
-  await window.fileStorage!.setItem(key, JSON.stringify(value));
+async function writeProjectJson(storage: typeof fileStorage, key: string, value: unknown): Promise<void> {
+  await storage.setItem(key, JSON.stringify(value));
 }
 
 async function migrateSeededDemoProjectToEnglish(): Promise<void> {
-  if (!window.fileStorage) return;
+  const storage = window.fileStorage;
+  if (!storage) return;
 
   try {
-    if (await window.fileStorage.exists(DEMO_ENGLISH_MIGRATION_FLAG_KEY)) {
+    if (await storage.exists(DEMO_ENGLISH_MIGRATION_FLAG_KEY)) {
       return;
     }
   } catch {
     // If exists() is unavailable, continue and inspect the data directly.
   }
 
-  const projectStoreRaw = await window.fileStorage.getItem('moyin-project-store');
+  const projectStoreRaw = await storage.getItem('moyin-project-store');
   if (!projectStoreRaw) return;
 
   let currentProjectStore: any;
@@ -78,7 +79,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
   const projectKeys = ['script', 'director', 'scenes', 'sclass', 'media', 'characters'] as const;
   const currentProjectPayloads = await Promise.all(
     projectKeys.map(async (key) => {
-      const raw = await window.fileStorage.getItem(`_p/${DEMO_PROJECT_ID}/${key}`);
+      const raw = await storage.getItem(`_p/${DEMO_PROJECT_ID}/${key}`);
       return [key, raw] as const;
     })
   );
@@ -95,7 +96,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
     });
 
   if (!hasLegacyChinese) {
-    await writeProjectJson(DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
+    await writeProjectJson(storage, DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
       migratedAt: new Date().toISOString(),
       demoProjectId: DEMO_PROJECT_ID,
       skipped: true,
@@ -116,7 +117,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
   };
 
   for (const [key, payload] of Object.entries(projectPayloads)) {
-    await writeProjectJson(`_p/${DEMO_PROJECT_ID}/${key}`, payload);
+    await writeProjectJson(storage, `_p/${DEMO_PROJECT_ID}/${key}`, payload);
   }
 
   if (currentProjectStoreState?.projects && referenceDemoProject) {
@@ -131,7 +132,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
         : project
     ));
 
-    await writeProjectJson('moyin-project-store', {
+    await writeProjectJson(storage, 'moyin-project-store', {
       ...currentProjectStore,
       state: {
         ...currentProjectStoreState,
@@ -141,7 +142,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
     });
   }
 
-  const currentCharacterLibraryRaw = await window.fileStorage.getItem('moyin-character-library');
+  const currentCharacterLibraryRaw = await storage.getItem('moyin-character-library');
   if (currentCharacterLibraryRaw) {
     try {
       const currentCharacterLibrary = JSON.parse(currentCharacterLibraryRaw);
@@ -159,7 +160,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
           ...referenceDemoCharacters,
         ];
 
-        await writeProjectJson('moyin-character-library', {
+        await writeProjectJson(storage, 'moyin-character-library', {
           ...currentCharacterLibrary,
           state: {
             ...currentCharacterState,
@@ -172,7 +173,7 @@ async function migrateSeededDemoProjectToEnglish(): Promise<void> {
     }
   }
 
-  await writeProjectJson(DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
+  await writeProjectJson(storage, DEMO_ENGLISH_MIGRATION_FLAG_KEY, {
     migratedAt: new Date().toISOString(),
     demoProjectId: DEMO_PROJECT_ID,
     source: 'bundled-demo-data',

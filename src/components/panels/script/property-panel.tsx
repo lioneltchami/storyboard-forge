@@ -150,7 +150,7 @@ export function PropertyPanel({
   const [copiedShotPrompts, setCopiedShotPrompts] = useState(false);
   const [copiedScene, setCopiedScene] = useState(false);
   const scriptProject = useActiveScriptProject();
-  const promptLanguage = scriptProject?.promptLanguage || 'zh';
+  const promptLanguage = scriptProject?.promptLanguage || 'en';
 
   // 复制场景数据
   const handleCopySceneData = async () => {
@@ -195,7 +195,7 @@ export function PropertyPanel({
       lines.push(`Viewpoint count: ${scene.viewpoints.length}`);
       lines.push('');
       scene.viewpoints.forEach((vp, idx) => {
-        lines.push(`### Viewpoint ${idx + 1}: ${vp.name}`);
+        lines.push(`### Viewpoint ${idx + 1}: ${promptLanguage === 'en' ? vp.nameEn || vp.name : vp.name || vp.nameEn}`);
         lines.push(`- ID: ${vp.id}`);
         if (vp.nameEn) lines.push(`- English name: ${vp.nameEn}`);
         if (vp.keyProps && vp.keyProps.length > 0) lines.push(`- Key props: ${vp.keyProps.join('、')}`);
@@ -1295,7 +1295,7 @@ export function PropertyPanel({
                           <span className="w-5 h-5 rounded bg-primary/10 text-primary flex items-center justify-center font-medium">
                             {idx + 1}
                           </span>
-                          <span className="flex-1 truncate">{vp.name}</span>
+                          <span className="flex-1 truncate">{promptLanguage === 'en' ? vp.nameEn || vp.name : vp.name || vp.nameEn}</span>
                           {vp.shotIndexes && vp.shotIndexes.length > 0 && (
                             <span className="text-muted-foreground">
                               Shots #{vp.shotIndexes.map(i => String(i).padStart(2, '0')).join(',#')}

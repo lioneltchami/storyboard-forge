@@ -1624,7 +1624,7 @@ export const useDirectorStore = create<DirectorStore>()(
 
     const blankScene: SplitScene = {
       id: newId,
-      sceneName: `Blank Scene ${newId + 1}`,
+      sceneName: `Untitled Scene ${newId + 1}`,
       sceneLocation: '',
       imageDataUrl: '',
       imageHttpUrl: null,

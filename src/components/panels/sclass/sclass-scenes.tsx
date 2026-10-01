@@ -1730,9 +1730,9 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     
     console.log('[SingleImage] Using config:', { platform, model, imageBaseUrl });
 
-    // Need a prompt to generate - prefer imagePromptZh (first frame static), fallback to videoPromptZh
-    const promptToUse = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() 
-      || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
+    // Need a prompt to generate - English-first for the localized app, with legacy Chinese fallback.
+    const promptToUse = scene.imagePrompt?.trim() || scene.imagePromptZh?.trim()
+      || scene.videoPrompt?.trim() || scene.videoPromptZh?.trim() || '';
     if (!promptToUse) {
       toast.warning("Please fill in the first-frame prompt before generating an image");
       return;
@@ -1987,7 +1987,7 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
   };
 
   const composeTilePrompt = (scene: SplitScene, angle: Angle, aspect: '16:9'|'9:16', styleTokens?: string[]) => {
-    const base = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
+    const base = scene.imagePrompt?.trim() || scene.imagePromptZh?.trim() || scene.videoPrompt?.trim() || scene.videoPromptZh?.trim() || '';
     const shot = allowedShotFromSize(scene.shotSize);
     const vertical = aspect === '9:16' ? 'vertical composition, tighter framing, avoid letterboxing, ' : '';
     // 禁用相机运动与节奏，仅保留视角/景别/构图
@@ -2265,9 +2265,9 @@ export function SClassScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
         const col = (idx % cols) + 1;
         let desc = '';
         if (task.type === 'end') {
-          desc = s.endFramePromptZh?.trim() || s.endFramePrompt?.trim() || (s.imagePromptZh || s.imagePrompt || '') + ' end state';
+          desc = s.endFramePrompt?.trim() || s.endFramePromptZh?.trim() || (s.imagePrompt || s.imagePromptZh || '') + ' end state';
         } else {
-          desc = s.imagePromptZh?.trim() || s.imagePrompt?.trim() || s.videoPromptZh?.trim() || s.videoPrompt?.trim() || `scene ${idx + 1}`;
+          desc = s.imagePrompt?.trim() || s.imagePromptZh?.trim() || s.videoPrompt?.trim() || s.videoPromptZh?.trim() || `scene ${idx + 1}`;
         }
         
         // 人物数量约束

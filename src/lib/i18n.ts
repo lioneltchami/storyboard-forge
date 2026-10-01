@@ -81,6 +81,7 @@ type MessageTree = {
     desktopOnly: string;
     openDownloadFailed: string;
     noReleaseNotes: string;
+    releaseNotesUnavailable: string;
   };
   projectHeader: {
     returnToSeries: string;
@@ -224,16 +225,17 @@ export const messages: Record<Locale, MessageTree> = {
       releaseNotes: "Release notes",
       publishedAt: "Published at",
       downloadMethod: "Download method",
-      downloadHint: "Choose GitHub or Baidu Netdisk to download the latest installer.",
+      downloadHint: "Choose an available download method for the latest installer.",
       codeLabel: "Code:",
       noDownloadLink: "The current manifest does not provide download links.",
       githubDownload: "GitHub download",
-      baiduDownload: "Baidu Netdisk download",
+      baiduDownload: "Mirror download",
       ignoreVersion: "Ignore this version",
       later: "Later",
       desktopOnly: "Use this feature in the desktop app.",
       openDownloadFailed: "Failed to open download link",
       noReleaseNotes: "No release notes were provided for this release.",
+      releaseNotesUnavailable: "Release notes are available from the download page.",
     },
     projectHeader: {
       returnToSeries: "Back to series view",
@@ -385,6 +387,7 @@ export const messages: Record<Locale, MessageTree> = {
       desktopOnly: "请在桌面版中使用此功能",
       openDownloadFailed: "打开下载链接失败",
       noReleaseNotes: "本次发布未填写更新说明。",
+      releaseNotesUnavailable: "更新说明请查看下载页面。",
     },
     projectHeader: {
       returnToSeries: "返回全剧视图",

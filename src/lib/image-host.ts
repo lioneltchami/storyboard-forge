@@ -118,7 +118,7 @@ async function toUploadFile(imageData: string, name?: string): Promise<{ blob: B
   if (isHttpUrl(imageData)) {
     const response = await fetch(imageData);
     if (!response.ok) {
-      throw new Error(`下载图片失败: ${response.status}`);
+      throw new Error(`Image download failed: ${response.status}`);
     }
     blob = await response.blob();
   } else if (imageData.startsWith('data:')) {
@@ -179,7 +179,7 @@ async function uploadWithProvider(
     }
     const uploadUrl = resolveUploadUrl(provider);
     if (!uploadUrl) {
-      return { success: false, error: '图床上传地址未配置' };
+      return { success: false, error: 'Image-host upload URL is not configured.' };
     }
 
     const fieldName = provider.imageField || 'image';
@@ -240,8 +240,8 @@ async function uploadWithProvider(
         ? errorMessage
         : typeof messageField === 'string'
           ? messageField
-          : text || `上传失败: ${response.status}`;
-      return { success: false, error: `图床 ${provider.name} 上传失败：${message}` };
+          : text || `Upload failed: ${response.status}`;
+      return { success: false, error: `Image host ${provider.name} upload failed: ${message}` };
     }
 
     const urlField = getByPath(data, provider.responseUrlField || 'url');
@@ -265,10 +265,10 @@ async function uploadWithProvider(
       platform: provider.platform,
       responsePreview: trimmedText.substring(0, 200),
     });
-    return { success: false, error: `图床 ${provider.name} 上传成功但未返回 URL` };
+    return { success: false, error: `Image host ${provider.name} reported success but returned no URL.` };
   } catch (error) {
-    const message = error instanceof Error ? error.message : '上传失败';
-    return { success: false, error: `图床 ${provider.name} 请求失败：${message}` };
+    const message = error instanceof Error ? error.message : 'Upload failed';
+    return { success: false, error: `Image host ${provider.name} request failed: ${message}` };
   }
 }
 
@@ -288,7 +288,7 @@ async function attemptProviderUpload(
   try {
     return await uploadWithProvider(provider, apiKey, imageData, options);
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : '上传失败' };
+    return { success: false, error: error instanceof Error ? error.message : 'Upload failed.' };
   }
 }
 
@@ -312,11 +312,11 @@ export async function uploadToImageHost(
     : store.getEnabledImageHostProviders();
 
   if (!providers || providers.length === 0) {
-    return { success: false, error: '图床未配置' };
+    return { success: false, error: 'No image host is configured.' };
   }
 
   const orderedProviders = getRotatedProviders(providers);
-  let lastError = '上传失败';
+  let lastError = 'Upload failed';
 
   for (const provider of orderedProviders) {
     const keys = parseApiKeys(provider.apiKey);
@@ -327,14 +327,14 @@ export async function uploadToImageHost(
           if (result.success) {
             return result;
           }
-          lastError = result.error || '上传失败';
+          lastError = result.error || 'Upload failed';
           if (attempt < 1) {
             await sleep(600);
           }
         }
         continue;
       }
-      lastError = `图床 ${provider.name} 未配置 API Key`;
+      lastError = `Image host ${provider.name} does not have an API key configured.`;
       continue;
     }
 
@@ -344,7 +344,7 @@ export async function uploadToImageHost(
     for (let i = 0; i < maxRetries; i++) {
       const apiKey = keyManager.getCurrentKey();
       if (!apiKey) {
-        lastError = '所有 API Key 暂时不可用';
+        lastError = 'All API keys are temporarily unavailable.';
         break;
       }
 
@@ -353,7 +353,7 @@ export async function uploadToImageHost(
         return result;
       }
 
-      lastError = result.error || '上传失败';
+      lastError = result.error || 'Upload failed';
       keyManager.markCurrentKeyFailed();
     }
 

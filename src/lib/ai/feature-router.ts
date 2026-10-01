@@ -10,7 +10,7 @@
  * Usage:
  *   const config = getFeatureConfig('character_generation');
  *   if (!config) {
- *     toast.error('请先在设置中配置角色生成的 API 供应商');
+ *     toast.error('Configure the character generation API provider in Settings first.');
  *     return;
  *   }
  *   // Use config.apiKey and config.provider in API call
@@ -228,7 +228,7 @@ export async function callFeatureAPI(
     throw new Error('Please configure a Base URL in Settings.');
   }
   if (!model) {
-    throw new Error('请先在设置中配置模型');
+    throw new Error('Configure a model in Settings first.');
   }
   
   console.log(`[callFeatureAPI] 功能: ${feature}`);

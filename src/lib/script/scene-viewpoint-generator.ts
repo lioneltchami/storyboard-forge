@@ -476,8 +476,8 @@ export function extractViewpointsFromShots(
   
   // 如果视角不足 6 个，补充默认视角
   const defaultViewpoints: Array<Omit<SceneViewpoint, 'shotIds' | 'gridIndex'>> = [
-    { id: 'overview', name: '全景', nameEn: 'Overview', keyProps: [], keyPropsEn: [], description: '整体空间布局', descriptionEn: 'Overall spatial layout' },
-    { id: 'detail', name: '细节', nameEn: 'Detail View', keyProps: [], keyPropsEn: [], description: '装饰细节特写', descriptionEn: 'Decorative details close-up' },
+    { id: 'overview', name: 'Overview', nameEn: 'Overview', keyProps: [], keyPropsEn: [], description: 'Overall spatial layout', descriptionEn: 'Overall spatial layout' },
+    { id: 'detail', name: 'Detail View', nameEn: 'Detail View', keyProps: [], keyPropsEn: [], description: 'Decorative detail close-up', descriptionEn: 'Decorative detail close-up' },
   ];
   
   while (viewpoints.length < maxViewpoints && defaultViewpoints.length > 0) {
@@ -510,7 +510,7 @@ export function generateContactSheetPrompt(config: ContactSheetConfig): ContactS
     console.log(`[generateContactSheetPrompt] 使用 AI 分析视角: ${scene.viewpoints.length} 个`);
     viewpoints = scene.viewpoints.slice(0, maxViewpoints).map((v: any, idx: number) => ({
       id: v.id || `viewpoint_${idx}`,
-      name: v.name || '未命名视角',
+      name: v.name || 'Unnamed viewpoint',
       nameEn: v.nameEn || 'Unnamed Viewpoint',
       shotIds: v.shotIds || [],
       keyProps: v.keyProps || [],
@@ -736,8 +736,8 @@ function getDefaultViewpointsForEnvironment(
 ): Array<Omit<SceneViewpoint, 'shotIds' | 'gridIndex'>> {
   // 通用默认视角
   const commonDefaults: Array<Omit<SceneViewpoint, 'shotIds' | 'gridIndex'>> = [
-    { id: 'overview', name: '全景', nameEn: 'Overview', keyProps: [], keyPropsEn: [], description: '整体空间布局', descriptionEn: 'Overall spatial layout' },
-    { id: 'detail', name: '细节', nameEn: 'Detail View', keyProps: [], keyPropsEn: [], description: '细节特写', descriptionEn: 'Detail close-up' },
+    { id: 'overview', name: 'Overview', nameEn: 'Overview', keyProps: [], keyPropsEn: [], description: 'Overall spatial layout', descriptionEn: 'Overall spatial layout' },
+    { id: 'detail', name: 'Detail View', nameEn: 'Detail View', keyProps: [], keyPropsEn: [], description: 'Detail close-up', descriptionEn: 'Detail close-up' },
   ];
   
   // 根据环境类型返回特定默认视角
@@ -902,7 +902,7 @@ export function extractAllViewpointsFromShots(
     if (!viewpointMap.has('overview')) {
       viewpointMap.set('overview', {
         id: 'overview',
-        name: '全景',
+        name: 'Overview',
         nameEn: 'Overview',
         shotIds: unmatchedShots.map(s => s.id),
         keyProps: [],
@@ -927,8 +927,8 @@ export function extractAllViewpointsFromShots(
   
   // 补充默认视角（全景和细节）
   const defaultViewpoints = [
-    { id: 'overview', name: '全景', nameEn: 'Overview', keyProps: [] as string[], keyPropsEn: [] as string[], description: '整体空间布局', descriptionEn: 'Overall spatial layout' },
-    { id: 'detail', name: '细节', nameEn: 'Detail View', keyProps: [] as string[], keyPropsEn: [] as string[], description: '细节特写', descriptionEn: 'Detail close-up' },
+    { id: 'overview', name: 'Overview', nameEn: 'Overview', keyProps: [] as string[], keyPropsEn: [] as string[], description: 'Overall spatial layout', descriptionEn: 'Overall spatial layout' },
+    { id: 'detail', name: 'Detail View', nameEn: 'Detail View', keyProps: [] as string[], keyPropsEn: [] as string[], description: 'Detail close-up', descriptionEn: 'Detail close-up' },
   ];
   
   while (viewpoints.length < 6 && defaultViewpoints.length > 0) {
@@ -1282,7 +1282,7 @@ export function buildContactSheetDataFromViewpoints(
       pendingViewpoints.push({
         id: vp.id,
         name: vp.name,
-        nameEn: vp.nameEn || vp.name, // 如果没有英文名，使用中文名
+        nameEn: vp.nameEn || 'Unnamed viewpoint',
         shotIds: vp.shotIds,
         shotIndexes,
         keyProps: vp.keyProps,
@@ -1332,9 +1332,9 @@ export function buildContactSheetDataFromViewpoints(
       const row = Math.floor(idx / gridLayout.cols) + 1;
       const col = (idx % gridLayout.cols) + 1;
       const vpNameEn = vp.nameEn || vp.name;
-      const content = vp.keyProps.length > 0 
-        ? `showing ${vp.keyProps.join(', ')}` 
-        : (vpNameEn === 'Overview' || vp.name === '全景' ? 'wide shot showing the entire room layout' : `${vpNameEn} angle of the room`);
+      const content = vp.keyProps.length > 0
+        ? `showing ${vp.keyProps.join(', ')}`
+        : (vpNameEn === 'Overview' || vp.name === 'Overview' || vp.name === '全景' ? 'wide shot showing the entire room layout' : `${vpNameEn} angle of the room`);
       
       promptParts.push(`Panel [row ${row}, col ${col}] (no people): ${content} [same style]`);
     });
@@ -1356,7 +1356,7 @@ export function buildContactSheetDataFromViewpoints(
     const gridItemsZh = pageViewpoints.map((vp, i) => {
       const content = vp.keyProps.length > 0 
         ? `展示${vp.keyProps.join('、')}` 
-        : (vp.name === '全景' ? '展示整个空间布局的宽角度全景' : `${vp.name}视角`);
+        : (vp.name === 'Overview' || vp.name === '全景' ? 'wide shot showing the entire space layout' : `${vp.name} view`);
       return `[${i + 1}] ${vp.name}：${content}`;
     }).join('\n');
     

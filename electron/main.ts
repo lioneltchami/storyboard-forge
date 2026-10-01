@@ -21,6 +21,7 @@ import type { AvailableUpdateInfo, OpenExternalResult, UpdateCheckResult, Update
 // │   └── index.html
 //
 process.env.APP_ROOT = path.join(__dirname, '../..')
+const APP_ICON_PATH = path.join(process.env.APP_ROOT, 'build', 'icon.png')
 
 export const VITE_DEV_SERVER_URL = process.env['ELECTRON_RENDERER_URL'] || process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(__dirname)
@@ -31,6 +32,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 type PackageUpdateConfig = {
+  enabled?: boolean
   manifestUrl?: string
   defaultGithubUrl?: string
   defaultBaiduUrl?: string
@@ -103,6 +105,10 @@ function getDefaultBaiduCode() {
     : undefined
 }
 
+function areUpdatesEnabled() {
+  return packageUpdateConfig.enabled !== false && !!getUpdateManifestUrl()
+}
+
 async function fetchUpdateManifest() {
   const manifestUrl = getUpdateManifestUrl()
   if (!manifestUrl) {
@@ -141,6 +147,10 @@ async function fetchUpdateManifest() {
 }
 
 async function resolveAvailableUpdate(currentVersion: string): Promise<AvailableUpdateInfo | null> {
+  if (!areUpdatesEnabled()) {
+    return null
+  }
+
   const manifest = await fetchUpdateManifest()
   if (compareVersions(manifest.version, currentVersion) <= 0) {
     return null
@@ -160,6 +170,7 @@ async function resolveAvailableUpdate(currentVersion: string): Promise<Available
 function createWindow() {
   win = new BrowserWindow({
     title: 'Storyboard Forge',
+    icon: APP_ICON_PATH,
     width: 1400,
     height: 900,
     minWidth: 1200,
@@ -1205,7 +1216,7 @@ ipcMain.handle('storage-export-data', async (_event, targetPath: string) => {
     if (!targetPath) return { success: false, error: 'Path is required' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `storyboard-forge-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     
     // Create export structure
@@ -1243,7 +1254,7 @@ ipcMain.handle('storage-import-data', async (_event, sourcePath: string) => {
     }
     
     // Create temporary backup for rollback
-    const backupDir = path.join(os.tmpdir(), `moyin-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `storyboard-forge-backup-${Date.now()}`)
     const currentProjectsDir = getProjectDataRoot()
     const currentMediaDir = getMediaRoot()
     
@@ -1347,7 +1358,7 @@ ipcMain.handle('storage-export-project-data', async (_event, targetPath: string)
     if (!targetPath) return { success: false, error: 'Path is required' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `storyboard-forge-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     ensureDir(path.join(exportDir, 'projects'))
     ensureDir(path.join(exportDir, 'media'))
@@ -1368,7 +1379,7 @@ ipcMain.handle('storage-import-project-data', async (_event, sourcePath: string)
 
     const currentProjectsDir = getProjectDataRoot()
     const currentMediaDir = getMediaRoot()
-    const backupDir = path.join(os.tmpdir(), `moyin-legacy-import-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `storyboard-forge-legacy-import-backup-${Date.now()}`)
 
     try {
       if (fs.existsSync(currentProjectsDir)) {
@@ -1427,7 +1438,7 @@ ipcMain.handle('storage-export-media-data', async (_event, targetPath: string) =
     if (!targetPath) return { success: false, error: 'Path cannot be empty' }
     const exportDir = path.join(
       normalizePath(targetPath),
-      `moyin-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
+      `storyboard-forge-data-${new Date().toISOString().replace(/[:.]/g, '-')}`
     )
     ensureDir(path.join(exportDir, 'projects'))
     ensureDir(path.join(exportDir, 'media'))
@@ -1447,7 +1458,7 @@ ipcMain.handle('storage-import-media-data', async (_event, sourcePath: string) =
     const source = normalizePath(sourcePath)
     if (source === target) return { success: true }
 
-    const backupDir = path.join(os.tmpdir(), `moyin-media-import-backup-${Date.now()}`)
+    const backupDir = path.join(os.tmpdir(), `storyboard-forge-media-import-backup-${Date.now()}`)
 
     try {
       if (fs.existsSync(target)) {
@@ -1596,7 +1607,7 @@ ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filt
 
 // ==================== Demo Project Seed ====================
 const DEMO_PROJECT_ID = 'a4bbe260-0127-49c7-9230-e766402663c7'
-const LEGACY_DEMO_PROJECT_TITLE = '灌篮少女（演示）'
+const LEGACY_DEMO_PROJECT_TITLE = 'Basketball Girl (Demo)'
 
 /**
  * Get the path to bundled demo-data.
@@ -1777,6 +1788,10 @@ app.whenReady().then(() => {
   // Seed demo project on first run (before window creation)
   seedDemoProject()
   migratePersistedDemoProject()
+
+  if (process.platform === 'darwin' && fs.existsSync(APP_ICON_PATH)) {
+    app.dock.setIcon(APP_ICON_PATH)
+  }
 
   scheduleAutoClean()
   // Handle local-image:// protocol

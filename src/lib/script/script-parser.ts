@@ -224,7 +224,7 @@ export async function callChatAPI(
   
   if (!apiKey) {
     console.error('[callChatAPI] ❌ API Key 为空！');
-    throw new Error('API Key 未配置');
+    throw new Error('No API key is configured.');
   }
   
   // Create or use existing key manager for rotation
@@ -234,10 +234,10 @@ export async function callChatAPI(
   console.log(`[callChatAPI] 使用 ${provider}，共 ${totalKeys} 个 API keys`);
 
   if (!baseUrl) {
-    throw new Error('Base URL 未配置');
+    throw new Error('No API base URL is configured.');
   }
   if (!model) {
-    throw new Error('模型未配置');
+    throw new Error('No model is configured.');
   }
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
   const url = /\/v\d+$/.test(normalizedBaseUrl)
@@ -393,7 +393,7 @@ export async function callChatAPI(
         if (keyManager.handleError(403)) {
           console.warn(`[callChatAPI] 内容被安全过滤(${finishReason})，轮换 key 重试`);
         }
-        throw new Error(`内容被安全过滤(finish_reason: ${finishReason})`);
+        throw new Error(`The response was blocked by a safety filter (finish_reason: ${finishReason}).`);
       }
       
       // 推理模型回退：如果有 reasoning_content 但 content 为空，说明模型耗尽 token 在思考上
@@ -564,7 +564,7 @@ ${rawScript}
     return scriptData;
   } catch (e) {
     console.error('[parseScript] Failed to parse JSON:', cleaned);
-    throw new Error('无法解析AI返回的剧本数据');
+    throw new Error('Could not parse the script data returned by the AI.');
   }
 }
 

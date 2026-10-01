@@ -476,7 +476,7 @@ export function DirectorContextPanel() {
       const fallbackPromptZh = scene.visualPrompt?.trim()
         || [scene.location, scene.atmosphere].filter(Boolean).join(' - ')
         || scene.name
-        || '场景描述';
+        || 'Scene description';
       const fallbackPromptEn = scene.visualPromptEn?.trim() || '';
       const matchedScene = sceneLibraryScenes.find((s) =>
         !s.parentSceneId &&
@@ -613,10 +613,10 @@ export function DirectorContextPanel() {
   const handleSendShot = (shot: Shot, scene: ScriptScene) => {
     // 构建故事提示
     const parts: string[] = [];
-    if (scene.location) parts.push(`场景：${scene.location}`);
-    if (scene.time) parts.push(`时间：${scene.time}`);
-    if (shot.actionSummary) parts.push(`动作：${shot.actionSummary}`);
-    if (shot.dialogue) parts.push(`对白：${shot.dialogue}`);
+    if (scene.location) parts.push(`Scene: ${scene.location}`);
+    if (scene.time) parts.push(`Time: ${scene.time}`);
+    if (shot.actionSummary) parts.push(`Action: ${shot.actionSummary}`);
+    if (shot.dialogue) parts.push(`Dialogue: ${shot.dialogue}`);
 
     const storyPrompt = parts.join("\n");
 
@@ -650,9 +650,9 @@ export function DirectorContextPanel() {
 
     // 构建故事提示 - 合并场景下所有分镜
     const parts: string[] = [];
-    if (scene.location) parts.push(`场景：${scene.location}`);
-    if (scene.time) parts.push(`时间：${scene.time}`);
-    if (scene.atmosphere) parts.push(`氛围：${scene.atmosphere}`);
+    if (scene.location) parts.push(`Scene: ${scene.location}`);
+    if (scene.time) parts.push(`Time: ${scene.time}`);
+    if (scene.atmosphere) parts.push(`Mood: ${scene.atmosphere}`);
 
     // 添加所有分镜的动作和对白
     sceneShots.forEach((shot, idx) => {
@@ -660,7 +660,7 @@ export function DirectorContextPanel() {
       if (shot.actionSummary) shotParts.push(shot.actionSummary);
       if (shot.dialogue) shotParts.push(`"${shot.dialogue}"`);
       if (shotParts.length > 0) {
-        parts.push(`[镜头${idx + 1}] ${shotParts.join(" - ")}`);
+        parts.push(`[Shot ${idx + 1}] ${shotParts.join(" - ")}`);
       }
     });
 

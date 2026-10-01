@@ -36,7 +36,7 @@ export function populateSeriesMetaFromImport(
   // 验证标题不是集标题（如"第一集 初遇"）
   const isEpTitle = (t: string) => /^第[一二三四五六七八九十百千\d]+集/.test(t);
   const rawTitle = background.title || scriptData.title || '';
-  const safeTitle = (rawTitle && !isEpTitle(rawTitle)) ? rawTitle : '未命名';
+  const safeTitle = (rawTitle && !isEpTitle(rawTitle)) ? rawTitle : 'Untitled';
 
   const meta: SeriesMeta = {
     // 故事核心
@@ -64,7 +64,7 @@ export function populateSeriesMetaFromImport(
     colorPalette: undefined,
 
     // 制作设定 — promptLanguage 从用户选择直接映射
-    language: scriptData.language || '中文',
+    language: scriptData.language || 'Chinese',
     promptLanguage: importSettings?.promptLanguage,
   };
 

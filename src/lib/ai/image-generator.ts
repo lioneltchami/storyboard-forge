@@ -356,7 +356,7 @@ async function submitViaChatCompletions(
     // 每次重试独立创建 AbortController，避免共享 controller 在重试时已超时
     const controller = new AbortController();
     const timeoutId = setTimeout(
-      () => controller.abort(new DOMException('图片生成请求超时（60秒），请检查网络后重试', 'TimeoutError')),
+      () => controller.abort(new DOMException('Image generation timed out after 60 seconds. Please check your network and try again.', 'TimeoutError')),
       60000
     );
 
@@ -414,7 +414,7 @@ async function submitViaChatCompletions(
         const reason = controller.signal.reason;
         const readableMsg = reason instanceof Error
           ? reason.message
-          : (typeof reason === 'string' ? reason : '请求被中止，请重试');
+          : (typeof reason === 'string' ? reason : 'The request was cancelled. Please try again.');
         const abortErr = new Error(readableMsg) as Error & { status?: number };
         throw abortErr;
       }
@@ -468,7 +468,7 @@ async function submitViaChatCompletions(
     }
 
     if (!lastChunk) {
-      throw new Error(`无法解析图片 API 响应: ${responseText.substring(0, 120)}`);
+      throw new Error(`Unable to parse the image API response: ${responseText.substring(0, 120)}`);
     }
 
     // Reconstruct standard response format from accumulated deltas
@@ -487,7 +487,7 @@ async function submitViaChatCompletions(
 
   // Extract image from response - multiple possible formats
   const choice = data.choices?.[0];
-  if (!choice) throw new Error('响应中无有效内容');
+  if (!choice) throw new Error('The image API response contained no valid content.');
 
   const message = choice.message;
 
@@ -518,7 +518,7 @@ async function submitViaChatCompletions(
     if (b64Match) return { imageUrl: b64Match[1] };
   }
 
-  throw new Error('未能从响应中提取图片 URL');
+  throw new Error('Could not extract an image URL from the API response.');
 }
 
 /**
@@ -536,7 +536,7 @@ async function submitImageTask(
   endpointTypes?: string[],
 ): Promise<{ taskId?: string; imageUrl?: string; pollUrl?: string }> {
   if (!baseUrl) {
-    throw new Error('请先在设置中配置图片生成服务映射');
+    throw new Error('Configure an image-generation provider in Settings first.');
   }
   // 根据模型决定 size 格式
   let sizeValue: string = aspectRatio;
@@ -633,7 +633,7 @@ async function submitImageTask(
           if (sseMatch) {
             return JSON.parse(sseMatch[1]);
           }
-          throw new Error(`无法解析图片 API 响应: ${text.substring(0, 100)}`);
+          throw new Error(`Unable to parse the image API response: ${text.substring(0, 100)}`);
         }
       } finally {
         clearTimeout(timeoutId);
@@ -685,10 +685,10 @@ async function submitImageTask(
     return { taskId, pollUrl };
   } catch (error) {
     if (error instanceof Error) {
-      if (error.name === 'AbortError') throw new Error('API 请求超时');
+      if (error.name === 'AbortError') throw new Error('The image API request timed out.');
       throw error;
     }
-    throw new Error('调用图片生成 API 时发生未知错误');
+    throw new Error('An unknown error occurred while calling the image-generation API.');
   }
 }
 
@@ -768,7 +768,7 @@ async function pollTaskStatus(
     }
   }
 
-  throw new Error('图片生成超时');
+  throw new Error('Image generation timed out.');
 }
 
 /**
@@ -847,7 +847,7 @@ export async function submitGridImageRequest(params: {
       if (keyManager?.handleError) {
         keyManager.handleError(response.status, errorText);
       }
-      let errorMessage = `API 失败: ${response.status}`;
+      let errorMessage = `API failed: ${response.status}`;
       try {
         const errJson = JSON.parse(errorText);
         errorMessage = errJson.error?.message || errJson.message || errorMessage;
@@ -954,7 +954,7 @@ async function submitViaKlingImages(
       if (keyManager?.handleError) {
         keyManager.handleError(response.status, errText);
       }
-      const err = new Error(`Kling image API 错误: ${response.status} ${errText}`) as Error & { status?: number };
+      const err = new Error(`Kling image API error: ${response.status} ${errText}`) as Error & { status?: number };
       err.status = response.status;
       throw err;
     }
@@ -973,7 +973,7 @@ async function submitViaKlingImages(
   if (directUrl) return { imageUrl: directUrl };
 
   const taskId = data.data?.task_id;
-  if (!taskId) throw new Error('Kling image 返回空任务 ID');
+  if (!taskId) throw new Error('Kling image returned an empty task ID.');
 
   const pollUrl = `${rootBase}/${nativePath}/${taskId}`;
   const pollInterval = 2000;
@@ -990,14 +990,14 @@ async function submitViaKlingImages(
     const status = String(pollData.data?.task_status || '').toLowerCase();
     if (status === 'succeed' || status === 'success' || status === 'completed') {
       const imageUrl = pollData.data?.task_result?.images?.[0]?.url;
-      if (!imageUrl) throw new Error('Kling image 成功但无图片 URL');
+      if (!imageUrl) throw new Error('Kling image completed without returning an image URL.');
       return { imageUrl, taskId: String(taskId) };
     }
     if (status === 'failed' || status === 'error') {
-      throw new Error(pollData.data?.task_status_msg || 'Kling image 生成失败');
+      throw new Error(pollData.data?.task_status_msg || 'Kling image generation failed.');
     }
   }
-  throw new Error('Kling image 生成超时');
+  throw new Error('Kling image generation timed out.');
 }
 
 /**

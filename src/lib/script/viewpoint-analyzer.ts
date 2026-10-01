@@ -56,10 +56,10 @@ export async function analyzeSceneViewpoints(
   if (shots.length === 0) {
     return {
       viewpoints: [
-        { id: 'overview', name: '全景', nameEn: 'Overview', description: '整体空间', descriptionEn: 'Overall space', keyProps: [], keyPropsEn: [], shotIndexes: [] },
-        { id: 'detail', name: '细节', nameEn: 'Detail', description: '细节特写', descriptionEn: 'Detail close-up', keyProps: [], keyPropsEn: [], shotIndexes: [] },
+        { id: 'overview', name: 'Overview', nameEn: 'Overview', description: 'Overall space', descriptionEn: 'Overall space', keyProps: [], keyPropsEn: [], shotIndexes: [] },
+        { id: 'detail', name: 'Detail', nameEn: 'Detail', description: 'Detail close-up', descriptionEn: 'Detail close-up', keyProps: [], keyPropsEn: [], shotIndexes: [] },
       ],
-      analysisNote: '无分镜，使用默认视角',
+      analysisNote: 'No shots available, using default viewpoints',
     };
   }
   
@@ -170,7 +170,7 @@ ${shotSummaries}
     
     const viewpoints = (parsed.viewpoints || []).map((v: any, idx: number) => ({
       id: v.id || `viewpoint_${idx}`,
-      name: v.name || '未命名视角',
+      name: v.nameEn || v.name || 'Unnamed viewpoint',
       nameEn: v.nameEn || 'Unnamed Viewpoint',
       description: v.description || '',
       descriptionEn: v.descriptionEn || '',
@@ -195,11 +195,11 @@ ${shotSummaries}
     // 降级：返回基础视角
     return {
       viewpoints: [
-        { id: 'overview', name: '全景', nameEn: 'Overview', description: '整体空间布局', descriptionEn: 'Overall spatial layout', keyProps: [], keyPropsEn: [], shotIndexes: [] },
-        { id: 'medium', name: '中景', nameEn: 'Medium Shot', description: '中景视角', descriptionEn: 'Medium view', keyProps: [], keyPropsEn: [], shotIndexes: [] },
-        { id: 'detail', name: '细节', nameEn: 'Detail', description: '细节特写', descriptionEn: 'Detail close-up', keyProps: [], keyPropsEn: [], shotIndexes: [] },
+        { id: 'overview', name: 'Overview', nameEn: 'Overview', description: 'Overall spatial layout', descriptionEn: 'Overall spatial layout', keyProps: [], keyPropsEn: [], shotIndexes: [] },
+        { id: 'medium', name: 'Medium Shot', nameEn: 'Medium Shot', description: 'Medium view', descriptionEn: 'Medium view', keyProps: [], keyPropsEn: [], shotIndexes: [] },
+        { id: 'detail', name: 'Detail', nameEn: 'Detail', description: 'Detail close-up', descriptionEn: 'Detail close-up', keyProps: [], keyPropsEn: [], shotIndexes: [] },
       ],
-      analysisNote: 'AI 分析失败，使用默认视角',
+      analysisNote: 'AI analysis failed, using default viewpoints',
     };
   }
 }
@@ -217,7 +217,7 @@ export async function analyzeMultipleScenesViewpoints(
   for (let i = 0; i < scenesWithShots.length; i++) {
     const { scene, shots } = scenesWithShots[i];
     
-    onProgress?.(i + 1, scenesWithShots.length, scene.name || scene.location || '未知场景');
+    onProgress?.(i + 1, scenesWithShots.length, scene.name || scene.location || 'Unknown scene');
     
     const result = await analyzeSceneViewpoints(scene, shots, options);
     results.set(scene.id, result);

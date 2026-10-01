@@ -354,7 +354,7 @@ export function ScreenplayInput({ onGenerateStoryboard }: ScreenplayInputProps) 
       const characterDescriptions = selectedCharacters
       .map(c => `Character "${c.characterName}": ${c.visualTraits || 'Designed by AI from the name'}`)
         .join("; ");
-      fullPrompt = `${prompt}\n\n包含以下角色: ${characterDescriptions}`;
+      fullPrompt = `${prompt}\n\nInclude these characters: ${characterDescriptions}`;
     }
     return fullPrompt;
   };

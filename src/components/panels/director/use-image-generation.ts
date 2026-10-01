@@ -273,7 +273,7 @@ export function buildAnchorPhrase(_styleTokens?: string[]): string {
 }
 
 export function composeTilePrompt(scene: SplitScene, angle: Angle, aspect: '16:9'|'9:16', styleTokens?: string[]): string {
-  const base = scene.imagePromptZh?.trim() || scene.imagePrompt?.trim() || scene.videoPromptZh?.trim() || scene.videoPrompt?.trim() || '';
+  const base = scene.imagePrompt?.trim() || scene.imagePromptZh?.trim() || scene.videoPrompt?.trim() || scene.videoPromptZh?.trim() || '';
   const shot = allowedShotFromSize(scene.shotSize);
   const vertical = aspect === '9:16' ? 'vertical composition, tighter framing, avoid letterboxing, ' : '';
   const cameraPart = `${angle}, ${shot}`;
@@ -339,9 +339,9 @@ export function buildGridPrompt(
     const col = (idx % cols) + 1;
     let desc = '';
     if (isEndFrame) {
-      desc = s.endFramePromptZh?.trim() || s.endFramePrompt?.trim() || (s.imagePromptZh || s.imagePrompt || '') + ' end state';
+      desc = s.endFramePrompt?.trim() || s.endFramePromptZh?.trim() || (s.imagePrompt || s.imagePromptZh || '') + ' end state';
     } else {
-      desc = s.imagePromptZh?.trim() || s.imagePrompt?.trim() || s.videoPromptZh?.trim() || s.videoPrompt?.trim() || `scene ${idx + 1}`;
+      desc = s.imagePrompt?.trim() || s.imagePromptZh?.trim() || s.videoPrompt?.trim() || s.videoPromptZh?.trim() || `scene ${idx + 1}`;
     }
     const charCount = s.characterIds?.length || 0;
     const charConstraint = charCount === 0 

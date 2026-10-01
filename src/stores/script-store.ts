@@ -211,7 +211,7 @@ const cloneScriptCharacters = (characters: ScriptCharacter[] | undefined): Scrip
 
 const normalizeScriptProjectData = (
   projectId: string,
-  projectData: Partial<ScriptProjectData> & Record<string, unknown>,
+  projectData: Partial<ScriptProjectData> | undefined,
 ): ScriptProjectData => {
   const defaults = defaultProjectData();
   const defaultCalibration = defaultCalibrationState();
@@ -1119,9 +1119,10 @@ export const useScriptStore = create<ScriptStore>()(
         };
       },
       merge: (
-        persisted: Partial<ScriptStoreState & { projectData?: ScriptProjectData }> | undefined,
+        persistedState: unknown,
         current: ScriptStore,
       ): ScriptStore => {
+        const persisted = persistedState as Partial<ScriptStoreState & { projectData?: ScriptProjectData }> | undefined;
         if (!persisted) return current;
         
         // Legacy format: has `projects` as Record (from old monolithic file)

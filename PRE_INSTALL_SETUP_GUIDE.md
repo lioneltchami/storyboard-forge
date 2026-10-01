@@ -7,14 +7,10 @@
 
 Important: before installing the new version, uninstall the old version first, then install the new version in a different folder path.
 
-### Web beta invitation
-
-[Storyboard Forge web beta](https://moyincreator.com/)
-
 ### Download links
 
 - [GitHub repository](https://github.com/lioneltchami/storyboard-forge)
-- [Baidu Netdisk download](https://pan.baidu.com/s/1ImH6tOIiuFxIDXC0fC-6Lg) with extraction code `8888`
+- [GitHub releases](https://github.com/lioneltchami/storyboard-forge/releases)
 
 ### Installation and usage tutorial
 

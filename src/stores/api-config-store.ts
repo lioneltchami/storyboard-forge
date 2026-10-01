@@ -784,7 +784,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
         set((state) => ({
           featureBindings: { ...state.featureBindings, [feature]: bindings },
         }));
-        console.log(`[APIConfig] Set ${feature} -> [${bindings?.join(', ') || '无'}]`);
+        console.log(`[APIConfig] Set ${feature} -> [${bindings?.join(', ') || 'none'}]`);
       },
       
       // 切换单个绑定（添加/移除）

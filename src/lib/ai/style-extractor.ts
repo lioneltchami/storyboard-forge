@@ -222,11 +222,15 @@ export async function extractStyleTokens(
     throw new Error('The AI response could not be parsed.');
   }
 
+  const category = parsed.category;
   const result: StyleExtractionResult = {
     styleTokens: String(parsed.styleTokens || '').trim(),
     sceneTokens: String(parsed.sceneTokens || '').trim(),
-    category: ['real', '3d', '2d', 'stop_motion'].includes(parsed.category) ? parsed.category : '2d',
     summaryZh: String(parsed.summaryZh || parsed.summary_zh || '').trim(),
+    category:
+      typeof category === 'string' && ['real', '3d', '2d', 'stop_motion'].includes(category)
+        ? category
+        : '2d',
   };
 
   console.log('[StyleExtractor] Extracted:', {

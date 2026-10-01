@@ -121,7 +121,7 @@ export function GenerationPanel({ selectedCharacter, onCharacterCreated }: Gener
   const [identityAnchors, setIdentityAnchors] = useState<CharacterIdentityAnchors | undefined>();
   const [charNegativePrompt, setCharNegativePrompt] = useState<CharacterNegativePrompt | undefined>();
   // === 提示词语言偏好 ===
-  const [promptLanguage, setPromptLanguage] = useState<PromptLanguage>('zh');
+  const [promptLanguage, setPromptLanguage] = useState<PromptLanguage>('en');
   // === 年代信息（从剧本元数据传递）===
   const [storyYear, setStoryYear] = useState<number | undefined>();
   const [era, setEra] = useState<string | undefined>();
@@ -193,12 +193,12 @@ export function GenerationPanel({ selectedCharacter, onCharacterCreated }: Gener
       
       // Also build description for display/generation prompt
       const descParts: string[] = [];
-      if (pendingCharacterData.role) descParts.push(`【身份/背景】\n${pendingCharacterData.role}`);
-      if (pendingCharacterData.traits) descParts.push(`【核心特质】\n${pendingCharacterData.traits}`);
-      if (pendingCharacterData.skills) descParts.push(`【技能/能力】\n${pendingCharacterData.skills}`);
-      if (pendingCharacterData.keyActions) descParts.push(`【关键事迹】\n${pendingCharacterData.keyActions}`);
-      if (pendingCharacterData.appearance) descParts.push(`【外貌特征】\n${pendingCharacterData.appearance}`);
-      if (pendingCharacterData.relationships) descParts.push(`【人物关系】\n${pendingCharacterData.relationships}`);
+      if (pendingCharacterData.role) descParts.push(`[Role / background]\n${pendingCharacterData.role}`);
+      if (pendingCharacterData.traits) descParts.push(`[Core traits]\n${pendingCharacterData.traits}`);
+      if (pendingCharacterData.skills) descParts.push(`[Skills / abilities]\n${pendingCharacterData.skills}`);
+      if (pendingCharacterData.keyActions) descParts.push(`[Key actions]\n${pendingCharacterData.keyActions}`);
+      if (pendingCharacterData.appearance) descParts.push(`[Appearance]\n${pendingCharacterData.appearance}`);
+      if (pendingCharacterData.relationships) descParts.push(`[Relationships]\n${pendingCharacterData.relationships}`);
       if (descParts.length > 0) {
         setDescription(descParts.join("\n\n"));
       }
@@ -378,7 +378,7 @@ export function GenerationPanel({ selectedCharacter, onCharacterCreated }: Gener
     try {
       // 构建提示词：根据语言偏好选择提示词 + 6层身份锚点 + 参考图优先级逻辑 + 年代信息
       // 获取实时的语言偏好（优先使用 pending 传来的，其次从 scriptProject 读取）
-      const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'zh';
+      const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'en';
       const prompt = buildCharacterSheetPrompt(
         description, 
         name, 
@@ -855,7 +855,7 @@ export function GenerationPanel({ selectedCharacter, onCharacterCreated }: Gener
                   
                   {/* Professional visual prompt: show one language at a time and apply edits directly */}
                   {(() => {
-                    const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'zh';
+                    const effectiveLang = promptLanguage || scriptProject?.promptLanguage || 'en';
                     const showZh = effectiveLang === 'zh' || effectiveLang === 'zh+en';
                     const activePrompt = showZh ? visualPromptZh : visualPromptEn;
                     const setActivePrompt = showZh ? setVisualPromptZh : setVisualPromptEn;
@@ -1264,7 +1264,7 @@ function buildCharacterSheetPrompt(
   const isRealistic = stylePreset?.category === 'real';
   
   // 根据语言偏好选择主视觉提示词
-  const lang = promptLanguage || 'zh';
+  const lang = promptLanguage || 'en';
 
   // 构建年代服装提示词（根据语言偏好）
   let eraPrompt = '';

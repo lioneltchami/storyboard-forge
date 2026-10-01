@@ -48,17 +48,17 @@ function summarizeScene(scene: SplitScene, characters: Character[]): string {
     .join('、');
 
   const parts: string[] = [];
-  parts.push(`场景：${scene.sceneName || '未命名'}`);
-  if (scene.sceneLocation) parts.push(`地点：${scene.sceneLocation}`);
-  parts.push(`时长：${scene.duration || 5}s`);
-  if (charNames) parts.push(`角色：${charNames}`);
-  if (scene.actionSummary) parts.push(`动作：${scene.actionSummary}`);
-  if (scene.cameraMovement) parts.push(`运镜：${scene.cameraMovement}`);
-  if (scene.dialogue) parts.push(`对白：${scene.dialogue}`);
-  if (scene.ambientSound) parts.push(`环境音：${scene.ambientSound}`);
-  if (scene.soundEffectText) parts.push(`音效：${scene.soundEffectText}`);
-  if (scene.emotionTags?.length) parts.push(`情绪：${scene.emotionTags.join('、')}`);
-  if (scene.narrativeFunction) parts.push(`叙事功能：${scene.narrativeFunction}`);
+  parts.push(`Scene: ${scene.sceneName || 'Untitled'}`);
+  if (scene.sceneLocation) parts.push(`Location: ${scene.sceneLocation}`);
+  parts.push(`Duration: ${scene.duration || 5}s`);
+  if (charNames) parts.push(`Characters: ${charNames}`);
+  if (scene.actionSummary) parts.push(`Action: ${scene.actionSummary}`);
+  if (scene.cameraMovement) parts.push(`Camera movement: ${scene.cameraMovement}`);
+  if (scene.dialogue) parts.push(`Dialogue: ${scene.dialogue}`);
+  if (scene.ambientSound) parts.push(`Ambient sound: ${scene.ambientSound}`);
+  if (scene.soundEffectText) parts.push(`Sound effects: ${scene.soundEffectText}`);
+  if (scene.emotionTags?.length) parts.push(`Mood: ${scene.emotionTags.join(', ')}`);
+  if (scene.narrativeFunction) parts.push(`Narrative function: ${scene.narrativeFunction}`);
 
   return parts.join('\n  ');
 }
@@ -88,39 +88,39 @@ export async function calibrateGroup(
 
   // ---- 构建输入 ----
   const sceneSummaries = scenes.map((s, i) =>
-    `【镜头${i + 1}】\n  ${summarizeScene(s, characters)}`
+    `[Shot ${i + 1}]\n  ${summarizeScene(s, characters)}`
   ).join('\n\n');
 
-  const systemPrompt = `你是一位资深电影导演兼剪辑师，擅长多镜头叙事视频的节奏把控和叙事连贯性优化。
+  const systemPrompt = `You are a senior film director and editor specializing in pacing, continuity, and multi-shot narrative video.
 
-【核心约束 — 严格执行】
-1. 严格基于以下镜头数据，不得添加剧本中不存在的角色、场景或对白。
-2. 只做叙事连贯优化和过渡设计，不改变各镜头的核心内容和情绪基调。
-3. 保留每个镜头的原有运镜和动作设计，只在镜头衔接处增加过渡指令。
-4. 音频设计必须基于各镜头已有的环境音/音效信息，不凭空创造新音源。
-5. calibratedPrompt 是对所有镜头的整合重写，必须包含每个镜头的核心信息，不遗漏。
+[Core constraints - follow exactly]
+1. Base every decision strictly on the shot data below. Do not add characters, locations, or dialogue that are not in the script.
+2. Improve narrative continuity and transitions only. Do not change each shot's core content or emotional tone.
+3. Preserve each shot's existing camera movement and action design. Add transition guidance only between shots.
+4. Audio design must be based on the existing ambient sound and sound effect details. Do not invent new sound sources.
+5. calibratedPrompt must combine all shots into one complete group-level prompt without omitting any shot.
 
-请以 JSON 格式返回，不要有任何解释文字。`;
+Return JSON only. Do not include explanations outside the JSON. All returned text values must be in English.`;
 
-  const userPrompt = `【组信息】
-组名：${group.name}
-镜头数：${scenes.length}
-总时长：${totalDuration}s
+  const userPrompt = `[Group info]
+Group name: ${group.name}
+Shot count: ${scenes.length}
+Total duration: ${totalDuration}s
 
 ${sceneSummaries}
 
-请输出以下 JSON：
+Return this JSON:
 {
-  "narrativeArc": "用一句话描述这组镜头的叙事弧线（起承转合）",
+  "narrativeArc": "Describe the narrative arc of this shot group in one concise English sentence.",
   "transitions": [
-    "镜头1→镜头2 的过渡指令（如：画面溶解、硬切、声桥过渡等）"
+    "Transition guidance from Shot 1 to Shot 2, such as dissolve, hard cut, or audio bridge."
   ],
-  "groupAudioDesign": "整段 ${totalDuration}s 的音频设计规划（环境音层次、音效时机、情绪曲线）",
-  "calibratedPrompt": "整合优化后的完整组级提示词，中文，用于 Seedance 2.0 多镜头叙事视频生成"
+  "groupAudioDesign": "Audio design plan for the full ${totalDuration}s segment, including ambient layers, sound-effect timing, and emotional curve.",
+  "calibratedPrompt": "Complete optimized English group-level prompt for Seedance 2.0 multi-shot narrative video generation."
 }
 
-transitions 数组长度必须为 ${scenes.length - 1}（每两个相邻镜头之间一条）。
-calibratedPrompt 必须覆盖全部 ${scenes.length} 个镜头，保持镜头编号和时间轴。`;
+The transitions array must contain exactly ${scenes.length - 1} item(s), one for each adjacent shot pair.
+calibratedPrompt must cover all ${scenes.length} shots and preserve shot numbering and timeline order.`;
 
   // ---- 调用 LLM ----
   const raw = await callFeatureAPI('script_analysis', systemPrompt, userPrompt, {

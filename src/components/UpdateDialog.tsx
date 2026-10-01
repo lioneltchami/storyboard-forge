@@ -42,6 +42,10 @@ export function UpdateDialog({
     }
     return formatDateTime(publishedDate, locale);
   }, [locale, updateInfo?.publishedAt]);
+  const releaseNotes = updateInfo?.releaseNotes?.trim();
+  const displayReleaseNotes = releaseNotes && !/[\u3400-\u9fff]/.test(releaseNotes)
+    ? releaseNotes
+    : t(locale, "update.releaseNotesUnavailable");
 
   const handleOpenLink = async (url: string) => {
     if (!window.appUpdater) {
@@ -84,7 +88,7 @@ export function UpdateDialog({
               </div>
             </div>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-6">
-              {updateInfo.releaseNotes?.trim() || t(locale, "update.noReleaseNotes")}
+              {displayReleaseNotes || t(locale, "update.noReleaseNotes")}
             </p>
           </div>
 

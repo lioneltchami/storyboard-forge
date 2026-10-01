@@ -94,8 +94,8 @@ export async function analyzeCharacterStages(
   const userPrompt = `【剧本信息】
 剧名：《${background.title}》
 总集数：${totalEpisodes}集
-类型：${background.genre || '未知'}
-时代：${background.era || '现代'}
+类型：${background.genre || 'Unknown'}
+时代：${background.era || 'Modern'}
 
 【故事大纲】
 ${background.outline?.slice(0, 1500) || '无'}
@@ -103,9 +103,9 @@ ${background.outline?.slice(0, 1500) || '无'}
 【需要分析的角色】
 ${mainCharacters.map(c => `
 角色：${c.name}
-年龄：${c.age || '未知'}
-身份：${c.role || '未知'}
-外貌：${c.appearance || '未知'}
+年龄：${c.age || 'Unknown'}
+身份：${c.role || 'Unknown'}
+外貌：${c.appearance || 'Unknown'}
 `).join('\n')}
 
 请为每个角色分析是否需要多阶段形象，并生成阶段变体数据。

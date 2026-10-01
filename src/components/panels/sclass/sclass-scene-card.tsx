@@ -177,15 +177,16 @@ export function SClassSceneCard({
   // Resolve local-image:// paths to displayable URLs
   const resolvedImageUrl = useResolvedImageUrl(effectiveImageUrl);
   const resolvedEndFrameUrl = useResolvedImageUrl(effectiveEndFrameUrl);
+  const displayPrompt = (english?: string, chinese?: string) => english?.trim() || chinese?.trim() || '';
 
   // Start editing a prompt
   const startEditing = (type: 'image' | 'video' | 'endFrame') => {
     if (type === 'image') {
-      setEditPromptValue(scene.imagePromptZh || scene.imagePrompt || '');
+      setEditPromptValue(displayPrompt(scene.imagePrompt, scene.imagePromptZh));
     } else if (type === 'video') {
-      setEditPromptValue(scene.videoPromptZh || scene.videoPrompt || '');
+      setEditPromptValue(displayPrompt(scene.videoPrompt, scene.videoPromptZh));
     } else {
-      setEditPromptValue(scene.endFramePromptZh || scene.endFramePrompt || '');
+      setEditPromptValue(displayPrompt(scene.endFramePrompt, scene.endFramePromptZh));
     }
     setEditingPrompt(type);
   };
@@ -193,13 +194,13 @@ export function SClassSceneCard({
   // Save prompt
   const handleSavePrompt = () => {
     if (editingPrompt === 'image') {
-      onUpdateImagePrompt(scene.id, scene.imagePrompt, editPromptValue);
+      onUpdateImagePrompt(scene.id, editPromptValue, scene.imagePromptZh);
       toast.success(`Scene ${scene.id + 1} first-frame prompt updated`);
     } else if (editingPrompt === 'video') {
-      onUpdateVideoPrompt(scene.id, scene.videoPrompt, editPromptValue);
+      onUpdateVideoPrompt(scene.id, editPromptValue, scene.videoPromptZh);
       toast.success(`Scene ${scene.id + 1} video prompt updated`);
     } else if (editingPrompt === 'endFrame') {
-      onUpdateEndFramePrompt(scene.id, scene.endFramePrompt, editPromptValue);
+      onUpdateEndFramePrompt(scene.id, editPromptValue, scene.endFramePromptZh);
       toast.success(`Scene ${scene.id + 1} last-frame prompt updated`);
     }
     setEditingPrompt('none');
@@ -895,7 +896,7 @@ export function SClassSceneCard({
               </span>
               <span className={cn(
                 "text-[9px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 border",
-                (scene.imagePromptZh || scene.imagePrompt)
+                displayPrompt(scene.imagePrompt, scene.imagePromptZh)
                   ? "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20"
                   : "bg-muted text-muted-foreground/40 border-transparent"
               )}>
@@ -903,7 +904,7 @@ export function SClassSceneCard({
               </span>
               <span className={cn(
                 "text-[9px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 border",
-                (scene.endFramePromptZh || scene.endFramePrompt)
+                displayPrompt(scene.endFramePrompt, scene.endFramePromptZh)
                   ? "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/20"
                   : scene.needsEndFrame
                     ? "bg-orange-500/5 text-orange-400/60 border-dashed border-orange-400/30"
@@ -913,7 +914,7 @@ export function SClassSceneCard({
               </span>
               <span className={cn(
                 "text-[9px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 border",
-                (scene.videoPromptZh || scene.videoPrompt)
+                displayPrompt(scene.videoPrompt, scene.videoPromptZh)
                   ? "bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/20"
                   : "bg-muted text-muted-foreground/40 border-transparent"
               )}>
@@ -972,7 +973,7 @@ export function SClassSceneCard({
                     onClick={() => !isGeneratingAny && startEditing('image')}
                   >
                     <p className="text-[11px] text-muted-foreground flex-1 line-clamp-2 min-h-[1.5em]">
-                      {scene.imagePromptZh || scene.imagePrompt || "Click to add a first-frame description..."}
+                      {displayPrompt(scene.imagePrompt, scene.imagePromptZh) || "Click to add a first-frame description..."}
                     </p>
                     {!isGeneratingAny && <Edit3 className="h-2.5 w-2.5 text-blue-500/50 shrink-0 mt-0.5" />}
                   </div>
@@ -1017,7 +1018,7 @@ export function SClassSceneCard({
                       "text-[11px] flex-1 line-clamp-2 min-h-[1.5em]",
                       "text-orange-600 dark:text-orange-400"
                     )}>
-                      {scene.endFramePromptZh || scene.endFramePrompt || (scene.needsEndFrame ? "Click to add a last-frame description..." : "Click to add a last-frame description... (optional)")}
+                      {displayPrompt(scene.endFramePrompt, scene.endFramePromptZh) || (scene.needsEndFrame ? "Click to add a last-frame description..." : "Click to add a last-frame description... (optional)")}
                     </p>
                     {!isGeneratingAny && <Edit3 className="h-2.5 w-2.5 text-orange-500/50 shrink-0 mt-0.5" />}
                   </div>
@@ -1055,7 +1056,7 @@ export function SClassSceneCard({
                     onClick={() => !isGeneratingAny && startEditing('video')}
                   >
                     <p className="text-[11px] text-green-600 dark:text-green-400 flex-1 line-clamp-2 min-h-[1.5em]">
-                      {scene.videoPromptZh || scene.videoPrompt || "Click to add a motion description..."}
+                      {displayPrompt(scene.videoPrompt, scene.videoPromptZh) || "Click to add a motion description..."}
                     </p>
                     {!isGeneratingAny && <Edit3 className="h-2.5 w-2.5 text-green-500/50 shrink-0 mt-0.5" />}
                   </div>
@@ -1078,14 +1079,14 @@ export function SClassSceneCard({
                 <span className="shrink-0 inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 font-medium">
                   <ImageIcon className="h-2.5 w-2.5" /> First frame:
                 </span>
-                <span className="text-muted-foreground">{scene.imagePromptZh || scene.imagePrompt || 'Not set'}</span>
+                <span className="text-muted-foreground">{displayPrompt(scene.imagePrompt, scene.imagePromptZh) || 'Not set'}</span>
               </p>
               {(scene.needsEndFrame || scene.endFramePromptZh || scene.endFramePrompt) && (
                 <p className="text-[10px] truncate flex items-center gap-1.5">
                   <span className="shrink-0 inline-flex items-center gap-0.5 text-orange-600 dark:text-orange-400 font-medium">
                     ◉ Last frame:
                   </span>
-                  <span className="text-orange-600/70 dark:text-orange-400/70">{scene.endFramePromptZh || scene.endFramePrompt || 'Not set'}</span>
+                  <span className="text-orange-600/70 dark:text-orange-400/70">{displayPrompt(scene.endFramePrompt, scene.endFramePromptZh) || 'Not set'}</span>
                 </p>
               )}
               <p className="text-[10px] truncate flex items-center gap-1.5">
@@ -1093,7 +1094,7 @@ export function SClassSceneCard({
                   <Play className="h-2.5 w-2.5" /> Video:
                 </span>
                 <span className="text-muted-foreground">
-                  {scene.videoPromptZh || scene.videoPrompt || 'Not set'}
+                  {displayPrompt(scene.videoPrompt, scene.videoPromptZh) || 'Not set'}
                 {scene.cameraMovement && scene.cameraMovement !== 'none' && (
                     <span className="ml-1 text-green-500/50">[{CAMERA_MOVEMENT_PRESETS.find(p => p.id === scene.cameraMovement)?.label || scene.cameraMovement}]</span>
                   )}
