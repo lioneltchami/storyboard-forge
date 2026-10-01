@@ -10,9 +10,8 @@
  * - `local-image://...` → pass through (Electron custom protocol handles directly)
  * - `null/undefined/''` → null
  *
- * Note: `local-image://` is registered as a privileged Electron protocol
- * (bypassCSP, secure) with a handler in main process, so it can be used
- * directly in <img src> without converting to file:// URLs.
+ * Note: `local-image://` is registered as a secure Electron protocol with a
+ * main-process handler. The renderer Content Security Policy still applies.
  */
 
 import { useMemo } from 'react';

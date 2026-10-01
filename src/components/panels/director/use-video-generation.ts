@@ -467,8 +467,7 @@ export async function callVideoGenerationApi(
     if (signal?.aborted) return Promise.reject(new Error('User cancelled'));
     // 每次重试动态取当前 key（keyManager.handleError 已 rotate，需要用新 key）
     const currentApiKey = keyManager?.getCurrentKey?.() || apiKey;
-    const keyHint = currentApiKey ? `${currentApiKey.substring(0, 8)}…` : '(none)';
-    console.log(`[VideoGen] Using key: ${keyHint}, format: ${format}`);
+    console.log(`[VideoGen] Selecting ${format} video endpoint`);
     switch (format) {
       case 'openai_official':
         return callOpenAIOfficialVideoApi(currentApiKey, prompt, videoBaseUrl, model, aspectRatio, duration, videoResolution, onProgress, keyManager, signal);
@@ -600,7 +599,7 @@ async function callUnifiedVideoApi(
   // 绝对路径拼接：从域名根开始
   const rootBase = baseUrl.replace(/\/v\d+$/, '');
   const submitUrl = `${rootBase}${endpointPaths.submit}`;
-  console.log(`[VideoGen] Unified format → POST ${endpointPaths.submit}`, { model, metadata, hasImage: !!firstFrame?.url });
+  console.log(`[VideoGen] Unified format → POST ${endpointPaths.submit}`, { model, hasImage: !!firstFrame?.url });
 
   // 提交：直接使用端点类型对应的 URL
   const resp = await fetch(submitUrl, {
@@ -1044,7 +1043,7 @@ async function callKlingVideoApi(
   }
 
   const submitUrl = `${baseUrl}/kling/v1/videos/${endpointPath}`;
-  console.log('[VideoGen] Kling format →', endpointPath, { model, submitUrl });
+  console.log('[VideoGen] Kling format →', endpointPath, { model });
 
   const submitResponse = await fetch(submitUrl, {
     method: 'POST',

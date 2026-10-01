@@ -406,9 +406,20 @@ export function SettingsPanel() {
   ).length;
 
   const [activeTab, setActiveTab] = useState<string>("api");
+  const [hasSecureKeyStorage, setHasSecureKeyStorage] = useState<boolean | null>(null);
   const hasStorageManager = typeof window !== "undefined" && !!window.storageManager;
   const hasAppUpdater = typeof window !== "undefined" && !!window.appUpdater;
   const updatesEnabled = typeof window !== "undefined" && !!window.appUpdater?.enabled;
+
+  useEffect(() => {
+    if (!window.apiKeyVault) {
+      setHasSecureKeyStorage(false);
+      return;
+    }
+    window.apiKeyVault.getStatus()
+      .then(({ secure }) => setHasSecureKeyStorage(secure))
+      .catch(() => setHasSecureKeyStorage(false));
+  }, []);
 
   const formatBytes = useCallback((bytes: number) => {
     if (!bytes) return "0 B";
@@ -754,10 +765,21 @@ export function SettingsPanel() {
             <div>
               <h3 className="font-medium text-foreground text-sm">Security note</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                API keys are stored locally on this device and are not uploaded to our servers. Multiple keys are supported, with automatic fallback on failure.
+                API keys are encrypted with this device’s OS credential store. Requests go directly to the providers you configure. Multiple keys are supported, with automatic fallback on failure.
               </p>
             </div>
           </div>
+          {hasSecureKeyStorage === false && (
+            <div role="alert" className="flex items-start gap-3 p-4 border border-amber-500/40 bg-amber-500/10 rounded-lg">
+              <ShieldAlert className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+              <div>
+                <h3 className="font-medium text-foreground text-sm">Secure credential storage unavailable</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  API keys can be used until you close the app, but will not be saved. Set up your operating system’s secure credential store and re-enter keys to keep them between sessions.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* MemeFast purchase guidance */}
           <a

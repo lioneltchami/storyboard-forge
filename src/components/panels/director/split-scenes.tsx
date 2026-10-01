@@ -1456,27 +1456,8 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     const scene = splitScenes.find(s => s.id === sceneId);
     if (!scene) return;
 
-    // Debug: Check API store state
-    const apiStore = useAPIConfigStore.getState();
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[SplitScenes] API Store state:', {
-        providers: apiStore.providers.length,
-        apiKeys: Object.keys(apiStore.apiKeys),
-        memefastKey: apiStore.apiKeys['memefast'] ? 'set' : 'not set',
-        getApiKey_memefast: apiStore.getApiKey('memefast') ? 'set' : 'not set',
-      });
-    }
-
     // Use feature router with key rotation support
     const featureConfig = getFeatureConfig('video_generation');
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[SplitScenes] Feature config for video_generation:', featureConfig ? {
-        platform: featureConfig.platform,
-        model: featureConfig.models?.[0],
-        apiKey: featureConfig.apiKey ? `${featureConfig.apiKey.substring(0, 8)}...` : 'empty',
-        providerId: featureConfig.provider?.id,
-      } : 'null');
-    }
     
     if (!featureConfig) {
       toast.error(getFeatureNotConfiguredMessage('video_generation'));
@@ -1494,10 +1475,6 @@ export function SplitScenes({ onBack, onGenerateVideos }: SplitScenesProps) {
     if (!videoBaseUrl) {
       toast.error('Configure the video-generation service mapping in Settings first');
       return;
-    }
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[SplitScenes] Using video config:', { platform, model, videoBaseUrl });
     }
     
     // Get rotating key from manager

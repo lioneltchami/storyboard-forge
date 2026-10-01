@@ -234,7 +234,6 @@ export async function callFeatureAPI(
   console.log(`[callFeatureAPI] 功能: ${feature}`);
   console.log(`[callFeatureAPI] 供应商: ${config.provider.name} (${config.platform})`);
   console.log(`[callFeatureAPI] 模型: ${model}`);
-  console.log(`[callFeatureAPI] BaseURL: ${baseUrl}`);
   
   // 调用底层 API
   // 结构化 JSON 输出任务默认关闭深度思考，避免 reasoning 耗尽 token

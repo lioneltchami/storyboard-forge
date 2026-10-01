@@ -3,12 +3,12 @@
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
 /**
  * API Config Store v2
- * Manages API providers and keys with localStorage persistence
+ * Manages API providers and keeps credentials outside the persisted settings payload
  * Supports multi-key rotation and IProvider interface (AionUi pattern)
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import type { ProviderId, ServiceType } from '@opencut/ai-core';
 import { 
   type IProvider, 
@@ -535,6 +535,160 @@ const initialState: APIConfigState = {
   discoveredModelLimits: {},
 };
 
+type SecureApiKeyBundle = {
+  providers: Record<string, string>;
+  imageHostProviders: Record<string, string>;
+  legacy: Record<string, string>;
+};
+
+const emptySecureApiKeyBundle = (): SecureApiKeyBundle => ({ providers: {}, imageHostProviders: {}, legacy: {} });
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function takeSecureApiKeys(state: Record<string, unknown>): SecureApiKeyBundle {
+  const keys = emptySecureApiKeyBundle();
+  const providers = Array.isArray(state.providers) ? state.providers : [];
+  for (const value of providers) {
+    if (!isRecord(value)) continue;
+    if (typeof value.id === 'string' && typeof value.apiKey === 'string' && value.apiKey) {
+      keys.providers[value.id] = value.apiKey;
+    }
+    if (typeof value.apiKey === 'string') value.apiKey = '';
+  }
+
+  const imageHostProviders = Array.isArray(state.imageHostProviders) ? state.imageHostProviders : [];
+  for (const value of imageHostProviders) {
+    if (!isRecord(value)) continue;
+    if (typeof value.id === 'string' && typeof value.apiKey === 'string' && value.apiKey) {
+      keys.imageHostProviders[value.id] = value.apiKey;
+    }
+    if (typeof value.apiKey === 'string') value.apiKey = '';
+  }
+
+  if (isRecord(state.apiKeys)) {
+    for (const [provider, key] of Object.entries(state.apiKeys)) {
+      if (typeof key === 'string' && key) keys.legacy[provider] = key;
+    }
+    state.apiKeys = {};
+  }
+
+  return keys;
+}
+
+function mergeSecureApiKeys(
+  current: SecureApiKeyBundle,
+  incoming: SecureApiKeyBundle,
+): SecureApiKeyBundle {
+  return {
+    providers: { ...current.providers, ...incoming.providers },
+    imageHostProviders: { ...current.imageHostProviders, ...incoming.imageHostProviders },
+    legacy: { ...current.legacy, ...incoming.legacy },
+  };
+}
+
+function restoreSecureApiKeys(state: Record<string, unknown>, keys: SecureApiKeyBundle) {
+  const providers = Array.isArray(state.providers) ? state.providers : [];
+  for (const value of providers) {
+    if (isRecord(value) && typeof value.id === 'string' && keys.providers[value.id]) {
+      value.apiKey = keys.providers[value.id];
+    }
+  }
+
+  const imageHostProviders = Array.isArray(state.imageHostProviders) ? state.imageHostProviders : [];
+  for (const value of imageHostProviders) {
+    if (isRecord(value) && typeof value.id === 'string' && keys.imageHostProviders[value.id]) {
+      value.apiKey = keys.imageHostProviders[value.id];
+    }
+  }
+
+  state.apiKeys = { ...keys.legacy };
+}
+
+const apiConfigStateStorage: StateStorage = {
+  async getItem(name) {
+    const raw = localStorage.getItem(name);
+    if (!raw) return raw;
+
+    let envelope: { state?: unknown; version?: number } | undefined;
+    let persistedState: Record<string, unknown> | undefined;
+    let foundKeys = emptySecureApiKeyBundle();
+    try {
+      envelope = JSON.parse(raw) as { state?: unknown; version?: number };
+      if (!isRecord(envelope.state)) return raw;
+      persistedState = envelope.state;
+      foundKeys = takeSecureApiKeys(persistedState);
+
+      if (!window.apiKeyVault) {
+        localStorage.setItem(name, JSON.stringify(envelope));
+        restoreSecureApiKeys(persistedState, foundKeys);
+        console.warn('[APIConfig] OS credential storage is unavailable; API keys will only be kept for this session.');
+        return JSON.stringify(envelope);
+      }
+
+      const stored = await window.apiKeyVault.read();
+      if (!stored.success) throw new Error('Secure credential storage could not be read');
+
+      const secureKeys = mergeSecureApiKeys({
+        providers: stored.keys?.providers || {},
+        imageHostProviders: stored.keys?.imageHostProviders || {},
+        legacy: stored.keys?.legacy || {},
+      }, foundKeys);
+      const hasLegacyKeys = Object.values(foundKeys).some((entries) => Object.keys(entries).length > 0);
+      if (hasLegacyKeys) {
+        const saved = await window.apiKeyVault.write(secureKeys);
+        if (!saved.success) throw new Error('Secure credential migration could not be saved');
+        localStorage.setItem(name, JSON.stringify(envelope));
+      }
+
+      restoreSecureApiKeys(persistedState, secureKeys);
+      return JSON.stringify(envelope);
+    } catch (error) {
+      console.error('[APIConfig] Could not migrate saved credentials to secure storage:', error);
+      if (envelope && persistedState) {
+        if (window.apiKeyVault) {
+          try {
+            const recovered = await window.apiKeyVault.write(foundKeys);
+            if (!recovered.success) await window.apiKeyVault.clear();
+          } catch {
+            // Keep migrated values in memory for this session if the OS vault fails.
+          }
+        }
+        localStorage.setItem(name, JSON.stringify(envelope));
+        restoreSecureApiKeys(persistedState, foundKeys);
+        return JSON.stringify(envelope);
+      }
+      return null;
+    }
+  },
+
+  async setItem(name, value) {
+    try {
+      const envelope = JSON.parse(value) as { state?: unknown; version?: number };
+      if (!isRecord(envelope.state)) return;
+      const keys = takeSecureApiKeys(envelope.state);
+      localStorage.setItem(name, JSON.stringify(envelope));
+      if (window.apiKeyVault) {
+        const saved = await window.apiKeyVault.write(keys);
+        if (!saved.success) {
+          await window.apiKeyVault.clear();
+          console.error('[APIConfig] OS credential storage could not save API keys.');
+        }
+      } else if (Object.values(keys).some((entries) => Object.keys(entries).length > 0)) {
+        console.warn('[APIConfig] OS credential storage is unavailable; API keys will only be kept for this session.');
+      }
+    } catch (error) {
+      console.error('[APIConfig] Could not persist settings:', error);
+    }
+  },
+
+  async removeItem(name) {
+    localStorage.removeItem(name);
+    await window.apiKeyVault?.clear();
+  },
+};
+
 // ==================== Store ====================
 
 export const useAPIConfigStore = create<APIConfigStore>()(
@@ -908,7 +1062,6 @@ export const useAPIConfigStore = create<APIConfigStore>()(
           get().updateProvider({ ...existingProvider, apiKey: key });
         }
         
-        console.log(`[APIConfig] Updated ${provider} API key: ${get().maskApiKey(key)}`);
       },
 
       getApiKey: (provider) => {
@@ -1130,6 +1283,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
     }),
     {
       name: 'opencut-api-config',  // localStorage key
+      storage: createJSONStorage(() => apiConfigStateStorage),
       version: 13,  // v13: clear stale metadata caches on upgrade + fix chained migration
       migrate: (persistedState: unknown, version: number) => {
         // Use mutable result object for chained migration
@@ -1408,7 +1562,7 @@ export const useAPIConfigStore = create<APIConfigStore>()(
                   name: p.name?.trim() ? p.name : template.name,
                 };
                 if (updated.baseUrl !== p.baseUrl || updated.name !== p.name) {
-                  console.log(`[APIConfig] v12→v13: Updated ${p.platform} baseUrl: "${p.baseUrl}" -> "${template.baseUrl}"`);
+                  console.log(`[APIConfig] v12→v13: Refreshed defaults for ${p.platform}`);
                 }
                 return updated;
               }

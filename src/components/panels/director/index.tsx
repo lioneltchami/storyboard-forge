@@ -176,7 +176,6 @@ export function DirectorView() {
       const model = featureConfig.models[0]; // 获取第一个模型
       const baseUrl = featureConfig.baseUrl;
       
-      console.log('[DirectorView] Using image generation config:', { provider, model, baseUrl });
 
       const result = await generateStoryboardImage(
         {
@@ -237,7 +236,6 @@ export function DirectorView() {
     const model = videoConfig.models[0]; // 获取第一个模型
     const baseUrl = videoConfig.baseUrl;
     
-    console.log('[DirectorView] Using video generation config:', { provider, model, baseUrl });
 
     toast.info(`Generating videos for ${splitScenes.length} scenes... (using ${provider} ${model || ''})`);
 
