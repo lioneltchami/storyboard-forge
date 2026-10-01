@@ -446,7 +446,6 @@ export function ScriptView() {
       // 使用配置的 provider，不再硬编码
       const provider = (featureConfig?.platform === 'zhipu' ? 'zhipu' : 'openai') as string;
       
-      console.log('[handleGenerateEpisodeShots] apiKey length:', apiKey.length);
       console.log('[handleGenerateEpisodeShots] provider:', provider, '(from config:', featureConfig?.platform, ')');
       
       const options = {

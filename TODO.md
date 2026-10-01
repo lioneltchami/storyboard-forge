@@ -1,5 +1,9 @@
 # TODO
 
+## Security hardening
+
+- [ ] t1 Harden stored API credentials, renderer IPC, Electron defaults, and local media path validation. Verify with the macOS arm64 build and TypeScript check.
+
 ## Release / updater
 
 - Point the app updater at Storyboard Forge's own release feed on `lioneltchami/storyboard-forge`.

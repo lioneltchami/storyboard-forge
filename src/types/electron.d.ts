@@ -7,17 +7,17 @@ export {};
 
 declare global {
   interface Window {
-    ipcRenderer?: {
-      on: (channel: string, listener: (event: unknown, ...args: unknown[]) => void) => void;
-      off: (channel: string, listener: (event: unknown, ...args: unknown[]) => void) => void;
-      send: (channel: string, ...args: unknown[]) => void;
-      invoke: (channel: string, ...args: unknown[]) => Promise<unknown>;
+    apiKeyVault?: {
+      getStatus: () => Promise<{ secure: boolean }>;
+      read: () => Promise<{ success: boolean; keys?: { providers?: Record<string, string>; imageHostProviders?: Record<string, string>; legacy?: Record<string, string> } }>;
+      write: (keys: { providers: Record<string, string>; imageHostProviders: Record<string, string>; legacy: Record<string, string> }) => Promise<{ success: boolean }>;
+      clear: () => Promise<{ success: boolean }>;
     };
     imageStorage?: {
       saveImage: (url: string, category: string, filename: string) => Promise<{ success: boolean; localPath?: string; error?: string }>;
       getImagePath: (localPath: string) => Promise<string | null>;
       deleteImage: (localPath: string) => Promise<boolean>;
-      readAsBase64: (localPath: string) => Promise<string | null>;
+      readAsBase64: (localPath: string) => Promise<{ success: boolean; base64?: string; mimeType?: string; size?: number; error?: string }>;
       getAbsolutePath: (localPath: string) => Promise<string | null>;
     };
     fileStorage?: {

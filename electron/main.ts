@@ -1,9 +1,10 @@
 // Copyright (c) 2025 hotflow2024
 // Licensed under AGPL-3.0-or-later. See LICENSE for details.
 // Commercial licensing available. See COMMERCIAL_LICENSE.md.
-import { app, BrowserWindow, ipcMain, protocol, net, dialog, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, protocol, net, dialog, safeStorage, shell } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import https from 'node:https'
 import http from 'node:http'
 import os from 'node:os'
@@ -30,6 +31,88 @@ export const RENDERER_DIST = path.join(__dirname, '../renderer')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+
+function isAllowedRendererUrl(rawUrl: string) {
+  try {
+    const parsed = new URL(rawUrl)
+    if (VITE_DEV_SERVER_URL) {
+      const devOrigin = new URL(VITE_DEV_SERVER_URL)
+      return parsed.origin === devOrigin.origin
+    }
+    return parsed.protocol === 'file:'
+      && fileURLToPath(parsed) === path.join(RENDERER_DIST, 'index.html')
+  } catch {
+    return false
+  }
+}
+
+function registerRendererHandler(channel: string, handler: Parameters<typeof ipcMain.handle>[1]) {
+  ipcMain['handle'](channel, (event, ...args) => {
+    if (event.sender !== win?.webContents
+      || event.senderFrame !== event.sender.mainFrame
+      || !isAllowedRendererUrl(event.senderFrame.url)) {
+      throw new Error(`Blocked IPC request from an untrusted renderer: ${channel}`)
+    }
+    return handler(event, ...args)
+  })
+}
+
+type SecureApiKeyBundle = {
+  providers: Record<string, string>
+  imageHostProviders: Record<string, string>
+  legacy: Record<string, string>
+}
+
+const apiKeyVaultPath = () => path.join(app.getPath('userData'), 'api-key-vault.bin')
+
+function isSecureStorageAvailable() {
+  if (!safeStorage.isEncryptionAvailable()) return false
+  return process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    && Object.values(value).every((entry) => typeof entry === 'string')
+}
+
+function readApiKeyVault(): { success: boolean; keys?: SecureApiKeyBundle } {
+  if (!isSecureStorageAvailable()) return { success: false }
+  const vaultPath = apiKeyVaultPath()
+  if (!fs.existsSync(vaultPath)) {
+    return { success: true, keys: { providers: {}, imageHostProviders: {}, legacy: {} } }
+  }
+
+  try {
+    const content = JSON.parse(safeStorage.decryptString(fs.readFileSync(vaultPath))) as Partial<SecureApiKeyBundle>
+    if (!isStringRecord(content.providers)
+      || !isStringRecord(content.imageHostProviders)
+      || !isStringRecord(content.legacy)) return { success: false }
+    return { success: true, keys: content as SecureApiKeyBundle }
+  } catch {
+    return { success: false }
+  }
+}
+
+function writeApiKeyVault(keys: SecureApiKeyBundle): { success: boolean } {
+  if (!isSecureStorageAvailable()
+    || !isStringRecord(keys.providers)
+    || !isStringRecord(keys.imageHostProviders)
+    || !isStringRecord(keys.legacy)) return { success: false }
+
+  try {
+    const serialized = JSON.stringify(keys)
+    if (serialized.length > 4 * 1024 * 1024) return { success: false }
+    const encrypted = safeStorage.encryptString(serialized)
+    const vaultPath = apiKeyVaultPath()
+    const tempPath = `${vaultPath}.${process.pid}.tmp`
+    fs.mkdirSync(path.dirname(vaultPath), { recursive: true, mode: 0o700 })
+    fs.writeFileSync(tempPath, encrypted, { mode: 0o600 })
+    fs.renameSync(tempPath, vaultPath)
+    return { success: true }
+  } catch {
+    return { success: false }
+  }
+}
 
 type PackageUpdateConfig = {
   enabled?: boolean
@@ -105,6 +188,17 @@ function getDefaultBaiduCode() {
     : undefined
 }
 
+function isSecureProviderUrl(value: string) {
+  try {
+    const url = new URL(value)
+    if (url.protocol === 'https:') return true
+    return url.protocol === 'http:'
+      && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname.toLowerCase())
+  } catch {
+    return false
+  }
+}
+
 function areUpdatesEnabled() {
   return packageUpdateConfig.enabled !== false && !!getUpdateManifestUrl()
 }
@@ -177,12 +271,10 @@ function createWindow() {
     minHeight: 700,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.cjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
     },
-  })
-
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
   })
 
   // Open external links in system browser instead of inside Electron
@@ -194,12 +286,9 @@ function createWindow() {
   })
 
   win.webContents.on('will-navigate', (event, url) => {
-    // Allow navigating to the app itself (dev server or local file)
-    if (VITE_DEV_SERVER_URL && url.startsWith(VITE_DEV_SERVER_URL)) return
-    if (url.startsWith('file://')) return
-    // Block and open externally
+    if (isAllowedRendererUrl(url)) return
     event.preventDefault()
-    shell.openExternal(url)
+    if (url.startsWith('http://') || url.startsWith('https://')) shell.openExternal(url)
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -278,6 +367,46 @@ function ensureDir(dirPath: string) {
 
 function normalizePath(inputPath: string) {
   return path.isAbsolute(inputPath) ? inputPath : path.resolve(inputPath)
+}
+
+function resolveContainedPath(rootPath: string, relativePath: string, allowRoot = false): string | null {
+  if (typeof relativePath !== 'string' || relativePath.includes('\0')) return null
+  const normalized = relativePath.replace(/\\/g, '/')
+  if (path.posix.isAbsolute(normalized) || /^[A-Za-z]:/.test(normalized)) return null
+  const segments = normalized === '' && allowRoot ? [] : normalized.split('/')
+  if (segments.some((segment) => !segment || segment === '.' || segment === '..' || segment.includes(':'))) return null
+
+  try {
+    const root = fs.realpathSync(rootPath)
+    const resolved = path.resolve(root, ...segments)
+    const relative = path.relative(root, resolved)
+    if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return null
+
+    let current = root
+    for (const segment of segments) {
+      current = path.join(current, segment)
+      if (fs.existsSync(current) && fs.lstatSync(current).isSymbolicLink()) return null
+    }
+    return resolved
+  } catch {
+    return null
+  }
+}
+
+function resolveLocalImagePath(localPath: string): string | null {
+  return resolveLocalMediaPath(localPath, 'local-image:')
+}
+
+function resolveLocalMediaPath(localPath: string, scheme: 'local-image:' | 'local-video:'): string | null {
+  try {
+    const parsed = new URL(localPath)
+    if (parsed.protocol !== scheme || parsed.search || parsed.hash) return null
+    const category = decodeURIComponent(parsed.hostname)
+    const filename = decodeURIComponent(parsed.pathname.slice(1))
+    return resolveContainedPath(getMediaRoot(), `${category}/${filename}`)
+  } catch {
+    return null
+  }
 }
 
 // Check if childPath is inside parentPath (subdirectory)
@@ -428,7 +557,8 @@ async function clearCache(olderThanDays?: number): Promise<number> {
 
 // Get user data path for storing images
 const getImagesDir = (subDir: string) => {
-  const imagesDir = path.join(getMediaRoot(), subDir)
+  const imagesDir = resolveContainedPath(getMediaRoot(), subDir)
+  if (!imagesDir) throw new Error('Invalid image category')
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true })
   }
@@ -719,6 +849,10 @@ async function uploadImageHostFromMain({
     if (!uploadUrl) {
       return { success: false, error: 'The image host upload URL is not configured' }
     }
+    const url = new URL(uploadUrl)
+    if (!isSecureProviderUrl(url.toString())) {
+      return { success: false, error: 'Image-host upload URLs must use HTTPS; HTTP is allowed only for localhost.' }
+    }
 
     const fieldName = provider.imageField || 'image'
     const nameField = provider.nameField || 'name'
@@ -745,7 +879,6 @@ async function uploadImageHostFromMain({
       formData.append(nameField, options.name)
     }
 
-    const url = new URL(uploadUrl)
     if (provider.apiKeyParam && apiKey) {
       url.searchParams.set(provider.apiKeyParam, apiKey)
     }
@@ -827,8 +960,11 @@ async function uploadImageHostFromMain({
 }
 
 // IPC handlers for image management
-ipcMain.handle('save-image', async (_event, { url, category, filename }) => {
+registerRendererHandler('save-image', async (_event, { url, category, filename }) => {
   try {
+    if (typeof url !== 'string' || typeof category !== 'string' || typeof filename !== 'string') {
+      return { success: false, error: 'Invalid image request' }
+    }
     const imagesDir = getImagesDir(category)
     const ext = path.extname(filename) || '.png'
     const safeName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`
@@ -864,28 +1000,16 @@ ipcMain.handle('save-image', async (_event, { url, category, filename }) => {
   }
 })
 
-ipcMain.handle('get-image-path', async (_event, localPath: string) => {
-  // Convert local-image://category/filename to actual file path
-  const match = localPath.match(/^local-image:\/\/(.+)\/(.+)$/)
-  if (!match) return null
-  
-  const [, category, filename] = match
-  const filePath = path.join(getMediaRoot(), category, filename)
-  
-  if (fs.existsSync(filePath)) {
-    // Windows: file:///H:/path/to/file.png (三斜杠 + 正斜杠)
-    return `file:///${filePath.replace(/\\/g, '/')}`
-  }
-  return null
+registerRendererHandler('get-image-path', async (_event, localPath: string) => {
+  const filePath = resolveLocalImagePath(localPath)
+  return filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()
+    ? pathToFileURL(filePath).toString()
+    : null
 })
 
-ipcMain.handle('delete-image', async (_event, localPath: string) => {
-  const match = localPath.match(/^local-image:\/\/(.+)\/(.+)$/)
-  if (!match) return false
-  
-  const [, category, filename] = match
-  const filePath = path.join(getMediaRoot(), category, filename)
-  
+registerRendererHandler('delete-image', async (_event, localPath: string) => {
+  const filePath = resolveLocalImagePath(localPath)
+  if (!filePath) return false
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath)
@@ -897,22 +1021,10 @@ ipcMain.handle('delete-image', async (_event, localPath: string) => {
 })
 
 // Read local image as base64 (for AI API calls)
-ipcMain.handle('read-image-base64', async (_event, localPath: string) => {
+registerRendererHandler('read-image-base64', async (_event, localPath: string) => {
   try {
-    let filePath: string
-    
-    // Handle local-image:// protocol
-    const match = localPath.match(/^local-image:\/\/(.+)\/(.+)$/)
-    if (match) {
-      const [, category, filename] = match
-      filePath = path.join(getMediaRoot(), category, decodeURIComponent(filename))
-    } else if (localPath.startsWith('file://')) {
-      filePath = localPath.replace('file://', '')
-    } else {
-      filePath = localPath
-    }
-    
-    if (!fs.existsSync(filePath)) {
+    const filePath = resolveLocalImagePath(localPath)
+    if (!filePath || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
       return { success: false, error: 'File not found' }
     }
     
@@ -936,20 +1048,12 @@ ipcMain.handle('read-image-base64', async (_event, localPath: string) => {
 })
 
 // Get absolute file path for a local-image:// URL
-ipcMain.handle('get-absolute-path', async (_event, localPath: string) => {
-  const match = localPath.match(/^local-image:\/\/(.+)\/(.+)$/)
-  if (!match) return null
-  
-  const [, category, filename] = match
-  const filePath = path.join(getMediaRoot(), category, decodeURIComponent(filename))
-  
-  if (fs.existsSync(filePath)) {
-    return filePath
-  }
-  return null
+registerRendererHandler('get-absolute-path', async (_event, localPath: string) => {
+  const filePath = resolveLocalImagePath(localPath)
+  return filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile() ? filePath : null
 })
 
-ipcMain.handle('image-host-upload', async (_event, payload: ImageHostUploadRequest) => {
+registerRendererHandler('image-host-upload', async (_event, payload: ImageHostUploadRequest) => {
   return uploadImageHostFromMain(payload)
 })
 
@@ -962,10 +1066,32 @@ const getDataDir = () => {
   return dataDir
 }
 
-ipcMain.handle('file-storage-get', async (_event, key: string) => {
+function resolveStorageFile(key: string) {
+  if (typeof key !== 'string' || !key) return null
+  return resolveContainedPath(getDataDir(), `${key}.json`)
+}
+
+function resolveStorageDirectory(prefix: string, allowRoot = false) {
+  if (typeof prefix !== 'string') return null
+  return resolveContainedPath(getDataDir(), prefix, allowRoot)
+}
+
+registerRendererHandler('api-key-vault-read', async () => readApiKeyVault())
+registerRendererHandler('api-key-vault-status', async () => ({ secure: isSecureStorageAvailable() }))
+registerRendererHandler('api-key-vault-write', async (_event, keys: SecureApiKeyBundle) => writeApiKeyVault(keys))
+registerRendererHandler('api-key-vault-clear', async () => {
   try {
-    const filePath = path.join(getDataDir(), `${key}.json`)
-    if (fs.existsSync(filePath)) {
+    fs.rmSync(apiKeyVaultPath(), { force: true })
+    return { success: true }
+  } catch {
+    return { success: false }
+  }
+})
+
+registerRendererHandler('file-storage-get', async (_event, key: string) => {
+  try {
+    const filePath = resolveStorageFile(key)
+    if (filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const data = fs.readFileSync(filePath, 'utf-8')
       return data
     }
@@ -976,9 +1102,10 @@ ipcMain.handle('file-storage-get', async (_event, key: string) => {
   }
 })
 
-ipcMain.handle('file-storage-set', async (_event, key: string, value: string) => {
+registerRendererHandler('file-storage-set', async (_event, key: string, value: string) => {
   try {
-    const filePath = path.join(getDataDir(), `${key}.json`)
+    const filePath = resolveStorageFile(key)
+    if (!filePath || typeof value !== 'string') return false
     // Ensure parent directory exists (supports nested keys like _p/xxx/script)
     const parentDir = path.dirname(filePath)
     ensureDir(parentDir)
@@ -991,9 +1118,10 @@ ipcMain.handle('file-storage-set', async (_event, key: string, value: string) =>
   }
 })
 
-ipcMain.handle('file-storage-remove', async (_event, key: string) => {
+registerRendererHandler('file-storage-remove', async (_event, key: string) => {
   try {
-    const filePath = path.join(getDataDir(), `${key}.json`)
+    const filePath = resolveStorageFile(key)
+    if (!filePath) return false
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath)
     }
@@ -1005,20 +1133,20 @@ ipcMain.handle('file-storage-remove', async (_event, key: string) => {
 })
 
 // Check if a storage key exists
-ipcMain.handle('file-storage-exists', async (_event, key: string) => {
+registerRendererHandler('file-storage-exists', async (_event, key: string) => {
   try {
-    const filePath = path.join(getDataDir(), `${key}.json`)
-    return fs.existsSync(filePath)
+    const filePath = resolveStorageFile(key)
+    return !!filePath && fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   } catch {
     return false
   }
 })
 
 // List sub-directories under a directory prefix (used to discover project IDs under _p/)
-ipcMain.handle('file-storage-list-dirs', async (_event, prefix: string) => {
+registerRendererHandler('file-storage-list-dirs', async (_event, prefix: string) => {
   try {
-    const dirPath = path.join(getDataDir(), prefix)
-    if (!fs.existsSync(dirPath)) return []
+    const dirPath = resolveStorageDirectory(prefix, true)
+    if (!dirPath || !fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) return []
     const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
     return entries
       .filter(e => e.isDirectory() && !e.name.startsWith('.') && e.name !== '_migrated')
@@ -1029,24 +1157,25 @@ ipcMain.handle('file-storage-list-dirs', async (_event, prefix: string) => {
 })
 
 // List all JSON keys under a directory prefix
-ipcMain.handle('file-storage-list', async (_event, prefix: string) => {
+registerRendererHandler('file-storage-list', async (_event, prefix: string) => {
   try {
-    const dirPath = path.join(getDataDir(), prefix)
-    if (!fs.existsSync(dirPath)) return []
+    const dirPath = resolveStorageDirectory(prefix, true)
+    if (!dirPath || !fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) return []
     const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
     return entries
       .filter(e => e.isFile() && e.name.endsWith('.json'))
-      .map(e => `${prefix}/${e.name.replace('.json', '')}`)
+      .map(e => prefix ? `${prefix}/${e.name.replace('.json', '')}` : e.name.replace('.json', ''))
   } catch {
     return []
   }
 })
 
 // Remove an entire directory (for project deletion)
-ipcMain.handle('file-storage-remove-dir', async (_event, prefix: string) => {
+registerRendererHandler('file-storage-remove-dir', async (_event, prefix: string) => {
   try {
-    const dirPath = path.join(getDataDir(), prefix)
-    if (fs.existsSync(dirPath)) {
+    const dirPath = resolveStorageDirectory(prefix)
+    if (!dirPath) return false
+    if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
       await fs.promises.rm(dirPath, { recursive: true, force: true })
     }
     return true
@@ -1056,7 +1185,7 @@ ipcMain.handle('file-storage-remove-dir', async (_event, prefix: string) => {
   }
 })
 // ==================== Storage Manager ====================
-ipcMain.handle('storage-get-paths', async () => {
+registerRendererHandler('storage-get-paths', async () => {
   return {
     basePath: getStorageBasePath(),
     projectPath: getProjectDataRoot(),
@@ -1065,7 +1194,7 @@ ipcMain.handle('storage-get-paths', async () => {
   }
 })
 
-ipcMain.handle('storage-select-directory', async () => {
+registerRendererHandler('storage-select-directory', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory', 'createDirectory'],
   })
@@ -1074,7 +1203,7 @@ ipcMain.handle('storage-select-directory', async () => {
 })
 
 // Validate if a directory contains valid data (projects/ subfolder with .json files or _p/ dirs)
-ipcMain.handle('storage-validate-data-dir', async (_event, dirPath: string) => {
+registerRendererHandler('storage-validate-data-dir', async (_event, dirPath: string) => {
   try {
     if (!dirPath) return { valid: false, error: 'Path is required' }
     const target = normalizePath(dirPath)
@@ -1116,7 +1245,7 @@ ipcMain.handle('storage-validate-data-dir', async (_event, dirPath: string) => {
 })
 
 // Link to existing data directory (no data movement)
-ipcMain.handle('storage-link-data', async (_event, dirPath: string) => {
+registerRendererHandler('storage-link-data', async (_event, dirPath: string) => {
   try {
     if (!dirPath) return { success: false, error: 'Path is required' }
     const target = normalizePath(dirPath)
@@ -1146,7 +1275,7 @@ ipcMain.handle('storage-link-data', async (_event, dirPath: string) => {
 })
 
 // Move all data to new location (single operation)
-ipcMain.handle('storage-move-data', async (_event, newPath: string) => {
+registerRendererHandler('storage-move-data', async (_event, newPath: string) => {
   try {
     if (!newPath) return { success: false, error: 'Path is required' }
     const target = normalizePath(newPath)
@@ -1211,7 +1340,7 @@ ipcMain.handle('storage-move-data', async (_event, newPath: string) => {
 })
 
 // Export all data
-ipcMain.handle('storage-export-data', async (_event, targetPath: string) => {
+registerRendererHandler('storage-export-data', async (_event, targetPath: string) => {
   try {
     if (!targetPath) return { success: false, error: 'Path is required' }
     const exportDir = path.join(
@@ -1238,7 +1367,7 @@ ipcMain.handle('storage-export-data', async (_event, targetPath: string) => {
 })
 
 // Import all data (with backup for safety)
-ipcMain.handle('storage-import-data', async (_event, sourcePath: string) => {
+registerRendererHandler('storage-import-data', async (_event, sourcePath: string) => {
   try {
     if (!sourcePath) return { success: false, error: 'Path is required' }
     const source = normalizePath(sourcePath)
@@ -1318,12 +1447,12 @@ ipcMain.handle('storage-import-data', async (_event, sourcePath: string) => {
 })
 
 // Legacy handlers (kept for backward compatibility but redirect to new ones)
-ipcMain.handle('storage-validate-project-dir', async (_event, dirPath: string) => {
+registerRendererHandler('storage-validate-project-dir', async (_event, dirPath: string) => {
   // Redirect to new unified handler
   return ipcMain.emit('storage-validate-data-dir', null, dirPath)
 })
 
-ipcMain.handle('storage-link-project-data', async (_event, dirPath: string) => {
+registerRendererHandler('storage-link-project-data', async (_event, dirPath: string) => {
   // For legacy: assume dirPath is the projects folder, use parent as base
   const target = normalizePath(dirPath)
   const basePath = path.dirname(target)
@@ -1334,7 +1463,7 @@ ipcMain.handle('storage-link-project-data', async (_event, dirPath: string) => {
   return { success: true, path: basePath }
 })
 
-ipcMain.handle('storage-link-media-data', async (_event, dirPath: string) => {
+registerRendererHandler('storage-link-media-data', async (_event, dirPath: string) => {
   // For legacy: assume dirPath is the media folder, use parent as base
   const target = normalizePath(dirPath)
   const basePath = path.dirname(target)
@@ -1345,14 +1474,14 @@ ipcMain.handle('storage-link-media-data', async (_event, dirPath: string) => {
   return { success: true, path: basePath }
 })
 
-ipcMain.handle('storage-move-project-data', async () => {
+registerRendererHandler('storage-move-project-data', async () => {
   return { success: false, error: 'Please use the new unified storage path feature' }
 })
-ipcMain.handle('storage-move-media-data', async () => {
+registerRendererHandler('storage-move-media-data', async () => {
   return { success: false, error: 'Please use the new unified storage path feature' }
 })
 
-ipcMain.handle('storage-export-project-data', async (_event, targetPath: string) => {
+registerRendererHandler('storage-export-project-data', async (_event, targetPath: string) => {
   // Redirect to unified export
   try {
     if (!targetPath) return { success: false, error: 'Path is required' }
@@ -1370,7 +1499,7 @@ ipcMain.handle('storage-export-project-data', async (_event, targetPath: string)
   }
 })
 
-ipcMain.handle('storage-import-project-data', async (_event, sourcePath: string) => {
+registerRendererHandler('storage-import-project-data', async (_event, sourcePath: string) => {
   try {
     if (!sourcePath) return { success: false, error: 'Path is required' }
     const source = normalizePath(sourcePath)
@@ -1432,7 +1561,7 @@ ipcMain.handle('storage-import-project-data', async (_event, sourcePath: string)
   }
 })
 
-ipcMain.handle('storage-export-media-data', async (_event, targetPath: string) => {
+registerRendererHandler('storage-export-media-data', async (_event, targetPath: string) => {
   // Legacy: redirect to unified export
   try {
     if (!targetPath) return { success: false, error: 'Path cannot be empty' }
@@ -1451,7 +1580,7 @@ ipcMain.handle('storage-export-media-data', async (_event, targetPath: string) =
   }
 })
 
-ipcMain.handle('storage-import-media-data', async (_event, sourcePath: string) => {
+registerRendererHandler('storage-import-media-data', async (_event, sourcePath: string) => {
   try {
     if (!sourcePath) return { success: false, error: 'Path cannot be empty' }
     const target = getMediaRoot()
@@ -1488,7 +1617,7 @@ ipcMain.handle('storage-import-media-data', async (_event, sourcePath: string) =
   }
 })
 
-ipcMain.handle('storage-get-cache-size', async () => {
+registerRendererHandler('storage-get-cache-size', async () => {
   const dirs = getCacheDirs()
   const details = await Promise.all(
     dirs.map(async (dirPath) => ({
@@ -1500,7 +1629,7 @@ ipcMain.handle('storage-get-cache-size', async () => {
   return { total, details }
 })
 
-ipcMain.handle('storage-clear-cache', async (_event, options?: { olderThanDays?: number }) => {
+registerRendererHandler('storage-clear-cache', async (_event, options?: { olderThanDays?: number }) => {
   try {
     const clearedBytes = await clearCache(options?.olderThanDays)
     return { success: true, clearedBytes }
@@ -1510,18 +1639,18 @@ ipcMain.handle('storage-clear-cache', async (_event, options?: { olderThanDays?:
   }
 })
 
-ipcMain.handle('storage-update-config', async (_event, config: { autoCleanEnabled?: boolean; autoCleanDays?: number }) => {
+registerRendererHandler('storage-update-config', async (_event, config: { autoCleanEnabled?: boolean; autoCleanDays?: number }) => {
   storageConfig = { ...storageConfig, ...config }
   saveStorageConfig()
   scheduleAutoClean()
   return true
 })
 
-ipcMain.handle('app-updater-get-current-version', async () => {
+registerRendererHandler('app-updater-get-current-version', async () => {
   return app.getVersion()
 })
 
-ipcMain.handle('app-updater-check', async (): Promise<UpdateCheckResult> => {
+registerRendererHandler('app-updater-check', async (): Promise<UpdateCheckResult> => {
   const currentVersion = app.getVersion()
   try {
     const update = await resolveAvailableUpdate(currentVersion)
@@ -1541,7 +1670,7 @@ ipcMain.handle('app-updater-check', async (): Promise<UpdateCheckResult> => {
   }
 })
 
-ipcMain.handle('app-updater-open-link', async (_event, url: string): Promise<OpenExternalResult> => {
+registerRendererHandler('app-updater-open-link', async (_event, url: string): Promise<OpenExternalResult> => {
   const safeUrl = sanitizeExternalUrl(url)
   if (!safeUrl) {
     return { success: false, error: 'Invalid download link' }
@@ -1560,35 +1689,23 @@ ipcMain.handle('app-updater-open-link', async (_event, url: string): Promise<Ope
 })
 
 // ==================== File Export (Save Dialog) ====================
-ipcMain.handle('save-file-dialog', async (_event, { localPath, defaultPath, filters }: { localPath: string, defaultPath: string, filters: { name: string, extensions: string[] }[] }) => {
+registerRendererHandler('save-file-dialog', async (_event, { localPath, defaultPath, filters }: { localPath: string, defaultPath: string, filters: { name: string, extensions: string[] }[] }) => {
   try {
-    // Resolve the source file path
-    let sourcePath: string | null = null
-    
-    // Handle local-image:// and local-video:// protocols
-    const imageMatch = localPath.match(/^local-image:\/\/(.+)\/(.+)$/)
-    const videoMatch = localPath.match(/^local-video:\/\/(.+)\/(.+)$/)
-    
-    if (imageMatch) {
-      const [, category, filename] = imageMatch
-      sourcePath = path.join(getMediaRoot(), category, decodeURIComponent(filename))
-    } else if (videoMatch) {
-      const [, category, filename] = videoMatch
-      sourcePath = path.join(getMediaRoot(), category, decodeURIComponent(filename))
-    } else if (localPath.startsWith('file://')) {
-      sourcePath = localPath.replace('file://', '')
-    } else {
-      sourcePath = localPath
+    if (typeof localPath !== 'string' || typeof defaultPath !== 'string' || !Array.isArray(filters)) {
+      return { success: false, error: 'Invalid export request' }
     }
-    
-    if (!sourcePath || !fs.existsSync(sourcePath)) {
+    const sourcePath = resolveLocalMediaPath(localPath, 'local-image:')
+      || resolveLocalMediaPath(localPath, 'local-video:')
+    if (!sourcePath || !fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
       return { success: false, error: 'Source file not found' }
     }
     
     // Show save dialog
     const result = await dialog.showSaveDialog({
-      defaultPath: defaultPath,
-      filters: filters,
+      defaultPath: path.basename(defaultPath),
+      filters: filters.filter((filter) => typeof filter?.name === 'string'
+        && Array.isArray(filter.extensions)
+        && filter.extensions.every((extension) => typeof extension === 'string' && /^[a-z0-9]+$/i.test(extension))),
     })
     
     if (result.canceled || !result.filePath) {
@@ -1779,7 +1896,7 @@ protocol.registerSchemesAsPrivileged([{
   privileges: {
     secure: true,
     supportFetchAPI: true,
-    bypassCSP: true,
+    bypassCSP: false,
     stream: true,
   }
 }])
@@ -1801,7 +1918,10 @@ app.whenReady().then(() => {
       const url = new URL(request.url)
       const category = url.hostname
       const filename = decodeURIComponent(url.pathname.slice(1)) // Remove leading / and decode
-      const filePath = path.join(getMediaRoot(), category, filename)
+      const filePath = resolveContainedPath(getMediaRoot(), `${category}/${filename}`)
+      if (!filePath || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+        return new Response('Image not found', { status: 404 })
+      }
       
       // Read file directly
       const data = fs.readFileSync(filePath)

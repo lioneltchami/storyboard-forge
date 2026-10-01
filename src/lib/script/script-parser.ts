@@ -216,9 +216,7 @@ export async function callChatAPI(
   
   console.log('\n[callChatAPI] ==================== API 调用开始 ====================');
   console.log('[callChatAPI] provider:', provider);
-  console.log('[callChatAPI] apiKey 长度:', apiKey?.length || 0);
   console.log('[callChatAPI] apiKey 是否为空:', !apiKey);
-  console.log('[callChatAPI] baseUrl:', baseUrl);
   console.log('[callChatAPI] systemPrompt 长度:', systemPrompt.length);
   console.log('[callChatAPI] userPrompt 长度:', userPrompt.length);
   

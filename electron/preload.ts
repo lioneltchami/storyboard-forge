@@ -14,24 +14,13 @@ type PackageMetadata = {
 
 const updatesEnabled = (packageMetadata as PackageMetadata).updateConfig?.enabled !== false
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
-  },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.off(channel, ...omit)
-  },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.send(channel, ...omit)
-  },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.invoke(channel, ...omit)
-  },
+// --------- Expose narrowly-scoped APIs to the renderer ---------
+contextBridge.exposeInMainWorld('apiKeyVault', {
+  getStatus: () => ipcRenderer.invoke('api-key-vault-status'),
+  read: () => ipcRenderer.invoke('api-key-vault-read'),
+  write: (keys: { providers: Record<string, string>; imageHostProviders: Record<string, string>; legacy: Record<string, string> }) =>
+    ipcRenderer.invoke('api-key-vault-write', keys),
+  clear: () => ipcRenderer.invoke('api-key-vault-clear'),
 })
 
 // Image storage API

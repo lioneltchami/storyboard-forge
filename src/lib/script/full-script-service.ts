@@ -455,9 +455,7 @@ export async function generateEpisodeShots(
     
     console.log('\n============================================');
     console.log('[generateEpisodeShots] === 开始 AI 视角分析 ===');
-    console.log('[generateEpisodeShots] apiKey:', options.apiKey ? `已配置(长度${options.apiKey.length})` : '未配置');
     console.log('[generateEpisodeShots] provider:', options.provider);
-    console.log('[generateEpisodeShots] baseUrl:', options.baseUrl || '默认');
     console.log('[generateEpisodeShots] episodeScenes.length:', episodeScenes.length);
     console.log('[generateEpisodeShots] newShots.length:', newShots.length);
     console.log('============================================\n');

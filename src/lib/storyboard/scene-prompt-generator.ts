@@ -437,7 +437,7 @@ Return a RAW JSON array (no markdown code block). BILINGUAL output required.
     ];
 
     const endpoint = buildEndpoint(baseUrl, 'chat/completions');
-    console.log('[ScenePromptGenerator] Calling chat completion:', { model, hasImage: true, endpoint });
+    console.log('[ScenePromptGenerator] Calling chat completion:', { model, hasImage: true });
 
     const response = await fetch(endpoint, {
       method: 'POST',

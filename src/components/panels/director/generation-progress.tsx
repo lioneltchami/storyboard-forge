@@ -139,9 +139,7 @@ export function GenerationProgress() {
       // Prepare config with API keys
       // Spread apiKeys to avoid zustand proxy serialization issues
       const apiKeysCopy = { ...apiKeys };
-      console.log('[GenerationProgress] apiKeys from store:', apiKeysCopy);
-      console.log('[GenerationProgress] apiKeys.memefast:', apiKeysCopy?.memefast ? 'SET' : 'NOT SET');
-      
+
       const execConfig = {
         ...config,
         apiKeys: apiKeysCopy,
@@ -150,15 +148,8 @@ export function GenerationProgress() {
       
       // Execute based on mode
       if (isImageMode) {
-        console.log('[GenerationProgress] Starting image generation with config:', execConfig);
-        console.log('[GenerationProgress] execConfig.apiKeys:', execConfig.apiKeys);
         workerBridge.executeScreenplayImages(screenplay, execConfig);
       } else {
-        console.log('[GenerationProgress] Starting video generation with config:', execConfig);
-        // Debug: Log each scene's imageUrl before sending to worker
-        for (const scene of screenplay.scenes) {
-          console.log(`[GenerationProgress] Scene ${scene.sceneId} imageUrl: ${scene.imageUrl || 'NOT SET'}`);
-        }
         workerBridge.executeScreenplayVideos(screenplay, execConfig);
       }
     } catch (error) {

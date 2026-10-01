@@ -671,9 +671,6 @@ async function handleExecuteScreenplayImages(command: { type: string; payload: {
   const apiKeys = (config as any).apiKeys || {};
   const concurrency = config.concurrency || 1;
   
-  console.log('[AI Worker] Config apiKeys:', JSON.stringify(apiKeys));
-  console.log('[AI Worker] Config keys:', Object.keys(config as any));
-  
   // Validate API key (required for image generation)
   const imageKey = apiKeys.memefast || '';
   if (!imageKey && !mockImage) {
@@ -698,7 +695,6 @@ async function handleExecuteScreenplayImages(command: { type: string; payload: {
   // Get character reference images from config
   const characterReferenceImages = (config as any).characterReferenceImages || [];
   console.log(`[AI Worker] Using ${characterReferenceImages.length} character reference images`);
-  console.log(`[AI Worker] Image API Key: ${imageKey ? imageKey.substring(0, 10) + '...' : 'NOT SET'}`);
   
   // Prepare extended config with API keys
   const extendedConfig = {
